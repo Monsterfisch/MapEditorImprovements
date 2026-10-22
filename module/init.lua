@@ -21,12 +21,13 @@
 
   The counts use no code patches. The landscape editor's menu items are a static table handed
   to the Menu constructor by a CRT initializer (push table / mov ecx, menu / call Menu::Menu).
-  A copy of that table is built with two items added - the "i" button, and at the end of the
-  part of the menu that is always shown, an invisible item that draws the tooltip on top of
-  everything before it - and the counted buttons' render functions are replaced by wrappers
-  that run the game's button renderer and then draw the number in the game's own number style
-  (the one the siege engines' ammunition count uses). The push is pointed at the copy, and if
-  the menu has been built already, it is built again.
+  A copy of that table is built with items added: the "i" button; at the end of the part of
+  the menu that is always shown, an invisible item that draws the tooltip on top of
+  everything before it; and at the end of the Animals and Vegetation tabs an invisible item
+  that draws the numbers of the tab's buttons, after all of them, so no neighbouring picture
+  covers a number. The numbers use the game's own number style (the one the siege engines'
+  ammunition count uses). The push is pointed at the copy, and if the menu has been built
+  already, it is built again.
 
   Slots in use are counted once a frame, in assembly, while the counts are shown: the tree,
   rock and group arrays are walked the way the game's own "find a free slot" functions walk
@@ -67,7 +68,9 @@ local ITEM_IMAGE, ITEM_RENDER_TYPE, ITEM_TEXT = 0x20, 0x24, 0x2C
 local TYPE_CLICKABLE, TYPE_GROUP_START, TYPE_BLOCK, TYPE_END = 3, 0x01000000, 0x64, 0x66
 local TYPE_GROUP_MEMBER_MASK, TYPE_GROUP_MEMBER = 0xFF000000, 0x02000000
 local RENDER_SIMPLE, RENDER_IMAGE = 1, 3
+local ITEM_HOVERED, ITEM_MENU = 0x32, 0x4C
 local MENU_X, MENU_Y = 0x04, 0x08        -- the menu's position on screen
+local MENU_SCROLL = 0x14                 -- subtracted from x when drawing
 
 -- Item 9 is the line that shows the description of the button under the mouse.
 local HOVER_TEXT_ITEM = 9
@@ -85,16 +88,15 @@ local HOVER_TEXT_MOVED_X = 56
 local DEER, LION, RABBIT, CAMEL = 220, 221, 222, 223
 local VEGETATION, ANIMALS, ROCKS = 234, 235, 237
 
--- MenuItemRenderFunction_MapEditorLandscaping_GeneralButtons: the hover flag, the item
--- position globals (width and height follow the position) and the store that switches the
--- texture renderer to the screen (0) before drawing; 1 draws on the map surface.
+-- MenuItemRenderFunction_MapEditorLandscaping_GeneralButtons: the item position globals
+-- (width follows the position) and the store that switches the texture renderer to the
+-- screen (0) before drawing; 1 draws on the map surface.
 local BUTTON_RENDER = {
-  hover = { 0x01, { 0x8B, 0x35 } },
   y = { 0xEF, { 0x8B, 0x15 } },
   x = { 0xF8, { 0xA1 } },
   drawMode = { 0xC8, { 0xC7, 0x05 } },
 }
-local BUTTON_WIDTH, BUTTON_HEIGHT = 0x08, 0x0C   -- from the x global
+local BUTTON_WIDTH = 0x08                -- from the x global
 
 -- The description line's renderer: mov eax,[esp+4] / push eax / mov ecx, state / call / ret,
 -- and in the function it calls, the camera offset it adds for the map layer.
@@ -137,6 +139,7 @@ local MENU_ITEM_IS_INSIDE = 0x1E
 -- The tooltip.
 local TOOLTIP_FONT, TOOLTIP_COLOUR = 0x12, 0xB8EEFB  -- the description line's own style
 local TOOLTIP_LINE, TOOLTIP_PADDING, TOOLTIP_GAP = 16, 6, 4
+local ALIGN_RIGHT = -1                   -- the text ends at x
 
 -- The free slot searches. Slots run from 1 to the last one they test.
 -- LandscapeState::createTree: the first slot's "in use" word, the last slot, the slot size.
@@ -253,43 +256,47 @@ skip:
 jmp HOVER_RENDER
 ]]
 
--- Render function for a counted button: draw the button, then its number at the bottom.
-local COUNTED_BUTTON = [[
-mov eax,[esp+4]
-push eax
-call BUTTON_RENDER
-add esp,4
+-- Render function for the last item of a tab: the numbers of the tab's counted buttons, drawn
+-- after every button of the tab so no neighbouring picture covers them. The item's param is
+-- a list of (button item, counter) pairs ending in 0. A button's place on screen is worked
+-- out the way the menu's render pass does it (menu position - scroll + item position); its
+-- size is what the render pass took from the picture.
+local TAB_NUMBERS = [[
 cmp byte [SHOWN],0
 je done
-mov eax,[esp+4]
-mov ecx,COUNTERS
-scan_next:
-mov edx,[ecx]
-test edx,edx
-je done
-cmp edx,eax
-je found_it
-add ecx,8
-jmp scan_next
-found_it:
-mov edx,[ecx+4]
+push esi
+mov esi,[esp+8]
+next_button:
+mov eax,[esi]
+test eax,eax
+je finished
+mov ecx,[eax+ITEM_MENU]
+mov edx,[ecx+MENU_X]
+sub edx,[ecx+MENU_SCROLL]
+add edx,[eax+ITEM_X]
+mov ecx,[ecx+MENU_Y]
+add ecx,[eax+ITEM_Y]
+add ecx,[eax+ITEM_HEIGHT]
+sub ecx,NUMBER_FROM_BOTTOM
+mov eax,[eax+ITEM_WIDTH]
+sar eax,1
+add edx,eax
+mov eax,[esi+4]
 push 0
 push 0
 push NUMBER_FONT
 push 0
 push NUMBER_COLOUR
 push 1
-mov eax,[ITEM_Y]
-add eax,[ITEM_HEIGHT]
-sub eax,NUMBER_FROM_BOTTOM
-push eax
-mov eax,[ITEM_WIDTH]
-sar eax,1
-add eax,[ITEM_X]
-push eax
-push dword [edx]
+push ecx
+push edx
+push dword [eax]
 mov ecx,TEXT_MANAGER
 call RENDER_NUMBER
+add esi,8
+jmp next_button
+finished:
+pop esi
 done:
 ret
 ]]
@@ -427,12 +434,12 @@ local function resolveMenu(G)
   -- The buttons by command, the render function their groups give them, the block each one
   -- is in (the tab id of the 0x64 marker before it, 0 for the part that is always shown), and
   -- where the always shown part ends.
-  G.buttons = {}
+  G.buttons, G.blockEnd = {}, {}
   local groupRender, block = nil, 0
   for i = 0, ITEM_COUNT - 1 do
     local itemType = rd32(item(G.table, i, ITEM_TYPE))
     if itemType == TYPE_BLOCK then
-      if block == 0 then G.firstBlock = i end
+      if block == 0 then G.firstBlock = i else G.blockEnd[block] = G.blockEnd[block] or i end
       block = rd32(item(G.table, i, ITEM_PARAM))
     elseif itemType == TYPE_GROUP_START then
       groupRender = rd32(item(G.table, i, ITEM_RENDER))
@@ -445,8 +452,9 @@ local function resolveMenu(G)
       end
     end
   end
-  if G.firstBlock == nil then
-    error(MODULE_NAME .. ": the landscape editor's menu has no tabs")
+  if block ~= 0 then G.blockEnd[block] = G.blockEnd[block] or ITEM_COUNT end
+  if G.firstBlock == nil or G.blockEnd[ANIMALS] == nil or G.blockEnd[VEGETATION] == nil then
+    error(MODULE_NAME .. ": the landscape editor's menu has not got the tabs this module knows")
   end
   for _, param in ipairs({ DEER, LION, RABBIT, CAMEL, VEGETATION, ANIMALS, ROCKS }) do
     if G.buttons[param] == nil then
@@ -467,7 +475,6 @@ local function resolveMenu(G)
       error(MODULE_NAME .. ": the landscape editor's buttons are drawn by an unknown function")
     end
   end
-  G.hover = readOperand(G.buttonRender, BUTTON_RENDER.hover, "the editor button renderer")
   G.itemY = readOperand(G.buttonRender, BUTTON_RENDER.y, "the editor button renderer")
   G.itemX = readOperand(G.buttonRender, BUTTON_RENDER.x, "the editor button renderer")
   G.drawMode = readOperand(G.buttonRender, BUTTON_RENDER.drawMode, "the editor button renderer")
@@ -565,12 +572,14 @@ local function makeTooltip(G, newTable, moved, data)
     return { { "Rocks", rd32(data.totals + 4), G.rockSlots } }
   end
 
+  -- The tooltip sits to the left of the button. Its text is right-aligned, so a longer text
+  -- makes the box grow to the left, away from the button.
   return function()
     for _, param in ipairs({ ANIMALS, VEGETATION, ROCKS }) do
       local button = item(newTable, moved(G.buttons[param].index))
       local x = rd32(G.menu + MENU_X) + rd32(button + ITEM_X)
       local y = rd32(G.menu + MENU_Y) + rd32(button + ITEM_Y)
-      if rd16(button + 0x32) ~= 0
+      if rd16(button + ITEM_HOVERED) ~= 0
           and isMouseInside(G.mouse, x, y, rd32(button + ITEM_WIDTH), rd32(button + ITEM_HEIGHT)) ~= 0 then
         local shown, widest = lines(param), 0
         for i, line in ipairs(shown) do
@@ -579,15 +588,16 @@ local function makeTooltip(G, newTable, moved, data)
           widest = math.max(widest, textWidth(G.textManager, lineBuffers[i], #text, TOOLTIP_FONT))
         end
         local right = x - TOOLTIP_GAP
-        local left = math.max(right - widest - 2 * TOOLTIP_PADDING, rd32(G.menu + MENU_X) + 2)
+        local left = math.max(right - widest - 2 * TOOLTIP_PADDING, 0)
         local bottom = y + #shown * TOOLTIP_LINE + TOOLTIP_PADDING
         local target = rd32(G.pencil + PENCIL_TARGET)
         wr32(G.pencil + PENCIL_TARGET, 0)
         roundedBox(G.pencil, left, y, right, bottom, BOX_BLEND)
         wr32(G.pencil + PENCIL_TARGET, target)
         for i = 1, #shown do
-          shadowedText(G.textManager, lineBuffers[i], left + TOOLTIP_PADDING,
-            y + TOOLTIP_PADDING / 2 + (i - 1) * TOOLTIP_LINE, 0, TOOLTIP_COLOUR, 0, TOOLTIP_FONT, 0, 0)
+          shadowedText(G.textManager, lineBuffers[i], right - TOOLTIP_PADDING,
+            y + TOOLTIP_PADDING // 2 + (i - 1) * TOOLTIP_LINE, ALIGN_RIGHT, TOOLTIP_COLOUR, 0, TOOLTIP_FONT,
+            0, 0)
         end
         return
       end
@@ -599,22 +609,34 @@ end
 -- Map counts: the new item table
 ---------------------------------------------------------------------------------------
 
--- Copies the item table with the "i" button and the tooltip item inserted, and points the
--- counted buttons and the description line at the wrappers.
+-- Copies the item table with the new items inserted: the "i" button in front of item
+-- INFO_BEFORE_ITEM, the tooltip at the end of the always shown part, and at the end of the
+-- Animals and Vegetation tabs an item that draws the numbers of the tab's buttons.
 local function buildTable(G, shown)
-  -- The "i" goes in front of item INFO_BEFORE_ITEM, the tooltip in front of the first tab.
-  local newTable = core.allocate((ITEM_COUNT + 3) * MENU_ITEM_SIZE, true)
-  local function moved(index)
-    if index >= G.firstBlock then return index + 2 end
-    if index >= INFO_BEFORE_ITEM then return index + 1 end
-    return index
+  local inserts = {
+    [INFO_BEFORE_ITEM] = { "info" },
+    [G.firstBlock] = { "tooltip" },
+  }
+  for _, tab in ipairs({ ANIMALS, VEGETATION }) do
+    local before = G.blockEnd[tab]
+    inserts[before] = inserts[before] or {}
+    table.insert(inserts[before], tab)
   end
-  local infoIndex, tooltipIndex = INFO_BEFORE_ITEM, G.firstBlock + 1
-  core.writeBytes(newTable, core.readBytes(G.table, INFO_BEFORE_ITEM * MENU_ITEM_SIZE))
-  core.writeBytes(item(newTable, moved(INFO_BEFORE_ITEM)), core.readBytes(item(G.table, INFO_BEFORE_ITEM),
-    (G.firstBlock - INFO_BEFORE_ITEM) * MENU_ITEM_SIZE))
-  core.writeBytes(item(newTable, moved(G.firstBlock)), core.readBytes(item(G.table, G.firstBlock),
-    (ITEM_COUNT + 1 - G.firstBlock) * MENU_ITEM_SIZE))
+  local count = ITEM_COUNT + 1
+  for _, list in pairs(inserts) do count = count + #list end
+
+  local newTable = core.allocate(count * MENU_ITEM_SIZE, true)
+  local movedTo, added, slot = {}, {}, 0
+  for i = 0, ITEM_COUNT do
+    for _, kind in ipairs(inserts[i] or {}) do
+      added[kind] = slot
+      slot = slot + 1
+    end
+    core.writeBytes(item(newTable, slot), core.readBytes(item(G.table, i), MENU_ITEM_SIZE))
+    movedTo[i] = slot
+    slot = slot + 1
+  end
+  local function moved(index) return movedTo[index] end
 
   local data = {}
   data.shown = core.allocate(4, true)
@@ -629,34 +651,38 @@ local function buildTable(G, shown)
     FIRST_ROCK = G.firstRock, ROCK_SLOTS = G.rockSlots, ROCK_SIZE = G.rockSize,
     FIRST_GROUP = G.firstGroup, GROUP_SLOTS = G.groupSlots, GROUP_SIZE = G.groupSize,
   })
-  wr32(item(newTable, HOVER_TEXT_ITEM, ITEM_RENDER), core.allocateAssembly(DESCRIPTION_LINE, {
+  wr32(item(newTable, moved(HOVER_TEXT_ITEM), ITEM_RENDER), core.allocateAssembly(DESCRIPTION_LINE, {
     SHOWN = data.shown, COUNT_SLOTS = countSlots, HOVER_RENDER = G.hoverRender,
   }))
-  wr32(item(newTable, HOVER_TEXT_ITEM, ITEM_X), HOVER_TEXT_MOVED_X)
+  wr32(item(newTable, moved(HOVER_TEXT_ITEM), ITEM_X), HOVER_TEXT_MOVED_X)
 
-  -- The animal and plant buttons and the counter each one shows.
-  local counted = {}
-  for param, address in pairs(G.animals) do counted[#counted + 1] = { param, address } end
+  -- The numbers of the Animals and Vegetation tabs: per tab a list of (button, counter).
+  local counted = { [ANIMALS] = {}, [VEGETATION] = {} }
+  for param, address in pairs(G.animals) do table.insert(counted[ANIMALS], { param, address }) end
   for _, param in ipairs(G.plants) do
-    counted[#counted + 1] = { param, data.typeCounts + G.plantTypes[param] * 4 }
+    table.insert(counted[VEGETATION], { param, data.typeCounts + G.plantTypes[param] * 4 })
   end
-  local counters = core.allocate((#counted + 1) * 8, true)
-  for i, entry in ipairs(counted) do
-    wr32(counters + (i - 1) * 8, entry[1])
-    wr32(counters + (i - 1) * 8 + 4, entry[2])
-  end
-  local countedRender = core.allocateAssembly(COUNTED_BUTTON, {
-    BUTTON_RENDER = G.buttonRender, SHOWN = data.shown, COUNTERS = counters,
-    NUMBER_FONT = NUMBER_FONT, NUMBER_COLOUR = NUMBER_COLOUR, NUMBER_FROM_BOTTOM = NUMBER_FROM_BOTTOM,
-    ITEM_X = G.itemX, ITEM_Y = G.itemY, ITEM_WIDTH = G.itemX + BUTTON_WIDTH,
-    ITEM_HEIGHT = G.itemX + BUTTON_HEIGHT, TEXT_MANAGER = G.textManager, RENDER_NUMBER = G.renderNumber,
+  local tabNumbers = core.allocateAssembly(TAB_NUMBERS, {
+    SHOWN = data.shown, ITEM_MENU = ITEM_MENU, MENU_X = MENU_X, MENU_Y = MENU_Y,
+    MENU_SCROLL = MENU_SCROLL, ITEM_X = ITEM_X, ITEM_Y = ITEM_Y, ITEM_WIDTH = ITEM_WIDTH,
+    ITEM_HEIGHT = ITEM_HEIGHT, NUMBER_FROM_BOTTOM = NUMBER_FROM_BOTTOM, NUMBER_FONT = NUMBER_FONT,
+    NUMBER_COLOUR = NUMBER_COLOUR, TEXT_MANAGER = G.textManager, RENDER_NUMBER = G.renderNumber,
   })
-  for _, entry in ipairs(counted) do
-    wr32(item(newTable, moved(G.buttons[entry[1]].index), ITEM_RENDER), countedRender)
+  for tab, list in pairs(counted) do
+    local buttons = core.allocate((#list + 1) * 8, true)
+    for i, entry in ipairs(list) do
+      wr32(buttons + (i - 1) * 8, item(newTable, moved(G.buttons[entry[1]].index)))
+      wr32(buttons + (i - 1) * 8 + 4, entry[2])
+    end
+    local numbers = item(newTable, added[tab])
+    wr32(numbers + ITEM_TYPE, TYPE_CLICKABLE)    -- no size, so never under the mouse
+    wr32(numbers + ITEM_PARAM, buttons)
+    wr32(numbers + ITEM_RENDER, tabNumbers)
+    wr32(numbers + ITEM_RENDER_TYPE, RENDER_SIMPLE)
   end
 
   -- The "i" button.
-  local info = item(newTable, infoIndex)
+  local info = item(newTable, added.info)
   wr32(info + ITEM_TYPE, TYPE_CLICKABLE)
   wr32(info + ITEM_X, INFO_BUTTON[1])
   wr32(info + ITEM_Y, INFO_BUTTON[2])
@@ -683,16 +709,15 @@ local function buildTable(G, shown)
     end
     return registers
   end, pad, 5)
-  local tooltip = item(newTable, tooltipIndex)
+  local tooltip = item(newTable, added.tooltip)
   wr32(tooltip + ITEM_TYPE, TYPE_CLICKABLE)
   wr32(tooltip + ITEM_RENDER, core.allocateAssembly(TOOLTIP, {
     SHOWN = data.shown, PAD = pad,
-    ANIMALS_HOVER = item(newTable, moved(G.buttons[ANIMALS].index)) + 0x32,
-    VEGETATION_HOVER = item(newTable, moved(G.buttons[VEGETATION].index)) + 0x32,
-    ROCKS_HOVER = item(newTable, moved(G.buttons[ROCKS].index)) + 0x32,
+    ANIMALS_HOVER = item(newTable, moved(G.buttons[ANIMALS].index), ITEM_HOVERED),
+    VEGETATION_HOVER = item(newTable, moved(G.buttons[VEGETATION].index), ITEM_HOVERED),
+    ROCKS_HOVER = item(newTable, moved(G.buttons[ROCKS].index), ITEM_HOVERED),
   }))
   wr32(tooltip + ITEM_RENDER_TYPE, RENDER_SIMPLE)
-  wr32(tooltip + ITEM_TEXT, 0)
 
   return newTable, data.shown
 end
