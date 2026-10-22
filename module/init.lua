@@ -32,8 +32,9 @@
   Slots in use are counted once a frame, in assembly, while the counts are shown: the tree,
   rock and group arrays are walked the way the game's own "find a free slot" functions walk
   them, whose code also gives the slot counts and sizes. The tooltip can reach past the
-  panel onto the side decoration, which the game only paints in the menu's initial drawing;
-  once a tooltip goes away it asks for that drawing, as a click on a category button does.
+  panel onto the edge pictures beside it, which the game only paints in the menu's initial
+  drawing, and there only when the view's preparation has set a flag for it; once a tooltip
+  goes away it sets that flag and asks for that drawing, as a click on a category button does.
   The tooltip itself is drawn from lua,
   and only while the mouse is on one of the three category buttons.
 
@@ -140,6 +141,10 @@ local CATEGORY_CLICK = {
   repaint = { 0x62, { 0xC7, 0x05 } },
   present = { 0x6C, { 0xC7, 0x05 } },
 }
+-- MenuView_MapEditorLandscaping_Prepare, which the tab switch runs first: it sets the flag
+-- without which the initial drawing leaves out the edge pictures beside the panel.
+local AOB_LANDSCAPE_PREPARE = "6A 00 6A 1D C7 05 ? ? ? ? 01 00 00 00 E8 ? ? ? ? 6A 01 6A 15 E8"
+local PREPARE_EDGES = 0x06
 
 -- handleMenuItems, where it asks whether the mouse is over an item: the mouse and its
 -- "is the mouse in this box" test. (The ui module patches the function's start.)
@@ -340,6 +345,7 @@ quiet:
 cmp dword [DRAWN],0
 je nothing
 mov dword [DRAWN],0
+mov dword [EDGES],1
 mov dword [REPAINT],1
 mov dword [PRESENT],1
 nothing:
@@ -509,6 +515,7 @@ local function resolveMenu(G)
   local categoryClick = G.buttons[ANIMALS].groupAction
   G.repaint = readOperand(categoryClick, CATEGORY_CLICK.repaint, "the category button action")
   G.present = readOperand(categoryClick, CATEGORY_CLICK.present, "the category button action")
+  G.edges = rd32(scan(AOB_LANDSCAPE_PREPARE, "the landscape editor's edge pictures") + PREPARE_EDGES)
 end
 
 local function resolveDrawing(G)
@@ -737,6 +744,7 @@ local function buildTable(G, shown)
       end
       local last = rd32(data.drawn)
       if last ~= 0 and last ~= drawn then
+        wr32(G.edges, 1)
         wr32(G.repaint, 1)
         wr32(G.present, 1)
       end
@@ -748,6 +756,7 @@ local function buildTable(G, shown)
   wr32(tooltip + ITEM_TYPE, TYPE_CLICKABLE)
   wr32(tooltip + ITEM_RENDER, core.allocateAssembly(TOOLTIP, {
     SHOWN = data.shown, PAD = pad, DRAWN = data.drawn, REPAINT = G.repaint, PRESENT = G.present,
+    EDGES = G.edges,
     ANIMALS_HOVER = item(newTable, moved(G.buttons[ANIMALS].index), ITEM_HOVERED),
     VEGETATION_HOVER = item(newTable, moved(G.buttons[VEGETATION].index), ITEM_HOVERED),
     ROCKS_HOVER = item(newTable, moved(G.buttons[ROCKS].index), ITEM_HOVERED),
