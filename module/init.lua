@@ -31,16 +31,15 @@
 
   Slots in use are counted once a frame, in assembly, while the counts are shown: the tree,
   rock and group arrays are walked the way the game's own "find a free slot" functions walk
-  them, whose code also gives the slot counts and sizes. The tooltip can reach past the
-  panel onto the edge pictures beside it, which the game only paints in the menu's initial
-  drawing, and there only when the view's preparation has set a flag for it; once a tooltip
-  goes away it sets that flag and asks for that drawing, as a click on a category button does.
-  The tooltip itself is drawn from lua,
+  them, whose code also gives the slot counts and sizes. The tooltip is drawn from lua,
   and only while the mouse is on one of the three category buttons.
 
-  The description line and the "i" button lie above the panel, over the map. The game draws
-  there on the map surface, at the item position plus the camera offset (see its description
-  line renderer), and the "i" is drawn the same way.
+  The description line, the "i" button and the tooltip lie above the panel, over the map. The
+  game draws there on the map surface, at the item position plus the camera offset (see its
+  description line renderer), and the "i" and the tooltip are drawn the same way. The map
+  surface is drawn afresh every frame, so nothing stays behind. (Drawn on the screen instead,
+  the part outside the panel stayed on the edge pictures beside it, and above the panel's
+  lowest 128 rows it did not show at all: the game shows the map surface there.)
 
   Every address is found by pattern scan or read out of the instruction that uses it, so the
   module runs on Stronghold Crusader.exe and Stronghold_Crusader_Extreme.exe alike.
@@ -108,6 +107,7 @@ local HOVER_RENDER_BYTES = { 0x8B, 0x44, 0x24, 0x04, 0x50, 0xB9 }
 local HOVER_RENDER_CALL = 0x0A
 local CAMERA_X = { 0x5C, { 0x03, 0x0D } }   -- add ecx, [camera x]
 local CAMERA_Y = { 0x62, { 0x03, 0x3D } }   -- add edi, [camera y]
+local TEXT_LAYER = { 0x68, { 0xC7, 0x05 } }  -- mov dword [textManager.layer], 1
 
 -- The siege engine button's ammunition count: renderNumber2(count, x, y, 1, white, 0, 0x11,
 -- 0, 0) on the text manager. The number style the counts copy.
@@ -134,28 +134,19 @@ local WIDTH_UNTIL_CURSOR_CALL = 0x22     -- inside it: the text width up to a le
 local PENCIL_TARGET = 0x0C               -- 0 screen, 1 map surface
 local BOX_BLEND = 5
 
--- MenuItemActionHandler_MapEditorLandscaping_CategoryButtons (the category group's action):
--- after switching the tab it asks for the menu's initial drawing (everything, the side panels
--- included) and for the whole screen to be shown.
-local CATEGORY_CLICK = {
-  repaint = { 0x62, { 0xC7, 0x05 } },
-  present = { 0x6C, { 0xC7, 0x05 } },
-}
--- MenuView_MapEditorLandscaping_Prepare, which the tab switch runs first: it sets the flag
--- without which the initial drawing leaves out the edge pictures beside the panel.
-local AOB_LANDSCAPE_PREPARE = "6A 00 6A 1D C7 05 ? ? ? ? 01 00 00 00 E8 ? ? ? ? 6A 01 6A 15 E8"
-local PREPARE_EDGES = 0x06
-
 -- handleMenuItems, where it asks whether the mouse is over an item: the mouse and its
 -- "is the mouse in this box" test. (The ui module patches the function's start.)
 local AOB_MENU_ITEM = "8B 56 10 8B 46 4C 8B 4E 0C 52 8B 50 08 03 56 08 8B 40 04 03 46 04 51 52 50 B9"
 local MENU_ITEM_MOUSE = { 0x19, { 0xB9 } }
 local MENU_ITEM_IS_INSIDE = 0x1E
 
--- The tooltip.
+-- The tooltip: above the panel, over the map, just above the description line and starting
+-- at the button's left edge.
 local TOOLTIP_FONT, TOOLTIP_COLOUR = 0x12, 0xB8EEFB  -- the description line's own style
-local TOOLTIP_LINE, TOOLTIP_PADDING, TOOLTIP_GAP = 16, 6, 4
-local ALIGN_RIGHT = -1                   -- the text ends at x
+local TOOLTIP_LINE, TOOLTIP_PADDING = 16, 6
+local TOOLTIP_BOTTOM = HOVER_TEXT_POSITION[2] - 3
+local ALIGN_LEFT = 0
+local MAP_LAYER = 1                      -- text manager layer / pencil target: the map surface
 
 -- The free slot searches. Slots run from 1 to the last one they test.
 -- LandscapeState::createTree: the first slot's "in use" word, the last slot, the slot size.
@@ -329,9 +320,7 @@ jmp IMAGE_BUTTON
 ]]
 
 -- Render function for the tooltip item: hand over to lua while the mouse is on a category
--- button. Once a tooltip has gone, ask for the whole menu to be drawn again, as a click on a
--- category button does: the part of the box that lay beyond the panel is never drawn over
--- otherwise.
+-- button.
 local TOOLTIP = [[
 cmp byte [SHOWN],0
 je quiet
@@ -340,18 +329,11 @@ jne show
 cmp word [VEGETATION_HOVER],0
 jne show
 cmp word [ROCKS_HOVER],0
-jne show
-quiet:
-cmp dword [DRAWN],0
-je nothing
-mov dword [DRAWN],0
-mov dword [EDGES],1
-mov dword [REPAINT],1
-mov dword [PRESENT],1
-nothing:
-ret
+je quiet
 show:
 jmp PAD
+quiet:
+ret
 ]]
 
 -- Action of the "i" button.
@@ -460,7 +442,7 @@ local function resolveMenu(G)
   -- is in (the tab id of the 0x64 marker before it, 0 for the part that is always shown), and
   -- where the always shown part ends.
   G.buttons, G.blockEnd = {}, {}
-  local groupRender, groupAction, block = nil, nil, 0
+  local groupRender, block = nil, 0
   for i = 0, ITEM_COUNT - 1 do
     local itemType = rd32(item(G.table, i, ITEM_TYPE))
     if itemType == TYPE_BLOCK then
@@ -468,13 +450,12 @@ local function resolveMenu(G)
       block = rd32(item(G.table, i, ITEM_PARAM))
     elseif itemType == TYPE_GROUP_START then
       groupRender = rd32(item(G.table, i, ITEM_RENDER))
-      groupAction = rd32(item(G.table, i, ITEM_ACTION))
     elseif (itemType & TYPE_GROUP_MEMBER_MASK) == TYPE_GROUP_MEMBER then
       local param = rd32(item(G.table, i, ITEM_PARAM))
       if G.buttons[param] == nil then
         local render = rd32(item(G.table, i, ITEM_RENDER))
         if render == 0 then render = groupRender end
-        G.buttons[param] = { index = i, render = render, block = block, groupAction = groupAction }
+        G.buttons[param] = { index = i, render = render, block = block }
       end
     end
   end
@@ -510,12 +491,8 @@ local function resolveMenu(G)
   local describe = readCallTarget(G.hoverRender, HOVER_RENDER_CALL, "the description line renderer")
   G.cameraX = readOperand(describe, CAMERA_X, "the description line renderer")
   G.cameraY = readOperand(describe, CAMERA_Y, "the description line renderer")
+  G.textLayer = readOperand(describe, TEXT_LAYER, "the description line renderer")
   G.imageButton = scan(AOB_IMAGE_BUTTON, "the image button renderer")
-
-  local categoryClick = G.buttons[ANIMALS].groupAction
-  G.repaint = readOperand(categoryClick, CATEGORY_CLICK.repaint, "the category button action")
-  G.present = readOperand(categoryClick, CATEGORY_CLICK.present, "the category button action")
-  G.edges = rd32(scan(AOB_LANDSCAPE_PREPARE, "the landscape editor's edge pictures") + PREPARE_EDGES)
 end
 
 local function resolveDrawing(G)
@@ -603,8 +580,9 @@ local function makeTooltip(G, newTable, moved, data)
     return { { "Rocks", rd32(data.totals + 4), G.rockSlots } }
   end
 
-  -- The tooltip sits to the left of the button. Its text is right-aligned, so a longer text
-  -- makes the box grow to the left, away from the button.
+  -- Like the description line, the tooltip is drawn on the map surface (at the screen
+  -- position plus the camera offset), which is drawn afresh every frame: nothing of it stays
+  -- behind once the mouse leaves the button. Lines are added upwards, away from the panel.
   return function()
     for _, param in ipairs({ ANIMALS, VEGETATION, ROCKS }) do
       local button = item(newTable, moved(G.buttons[param].index))
@@ -618,22 +596,25 @@ local function makeTooltip(G, newTable, moved, data)
           writeCString(lineBuffers[i], text)
           widest = math.max(widest, textWidth(G.textManager, lineBuffers[i], #text, TOOLTIP_FONT))
         end
-        local right = x - TOOLTIP_GAP
-        local left = math.max(right - widest - 2 * TOOLTIP_PADDING, 0)
-        local bottom = y + #shown * TOOLTIP_LINE + TOOLTIP_PADDING
+        local left = x + rd32(G.cameraX)
+        local right = left + widest + 2 * TOOLTIP_PADDING
+        local bottom = rd32(G.menu + MENU_Y) + TOOLTIP_BOTTOM + rd32(G.cameraY)
+        local top = bottom - #shown * TOOLTIP_LINE - TOOLTIP_PADDING
         local target = rd32(G.pencil + PENCIL_TARGET)
-        wr32(G.pencil + PENCIL_TARGET, 0)
-        roundedBox(G.pencil, left, y, right, bottom, BOX_BLEND)
+        wr32(G.pencil + PENCIL_TARGET, MAP_LAYER)
+        roundedBox(G.pencil, left, top, right, bottom, BOX_BLEND)
         wr32(G.pencil + PENCIL_TARGET, target)
+        local layer = rd32(G.textLayer)
+        wr32(G.textLayer, MAP_LAYER)
         for i = 1, #shown do
-          shadowedText(G.textManager, lineBuffers[i], right - TOOLTIP_PADDING,
-            y + TOOLTIP_PADDING // 2 + (i - 1) * TOOLTIP_LINE, ALIGN_RIGHT, TOOLTIP_COLOUR, 0, TOOLTIP_FONT,
+          shadowedText(G.textManager, lineBuffers[i], left + TOOLTIP_PADDING,
+            top + TOOLTIP_PADDING // 2 + (i - 1) * TOOLTIP_LINE, ALIGN_LEFT, TOOLTIP_COLOUR, 0, TOOLTIP_FONT,
             0, 0)
         end
-        return param
+        wr32(G.textLayer, layer)
+        return
       end
     end
-    return 0
   end
 end
 
@@ -728,35 +709,23 @@ local function buildTable(G, shown)
   wr32(info + ITEM_TEXT, 0)              -- no description, the usual hover sound
 
   -- The tooltip: drawn after everything else that is always shown, never hit by the mouse.
-  -- The tooltip remembers which button it was drawn for. When that changes (another button,
-  -- or none), the whole menu is drawn again, so nothing of the old box stays behind.
   local pad = core.allocateCode({ 0x90, 0x90, 0x90, 0x90, 0x90, 0xC3 })
   local drawTooltip = makeTooltip(G, newTable, moved, data)
-  data.drawn = core.allocate(4, true)
   local broken = false
   core.detourCode(function(registers)
     if not broken then
-      local ok, drawn = pcall(drawTooltip)
+      local ok, problem = pcall(drawTooltip)
       if not ok then
         broken = true
-        log(WARNING, MODULE_NAME .. ": the tooltip stopped after an error: " .. tostring(drawn))
-        drawn = 0
+        log(WARNING, MODULE_NAME .. ": the tooltip stopped after an error: " .. tostring(problem))
       end
-      local last = rd32(data.drawn)
-      if last ~= 0 and last ~= drawn then
-        wr32(G.edges, 1)
-        wr32(G.repaint, 1)
-        wr32(G.present, 1)
-      end
-      wr32(data.drawn, drawn)
     end
     return registers
   end, pad, 5)
   local tooltip = item(newTable, added.tooltip)
   wr32(tooltip + ITEM_TYPE, TYPE_CLICKABLE)
   wr32(tooltip + ITEM_RENDER, core.allocateAssembly(TOOLTIP, {
-    SHOWN = data.shown, PAD = pad, DRAWN = data.drawn, REPAINT = G.repaint, PRESENT = G.present,
-    EDGES = G.edges,
+    SHOWN = data.shown, PAD = pad,
     ANIMALS_HOVER = item(newTable, moved(G.buttons[ANIMALS].index), ITEM_HOVERED),
     VEGETATION_HOVER = item(newTable, moved(G.buttons[VEGETATION].index), ITEM_HOVERED),
     ROCKS_HOVER = item(newTable, moved(G.buttons[ROCKS].index), ITEM_HOVERED),

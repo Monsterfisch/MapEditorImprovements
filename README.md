@@ -40,8 +40,9 @@ What the module does, in plain English, is in `module/locale/description-en.md`.
   UnitsState's count and the limit the editor tests it against.
 * **Tooltips.** The tooltip item's render checks the three category buttons' hover flags in
   assembly and only then calls lua, which checks the mouse with the game's own box test and
-  draws the Save dialog name box's translucent rounded box and shadowed text to the left of
-  the button. Nothing after it in the always shown part overlaps that spot.
+  draws the Save dialog name box's translucent rounded box and shadowed text above the panel,
+  over the button, on the map surface like the description line (camera offset added). The
+  map surface is drawn afresh every frame, so the tooltip leaves nothing behind.
 * **The "i".** Above the panel the game draws on the map surface at the item position plus
   the camera offset (its description line does this); the "i" is drawn the same way, through
   the game's image button renderer. The description line moves right to make room.
