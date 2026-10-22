@@ -1,7 +1,7 @@
 # Map Editor Improvements
 
 **Author**: Monsterfish
-**Version**: 1.0.2
+**Version**: 1.0.3
 
 Makes the map editor show more about the map you are working on. Every part can be switched
 off in the settings.
