@@ -1,13 +1,16 @@
 counts_group: Map counts
 counts_group_descr: |
-  Shows on the landscape editor's buttons how many animals, trees and rocks the map has.
+  Shows in the landscape editor how many animals, trees and rocks the map has, and how close
+  it is to the game's limits.
 counts_enabled: Show map counts
 counts_enabled_tooltip: |
-  The Animals button shows how many animals and units are on the map, the Rocks button how
-  many rocks. In the Animals menu, the deer, camel, rabbit and lion buttons show how many of
-  each there are. The number of trees and shrubs appears next to the button's description
-  when you point at the Vegetation button.
-  A red "i" button above the key button switches the numbers on and off while you work.
+  Point at the Animals, Vegetation or Rocks button for a tooltip with the count and the
+  game's limit, for example "Trees and shrubs: 812/1999". The Animals tooltip also shows the
+  herds and troops, which have a limit of their own.
+  In the Animals menu, the deer, camel, rabbit and lion buttons show how many of each there
+  are; in the Vegetation menu, every tree and shrub button shows how many of that plant there
+  are.
+  A red "i" button above the key button switches all of this on and off while you work.
 counts_shown: Numbers shown when the editor opens
 counts_shown_tooltip: |
   Off: the numbers start hidden, and the "i" button brings them up.
