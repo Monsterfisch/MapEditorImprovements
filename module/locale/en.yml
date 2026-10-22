@@ -1,0 +1,23 @@
+counts_group: Map counts
+counts_group_descr: |
+  Shows on the landscape editor's buttons how many animals, trees and rocks the map has.
+counts_enabled: Show map counts
+counts_enabled_tooltip: |
+  The Animals button shows how many animals and units are on the map, the Rocks button how
+  many rocks. In the Animals menu, the deer, camel, rabbit and lion buttons show how many of
+  each there are. The number of trees and shrubs appears next to the button's description
+  when you point at the Vegetation button.
+  A red "i" button above the key button switches the numbers on and off while you work.
+counts_shown: Numbers shown when the editor opens
+counts_shown_tooltip: |
+  Off: the numbers start hidden, and the "i" button brings them up.
+
+menu_group: Editor menu
+menu_group_descr: |
+  How the editor's menu at the bottom of the screen is drawn.
+menu_always_update: Always keep the menu up to date
+menu_always_update_tooltip: |
+  The game only redraws the menu while the mouse is over it. A change made elsewhere, for
+  example a hotkey that picks another tool, or the counts changing as you place animals,
+  only shows once you move the mouse back onto the menu. With this on, the menu is redrawn
+  all the time in the map editor.

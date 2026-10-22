@@ -1,0 +1,38 @@
+options:
+- display: GroupBox
+  category: [Map Editor Improvements]
+  header: '{{counts_group}}'
+  text: '{{counts_group_descr}}'
+  hasHeader: true
+  children:
+  - url: map-editor-improvements.counts.enabled
+    name: map-editor-improvements-counts-enabled
+    text: '{{counts_enabled}}'
+    tooltip: '{{counts_enabled_tooltip}}'
+    display: Switch
+    contents:
+      type: boolean
+      value: true
+  - url: map-editor-improvements.counts.shown
+    name: map-editor-improvements-counts-shown
+    text: '{{counts_shown}}'
+    tooltip: '{{counts_shown_tooltip}}'
+    display: Switch
+    contents:
+      type: boolean
+      value: true
+
+- display: GroupBox
+  category: [Map Editor Improvements]
+  header: '{{menu_group}}'
+  text: '{{menu_group_descr}}'
+  hasHeader: true
+  children:
+  - url: map-editor-improvements.menu.always_update
+    name: map-editor-improvements-menu-always-update
+    text: '{{menu_always_update}}'
+    tooltip: '{{menu_always_update_tooltip}}'
+    display: Switch
+    contents:
+      type: boolean
+      value: true
