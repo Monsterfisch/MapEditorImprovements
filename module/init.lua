@@ -260,9 +260,12 @@ local SHRUB_PALETTES = { [5] = 0, [6] = 3, [7] = 4, [8] = 7, [9] = 8 }
 local SHRUB_PICTURE = 1
 local FELLED_PALETTE = 0
 
--- The panels above the Vegetation menu.
-local PANEL_LEFT, PANEL_BOTTOM = ROW_LEFT, 444
-local PANEL_PADDING, PANEL_GAP = 4, 2
+-- The panels above the Vegetation menu: centred on the screen, squeezed together when wider.
+local PANEL_BOTTOM = 444
+local PANEL_PADDING, PANEL_GAP, PANEL_MARGIN = 4, 2, 4
+-- The present function, where it reads the screen size: mov edx,[width] / mov edi,[height].
+local AOB_SCREEN_SIZE = "8B 15 ? ? ? ? 8B 3D ? ? ? ? 89 44 24 20 03 C2 89 44 24 28"
+local SCREEN_WIDTH_OPERAND = 2
 local MOST_LOGS = 9                      -- buttons in the felled tree panel
 
 -- The unit count, and the limit the editor tests it against before placing more.
@@ -560,6 +563,7 @@ local function resolveDrawing(G)
   G.setupSurface = readCallTarget(G.colourBox, COLOUR_BOX_SURFACE, "the drawing surface")
   G.setupPencil = readCallTarget(G.colourBox, COLOUR_BOX_CLIP, "the drawing clip")
   G.pixelFormat = rd32(scan(AOB_PIXEL_FORMAT, "the pixel format") + PIXEL_FORMAT_OPERAND)
+  G.screenWidth = rd32(scan(AOB_SCREEN_SIZE, "the screen size") + SCREEN_WIDTH_OPERAND)
 
   local menuItem = scan(AOB_MENU_ITEM, "the menu's mouse test")
   G.mouse = readOperand(menuItem, MENU_ITEM_MOUSE, "the menu's mouse test")
@@ -829,29 +833,44 @@ local function makePanel(G, O, data, panel)
       tallest = math.max(tallest, entry.box.height)
     end
 
-    -- Lay the buttons out left to right, standing on the panel.
+    -- Lay the buttons out left to right, standing on the panel, centred on the screen; when
+    -- wider than the screen, the gaps shrink (below zero, the buttons overlap).
     local height = tallest + 2 * PANEL_PADDING
-    local top, x = PANEL_BOTTOM - height, PANEL_LEFT
+    local sum = 0
     for _, entry in ipairs(list) do
-      local width = entry.box.width + 2 * PANEL_PADDING
-      wr32(entry.item + ITEM_X, x)
+      entry.width = entry.box.width + 2 * PANEL_PADDING
+      sum = sum + entry.width
+    end
+    local screen = rd32(G.screenWidth)
+    local gap = PANEL_GAP
+    if #list > 1 and sum + gap * (#list - 1) > screen - 2 * PANEL_MARGIN then
+      gap = (screen - 2 * PANEL_MARGIN - sum) / (#list - 1)
+    end
+    local total = sum + gap * (#list - 1)
+    local menuX = rd32(G.menu + MENU_X)
+    local top = PANEL_BOTTOM - height
+    local x = (screen - total) / 2 - menuX
+    local left = math.floor(x + 0.5)
+    for _, entry in ipairs(list) do
+      entry.x = math.floor(x + 0.5)
+      wr32(entry.item + ITEM_X, entry.x)
       wr32(entry.item + ITEM_Y, top)
-      wr32(entry.item + ITEM_WIDTH, width)
+      wr32(entry.item + ITEM_WIDTH, entry.width)
       wr32(entry.item + ITEM_HEIGHT, height)
       if entry.param ~= nil then wr32(entry.item + ITEM_PARAM, entry.param) end
       wr16(entry.item + ITEM_HIDDEN, 0)
-      entry.x, entry.width = x, width
-      x = x + width + PANEL_GAP
+      x = x + entry.width + gap
     end
+    local right = math.floor(x - gap + 0.5)
 
     -- Draw them on the map surface, like the description line.
-    local offsetX = rd32(G.menu + MENU_X) - rd32(G.menu + MENU_SCROLL) + rd32(G.cameraX)
+    local offsetX = menuX - rd32(G.menu + MENU_SCROLL) + rd32(G.cameraX)
     local offsetY = rd32(G.menu + MENU_Y) + rd32(G.cameraY)
     local white = rd32(G.pixelFormat) == 0x565 and 0xFFFF or 0x7FFF
     local target = rd32(G.pencil + PENCIL_TARGET)
     wr32(G.pencil + PENCIL_TARGET, MAP_LAYER)
-    roundedBox(G.pencil, offsetX + PANEL_LEFT - PANEL_GAP, offsetY + top - PANEL_GAP,
-      offsetX + x, offsetY + PANEL_BOTTOM + PANEL_GAP, BOX_BLEND)
+    roundedBox(G.pencil, offsetX + left - PANEL_GAP, offsetY + top - PANEL_GAP,
+      offsetX + right + PANEL_GAP, offsetY + PANEL_BOTTOM + PANEL_GAP, BOX_BLEND)
     for _, entry in ipairs(list) do
       local left, right = offsetX + entry.x, offsetX + entry.x + entry.width - 1
       local upper, lower = offsetY + top, offsetY + PANEL_BOTTOM - 1
@@ -880,6 +899,19 @@ local function makePanel(G, O, data, panel)
         end
       end
       wr32(G.textLayer, layer)
+    end
+
+    -- The "i" was drawn before the panel (it belongs to the part of the menu that is always
+    -- shown); draw it again on top, the way its own renderer does (picture + 1 under the mouse).
+    if panel.info ~= nil then
+      local entry = G.buttonImages + INFO_IMAGE * IMAGE_SIZE
+      local picture = rd32(entry + 4)
+      if rd16(panel.info + ITEM_HOVERED) ~= 0 then picture = picture + 1 end
+      local mode = rd32(G.textures + TEXTURES_MODE)
+      wr32(G.textures + TEXTURES_MODE, MAP_LAYER)
+      renderGM(G.textures, rd32(entry), picture, offsetX + rd32(panel.info + ITEM_X),
+        offsetY + rd32(panel.info + ITEM_Y))
+      wr32(G.textures + TEXTURES_MODE, mode)
     end
   end
 end
@@ -1150,7 +1182,7 @@ local function buildTable(G, O)
     guarded[#guarded + 1] = 0
   end
   if O.shrubs or O.felled then
-    local panel = { items = {}, shrubs = {}, felled = {} }
+    local panel = { items = {}, shrubs = {}, felled = {}, info = added.info }
     if O.shrubs then
       for i, command in ipairs(SHRUB_COMMANDS) do
         local into = added["shrub" .. i]

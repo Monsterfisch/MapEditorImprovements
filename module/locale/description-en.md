@@ -1,7 +1,7 @@
 # Map Editor Improvements
 
 **Author**: Monsterfish
-**Version**: 1.0.6
+**Version**: 1.0.7
 
 Makes the map editor show more about the map you are working on and adds tools the editor
 lacks: tree growth stages, apple trees, more shrubs, felled trees, gravel and iron. Every
