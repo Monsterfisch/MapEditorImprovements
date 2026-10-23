@@ -15,6 +15,37 @@ counts_shown: Numbers shown when the editor opens
 counts_shown_tooltip: |
   Off: the numbers start hidden, and the "i" button brings them up.
 
+trees_group: Trees and shrubs
+trees_group_descr: |
+  More choice when placing vegetation in the landscape editor.
+trees_growth: Brush size sets the tree's growth stage
+trees_growth_tooltip: |
+  Trees are placed at the growth stage of the brush size: brush 1 places the smallest trees,
+  brush 4 fully grown ones (what the editor always places otherwise), brush 5 fully grown
+  ones the woodcutters leave alone for a while, brush 6 and 7 dead trees (7 decays sooner).
+  Shrubs are not affected.
+trees_apple: Apple tree button
+trees_apple_tooltip: |
+  Adds an apple tree to the Vegetation menu. The picture is images/apple.png (with
+  apple_hover.png and apple_selected.png) in the module's folder; replace them to change it.
+trees_shrubs: More shrubs
+trees_shrubs_tooltip: |
+  While the shrub with four more colours is chosen, a row above the Vegetation menu offers
+  all five of them.
+trees_felled: Felled trees
+trees_felled_tooltip: |
+  While a tree is chosen, a row above the Vegetation menu offers that tree felled, with every
+  number of logs it can still hold (9 down to 1 for a fully grown tree). Click one to place
+  felled trees, click it again to go back to standing trees.
+
+textures_group: Ground textures
+textures_group_descr: |
+  The Textures menu of the landscape editor.
+textures_gravel_and_iron: Gravel and iron in the Textures menu
+textures_gravel_and_iron_tooltip: |
+  Adds Gravel to the top row and Iron to the bottom row, and spreads both rows evenly. The
+  gravel picture is images/gravel.png (with gravel_hover.png and gravel_selected.png).
+
 menu_group: Editor menu
 menu_group_descr: |
   How the editor's menu at the bottom of the screen is drawn.

@@ -24,6 +24,60 @@ options:
 
 - display: GroupBox
   category: [Map Editor Improvements]
+  header: '{{trees_group}}'
+  text: '{{trees_group_descr}}'
+  hasHeader: true
+  children:
+  - url: map-editor-improvements.trees.growth_from_brush
+    name: map-editor-improvements-trees-growth-from-brush
+    text: '{{trees_growth}}'
+    tooltip: '{{trees_growth_tooltip}}'
+    display: Switch
+    contents:
+      type: boolean
+      value: true
+  - url: map-editor-improvements.trees.apple
+    name: map-editor-improvements-trees-apple
+    text: '{{trees_apple}}'
+    tooltip: '{{trees_apple_tooltip}}'
+    display: Switch
+    contents:
+      type: boolean
+      value: true
+  - url: map-editor-improvements.trees.shrubs
+    name: map-editor-improvements-trees-shrubs
+    text: '{{trees_shrubs}}'
+    tooltip: '{{trees_shrubs_tooltip}}'
+    display: Switch
+    contents:
+      type: boolean
+      value: true
+  - url: map-editor-improvements.trees.felled
+    name: map-editor-improvements-trees-felled
+    text: '{{trees_felled}}'
+    tooltip: '{{trees_felled_tooltip}}'
+    display: Switch
+    contents:
+      type: boolean
+      value: true
+
+- display: GroupBox
+  category: [Map Editor Improvements]
+  header: '{{textures_group}}'
+  text: '{{textures_group_descr}}'
+  hasHeader: true
+  children:
+  - url: map-editor-improvements.textures.gravel_and_iron
+    name: map-editor-improvements-textures-gravel-and-iron
+    text: '{{textures_gravel_and_iron}}'
+    tooltip: '{{textures_gravel_and_iron_tooltip}}'
+    display: Switch
+    contents:
+      type: boolean
+      value: true
+
+- display: GroupBox
+  category: [Map Editor Improvements]
   header: '{{menu_group}}'
   text: '{{menu_group_descr}}'
   hasHeader: true

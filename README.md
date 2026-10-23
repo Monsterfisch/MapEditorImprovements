@@ -13,6 +13,7 @@ What the module does, in plain English, is in `module/locale/description-en.md`.
 |---|---|
 | `module/` | the module itself - this is the source of truth, edited in place |
 | `tools/publish.py` | copies `module/` into the game's module folder under a new version |
+| `tools/make_icons.py` | makes `module/images/apple*.png` from the game's apple tree, and cuts a stacked gravel picture into its three states |
 
 ## Working on it
 
@@ -49,5 +50,19 @@ What the module does, in plain English, is in `module/locale/description-en.md`.
 * **Always up to date.** In the main loop, `cmp [GameCore.countdown], 0 / jne <full redraw>`
   is pointed at a stub that also takes the full redraw when GameMode2 is 1 (map editor). The
   countdown is not touched, so nothing else that reads it changes.
+* **Growth stage.** placeTree's `push 3` (the stage it hands createTree) becomes brush - 1.
+* **Apple tree.** Command 136 (routed through placeTree like the shrubs, normally an unused
+  invisible shrub) is answered with type 15 by a hook on the command-to-type function.
+* **Shrubs 5-9.** Commands 130-134 already exist; the panel buttons are copies of the shrub
+  button with those commands. The five are one sprite in createTree's palettes 0, 3, 4, 7, 8.
+* **Felled trees.** Right after placeTree's createTree call, a chosen log count lays the new
+  tree down as the woodcutter leaves it (lying = 2, logs, no chops) and its update function
+  picks the picture. The panel shows the game's own sprites (renderGM on the map surface
+  with the tree palette), placed by bounding boxes read from the loaded picture data.
+* **Above the panel.** A new first item tells the game's map click handler the mouse is not
+  on the map while it is on one of the module's buttons there.
+* **Textures.** Gravel (command 13) and a copy of the Heights menu's Iron button join the
+  rows; the rows are spread evenly once the pictures are loaded, and taken off the user
+  control table so the menu loader does not put them back.
 * Every address is found by pattern scan or read out of the instruction that uses it, and
   checked against the bytes the module expects. Verified offline against both exes.
