@@ -38,6 +38,26 @@ trees_felled_tooltip: |
   number of logs it can still hold (9 down to 1 for a fully grown tree). Click one to place
   felled trees, click it again to go back to standing trees.
 
+trees_random_mix: Random mixes in the tree rows
+trees_random_mix_tooltip: |
+  Adds buttons marked "?" to the rows above the Vegetation menu:
+  - Random tree (first in the felled tree row): trees of every growth stage from the smallest
+    up to the brush's, mixed at random. Not offered for the smallest trees or dead ones.
+  - Random felled tree (last in the felled tree row): felled trees with a random number of
+    logs.
+  - Random shrub (last in the shrub row): the five shrub colours mixed at random.
+  Click one again, or choose another button, to stop mixing.
+trees_obstacles: Check box for trees next to obstacles
+trees_obstacles_tooltip: |
+  Adds a check box to the top row of the Vegetation menu. While it is ticked, trees and
+  shrubs can be placed right next to buildings, rocks, walls and other trees, which the game
+  normally keeps them away from. Point at it to see whether it is on.
+trees_sorted_rows: Tidy the Vegetation menu's rows
+trees_sorted_rows_tooltip: |
+  Moves the shrub from the top row to the bottom row and sorts the bottom row's shrubs, so
+  the top row holds the trees (and the apple tree and the check box) and the bottom row all
+  the shrubs.
+
 textures_group: Ground textures
 textures_group_descr: |
   The Textures menu of the landscape editor.
@@ -45,6 +65,37 @@ textures_gravel_and_iron: Gravel and iron in the Textures menu
 textures_gravel_and_iron_tooltip: |
   Adds Gravel to the top row and Iron to the bottom row, and spreads both rows evenly. The
   gravel picture is images/gravel.png (with gravel_hover.png and gravel_selected.png).
+
+rocks_group: Rocks
+rocks_group_descr: |
+  The Rocks menu of the landscape editor.
+rocks_signpost: Signpost in the Rocks menu of skirmish maps
+rocks_signpost_tooltip: |
+  Skirmish maps get the same Rocks menu as scenario maps, with the signpost button.
+rocks_random_preview: Random rotation shows in the preview
+rocks_random_preview_tooltip: |
+  With the random rotation button chosen, the game turns the rock so fast that the preview
+  under the mouse cannot follow it. With this on it turns once a second instead, and the
+  preview shows the rock you are about to place.
+rocks_variants: Rock variant row
+rocks_variants_tooltip: |
+  A row above the Rocks menu shows the four variants of the chosen rock size, turned the way
+  they would be placed. Click one to place only that variant; click it again, or any button
+  of the Rocks menu, to go back to the game's changing variants.
+rocks_extra_rock: Extra small rock
+rocks_extra_rock_tooltip: |
+  For the smallest rocks, the variant row also offers a fifth one: a small rock the game has
+  but the editor never places. It is saved in the map like any other rock.
+
+herds_group: Herds
+herds_group_descr: |
+  The animals of the landscape editor.
+herds_panel: Herd panel
+herds_panel_tooltip: |
+  While the deer, lion, rabbit or camel is chosen, a panel above the Animals menu shows how
+  many animals a herd gets (a fixed part plus a random part) and which troop type the herd
+  uses. Its check box makes herds as big as the brush: 2 x brush size - 1 animals (1 to 13),
+  with no random part.
 
 menu_group: Editor menu
 menu_group_descr: |

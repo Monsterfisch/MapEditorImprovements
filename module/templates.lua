@@ -129,17 +129,18 @@ mov dword [DRAW_MODE],1
 jmp IMAGE_BUTTON
 ]]
 
--- Render function for the tooltip item: hand over to lua while the mouse is on a category
--- button.
+-- Render function for the tooltip item: hand over to lua while the mouse is on one of the
+-- buttons with a tooltip (a list of their hover words, ending in 0).
 templates.tooltip = [[
-cmp byte [SHOWN],0
+mov ecx,HOVER_WORDS
+next_word:
+mov eax,[ecx]
+test eax,eax
 je quiet
-cmp word [ANIMALS_HOVER],0
+cmp word [eax],0
 jne show
-cmp word [VEGETATION_HOVER],0
-jne show
-cmp word [ROCKS_HOVER],0
-je quiet
+add ecx,4
+jmp next_word
 show:
 jmp PAD
 quiet:
@@ -203,9 +204,9 @@ pop esi
 ret
 ]]
 
--- Render function of the panel item at the end of the Vegetation tab: the shrub panel while
--- one of its shrubs is chosen, the felled tree panel while a tree is chosen (lua draws them),
--- else every panel button hidden. A felled tree choice ends when another tool is chosen.
+-- Render function of the panel item at the end of a tab: lua draws the panel while one of two
+-- ranges of tools is chosen (an empty range is FIRST 1, LAST 0), else every panel button is
+-- hidden. A felled tree choice ends when another tool is chosen.
 templates.panel = [[
 mov eax,[SUBTYPE]
 cmp eax,[FELLED_COMMAND]
@@ -250,6 +251,130 @@ choose:
 mov [FELLED_LOGS],eax
 mov [FELLED_COMMAND],edx
 ret
+]]
+
+-- Action of a check box or other on/off button: flip the flag.
+templates.flip = [[
+xor byte [FLAG],1
+ret
+]]
+
+-- Render function of a check box in the panel (on the screen, like the other buttons): the
+-- picture of image table entry ON_IMAGE or OFF_IMAGE (+0 gm, +4 picture), + 1 under the mouse.
+templates.checkBox = [[
+mov ecx,OFF_IMAGE
+cmp byte [FLAG],0
+je chosen
+mov ecx,ON_IMAGE
+chosen:
+mov edx,[ecx]
+mov eax,[ecx+4]
+cmp dword [HOVER],0
+je draw
+inc eax
+draw:
+mov dword [DRAW_MODE],0
+push dword [ITEM_Y]
+push dword [ITEM_X]
+push eax
+push edx
+mov ecx,TEXTURES
+call RENDER_GM
+mov dword [DRAW_MODE],1
+ret
+]]
+
+---------------------------------------------------------------------------------------
+-- Rocks
+---------------------------------------------------------------------------------------
+
+-- Action of a rock variant button (param: variant + 1): choose that variant, or, clicked
+-- again, go back to the game's cycling variants.
+templates.rockClick = [[
+mov eax,[esp+4]
+cmp eax,[ROCK_LOCK]
+jne set_lock
+xor eax,eax
+set_lock:
+mov [ROCK_LOCK],eax
+ret
+]]
+
+-- Action of the Rocks menu's own rock buttons: they go back to the cycling variants.
+templates.rockButton = [[
+mov dword [ROCK_LOCK],0
+jmp ACTION
+]]
+
+-- The rock number the editor places and previews: variant + size * 4, or with a variant
+-- chosen in the panel that variant (+ size * 4), or for the extra rock EXTRA_ID. Replaces
+-- `lea ecx,[variant + size*4]` and the 6-byte instruction after it, which ends the template.
+templates.rockId = [[
+push eax
+mov eax,[ROCK_LOCK]
+test eax,eax
+jne locked
+mov ecx,[SIZE]
+shl ecx,2
+add ecx,[VARIANT]
+jmp rock_done
+locked:
+dec eax
+cmp eax,EXTRA_VARIANT
+jb chosen_variant
+mov ecx,EXTRA_ID
+jmp rock_done
+chosen_variant:
+mov ecx,[SIZE]
+shl ecx,2
+add ecx,eax
+rock_done:
+pop eax
+]]
+
+-- The random rock button's `mov [mode], ecx` (ecx = 5): mode 0 instead, the slowly turning
+-- mode the preview follows.
+templates.randomRockMode = [[
+mov dword [MODE],0
+jmp BACK
+]]
+
+---------------------------------------------------------------------------------------
+-- Herds
+---------------------------------------------------------------------------------------
+
+-- An animal's herd size, `and eax,MASK / mov edi,UNIT / add eax,BASE` (eax: a random byte):
+-- with the check box on, 2 * brush - 1 instead.
+templates.herdSize = [[
+and eax,MASK
+mov edi,UNIT
+add eax,BASE
+cmp byte [HERD_SYNC],0
+je herd_done
+mov eax,[BRUSH]
+add eax,eax
+dec eax
+herd_done:
+jmp BACK
+]]
+
+---------------------------------------------------------------------------------------
+-- Trees next to obstacles
+---------------------------------------------------------------------------------------
+
+-- placeTree, `xor ebx,ebx / test eax,eax / mov [esp+0x10],esi / jle <past the check>`:
+-- with the flag set, the check of the tiles around a new tree is skipped, as for a tree
+-- type that needs no room.
+templates.nearObstacles = [[
+xor ebx,ebx
+mov [esp+0x10],esi
+cmp byte [FLAG],0
+jne skip_check
+test eax,eax
+jle skip_check
+jmp CHECK
+skip_check:
+jmp PAST_CHECK
 ]]
 
 ---------------------------------------------------------------------------------------
@@ -367,24 +492,49 @@ ret
 -- Placing trees
 ---------------------------------------------------------------------------------------
 
--- LandscapeState::mapUITreeTypeToLogicalTreeType, start: the apple tree command gives the
--- apple tree type, every other command goes on as before (the replayed first two
--- instructions: mov eax,[esp+4] / add eax,-0x28).
-templates.appleType = [[
+-- mapUITreeTypeToLogicalTreeType(command), replacing `mov eax,[esp+4] / add eax,-0x28`: the
+-- apple tree command gives the apple tree, and while the random shrub is on, a shrub command
+-- one of the five shrubs at random.
+templates.plantType = [[
 mov eax,[esp+4]
 cmp eax,APPLE_COMMAND
 jne not_apple
 mov eax,APPLE_TYPE
 ret 4
 not_apple:
+cmp byte [RANDOM_SHRUB],0
+je plain
+cmp eax,FIRST_SHRUB
+jb plain
+cmp eax,LAST_SHRUB
+ja plain
+push ecx
+push edx
+mov eax,[SEED]
+imul eax,eax,RANDOM_MULTIPLIER
+add eax,RANDOM_INCREMENT
+mov [SEED],eax
+shr eax,16
+xor edx,edx
+mov ecx,LAST_SHRUB-FIRST_SHRUB+1
+div ecx
+lea eax,[edx+FIRST_SHRUB]
+pop edx
+pop ecx
+plain:
 add eax,-0x28
 jmp CONVERTER_BACK
 ]]
 
 -- placeTree, `push 3 / push 0 / movzx eax,ax`: the growth stage handed to createTree is the
--- brush size minus one (0 .. 6) instead of 3.
+-- brush size minus one (0 .. 6; BRUSH may be a constant instead) instead of 3, and with the
+-- random tree chosen for this tree tool (FELLED_LOGS = RANDOM_STANDING) a stage from 0 up to
+-- that one. The command is on the stack as at the felled tree site (createTree cleans up its
+-- arguments).
 templates.stageFromBrush = [[
 push eax
+push ecx
+push edx
 mov eax,[BRUSH]
 dec eax
 jns stage_low_ok
@@ -394,7 +544,26 @@ cmp eax,MAX_STAGE
 jle stage_high_ok
 mov eax,MAX_STAGE
 stage_high_ok:
+cmp dword [FELLED_LOGS],RANDOM_STANDING
+jne stage_done
+movsx ecx,word [esp+COMMAND_ON_STACK+12]
+cmp ecx,[FELLED_COMMAND]
+jne stage_done
+cmp eax,MOST_RANDOM_STAGE
+ja stage_done
+lea ecx,[eax+1]
+mov eax,[SEED]
+imul eax,eax,RANDOM_MULTIPLIER
+add eax,RANDOM_INCREMENT
+mov [SEED],eax
+shr eax,16
+xor edx,edx
+div ecx
+mov eax,edx
+stage_done:
 mov [STAGE],eax
+pop edx
+pop ecx
 pop eax
 push dword [STAGE]
 push 0
@@ -405,13 +574,16 @@ jmp BACK
 -- placeTree, right after createTree (`mov esi,eax / imul esi,esi,0x9C`; eax, the new tree,
 -- is used again further down): with a felled tree chosen for this tree tool, the new tree is
 -- laid down the way the woodcutter's log taking leaves it (lying, no chops left, that many
--- logs, at most what a tree of its type and stage gives), and its picture worked out again
--- by its update function, called as createTree calls it.
+-- logs, at most what a tree of its type and stage gives; RANDOM_FELLED: 1 up to that at
+-- random), and its picture worked out again by its update function, called as createTree
+-- calls it. The random standing tree (RANDOM_STANDING) stays standing.
 templates.felledTree = [[
 mov esi,eax
 test eax,eax
 je plain
 cmp dword [FELLED_LOGS],0
+je plain
+cmp dword [FELLED_LOGS],RANDOM_STANDING
 je plain
 push eax
 movsx edx,word [esp+COMMAND_ON_STACK+4]
@@ -427,6 +599,21 @@ imul ecx,eax,STAGES
 add ecx,[edx+TREE_STAGE]
 mov ecx,[LOGS+ecx*4]
 mov eax,[FELLED_LOGS]
+cmp eax,RANDOM_FELLED
+jne fixed_logs
+test ecx,ecx
+jle felled_done
+push edx
+mov eax,[SEED]
+imul eax,eax,RANDOM_MULTIPLIER
+add eax,RANDOM_INCREMENT
+mov [SEED],eax
+shr eax,16
+xor edx,edx
+div ecx
+lea eax,[edx+1]
+pop edx
+fixed_logs:
 cmp eax,ecx
 jle logs_fit
 mov eax,ecx

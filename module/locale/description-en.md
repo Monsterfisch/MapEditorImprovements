@@ -1,11 +1,11 @@
 # Map Editor Improvements
 
 **Author**: Monsterfish
-**Version**: 1.0.7
+**Version**: 1.0.8
 
 Makes the map editor show more about the map you are working on and adds tools the editor
-lacks: tree growth stages, apple trees, more shrubs, felled trees, gravel and iron. Every
-part can be switched off in the settings.
+lacks: tree growth stages, apple trees, more shrubs, felled trees, gravel and iron, rock
+variants, herd sizes. Every part can be switched off in the settings.
 
 ## Map counts
 
@@ -50,6 +50,21 @@ right to make room for it.
   tree, fewer for smaller ones, none for dead ones. Click one, and the trees you place lie
   felled with that many logs. Click it again to place standing trees again.
 
+- **Random mixes.** The rows above the Vegetation menu get buttons marked "?":
+  - **Random tree**, first in the felled tree row: every tree you place gets a random growth
+    stage from the smallest up to the brush's. Brush 1 (the smallest trees) and the dead
+    trees have none.
+  - **Random felled tree**, last in the felled tree row: felled trees with a random number of
+    logs, from 1 up to what that tree can hold.
+  - **Random shrub**, last in the shrub row: the five shrub colours mixed at random.
+
+  Click it again, or choose another button, to stop mixing.
+- **Trees next to obstacles.** A check box at the end of the top row. While it is ticked,
+  trees and shrubs can be placed right next to buildings, rocks, walls and other trees.
+  Point at it to see whether it is on.
+- **Tidier rows.** The top row holds the trees (and the apple tree and the check box); the
+  shrub that sat there moves to the bottom row, whose shrubs are sorted.
+
 The row above the Vegetation menu sits over the map; clicking it does not place anything on
 the map.
 
@@ -58,6 +73,27 @@ the map.
 The Textures menu gets **Gravel** at the end of the top row and **Iron** at the end of the
 bottom row (the same iron as in the Heights menu, which keeps its button too). Both rows are
 spread evenly over the panel to make room.
+
+## Rocks
+
+- **Signpost on skirmish maps.** Skirmish maps get the same Rocks menu as scenario maps, with
+  the signpost button.
+- **Random rotation in the preview.** With the random rotation button chosen, the rock turns
+  once a second instead of every frame, so the preview under the mouse shows the rock you
+  are about to place.
+- **Variant row.** A row above the Rocks menu shows the four variants of the chosen rock
+  size, turned the way they would be placed (it follows the random rotation too). Click one
+  and every rock you place is that variant. Click it again, or any button of the Rocks menu,
+  and the editor goes back to changing the variant after every rock.
+- **Extra small rock.** For the smallest rocks the row offers a fifth variant: a small rock
+  the game has but the editor never places. It is saved in the map like any other rock.
+
+## Herds
+
+While the deer, lion, rabbit or camel is chosen, a panel above the Animals menu shows how
+big that animal's herds are (a fixed number plus a random number) and which troop type the
+herd uses. Tick its check box and herds come out as big as the brush: 2 x brush size - 1
+animals, so brush 1 places single animals and brush 7 herds of 13.
 
 ## Pictures
 

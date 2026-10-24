@@ -3,7 +3,9 @@
 A UCP3 module for Stronghold Crusader and Stronghold Crusader Extreme. It makes the map editor
 show more about the map you are working on: how many animals, units, trees and rocks it has,
 right on the landscape editor's buttons, with a red "i" button to hide or show the numbers. It
-also keeps the editor's menu up to date while the mouse is on the map.
+also keeps the editor's menu up to date while the mouse is on the map, and adds tools: tree
+growth stages, apple trees, more shrubs, felled trees, random mixes, gravel and iron, rock
+variants, herd sizes.
 
 What the module does, in plain English, is in `module/locale/description-en.md`.
 
@@ -64,5 +66,19 @@ What the module does, in plain English, is in `module/locale/description-en.md`.
 * **Textures.** Gravel (command 13) and a copy of the Heights menu's Iron button join the
   rows; the rows are spread evenly once the pictures are loaded, and taken off the user
   control table so the menu loader does not put them back.
+* **Rocks.** The Rocks button's `jl` past `mov eax, 239` becomes a `jmp` (signpost tab on
+  skirmish maps); the random rotation button stores mode 0 instead of 5. The variant row draws
+  the game's rock tile pictures through its own footprint function and the map's turn; the
+  rock number at the click handler's placement and preview (`lea ecx,[variant + size*4]`)
+  comes from a stub that uses the chosen variant, or 16 for the extra 1x1 rock (see
+  `docs/size-4-rocks.md`).
+* **Herds.** The four herd sites (`and eax, mask / mov edi, unit / add eax, base`) are read for
+  the panel and replaced by stubs that give 2 x brush - 1 while its check box is on.
+* **Trees next to obstacles.** placeTree's `jle` past the check of the tiles around a new tree
+  is taken while the check box is on.
+* **Random mixes.** The felled tree choice also holds 0x40 (random standing tree: the stage
+  stub picks 0 .. the brush's) and 0x41 (random logs, in the felled tree stub); the random
+  shrub makes the command-to-type hook pick one of commands 130-134. A small linear
+  congruential generator gives the numbers.
 * Every address is found by pattern scan or read out of the instruction that uses it, and
   checked against the bytes the module expects. Verified offline against both exes.

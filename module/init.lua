@@ -37,6 +37,27 @@
   4. Ground textures: the Textures menu's two rows get a fifth button each, Gravel (command
      13, which the click handler already understands; pictures from images/) and Iron (a copy
      of the Heights menu's iron button), and the rows are spread evenly over the panel.
+  5. Rocks: skirmish maps open the scenario Rocks menu (tab 237, with the signpost) instead of
+     tab 239: the category button's `jl` past `mov eax, 239` becomes a `jmp`.
+  6. Random rock rotation: the random button sets rotation mode 0 instead of 5. Mode 5 turns
+     the rotation every frame and the preview ignores it; mode 0 turns it once a second and
+     the preview follows.
+  7. Rock variants: a row above the Rocks menu shows the four variants of the chosen rock size
+     and rotation (drawn from the game's own tile pictures through its own tile layout,
+     getBuildingSizeIndexMappingData, and the map's turn). Choosing one fixes the variant the
+     editor places and previews instead of cycling; the Rocks menu's own buttons go back to
+     cycling.
+  8. The extra rock: rock number 16 and up makes a 1x1 rock of type 0 (see docs/size-4-rocks.md);
+     the variant row offers it at size 1x1.
+  9. Herds: a panel above the Animals menu shows the chosen animal's herd size (base + random
+     mask) and troop type, read from the herd code, with a check box that makes herds
+     2 x brush - 1 animals.
+  10. Trees next to obstacles: a check box in the Vegetation menu skips placeTree's check of
+     the tiles around a new tree. The Vegetation menu's rows are tidied: the top row's shrub
+     moves to the bottom row, which is sorted by command.
+  11. Random mixes: the felled tree row gets a random standing tree (placeTree's stage, 0 up to
+     the brush's) and a random felled tree (logs 1 up to the most), the shrub row a random
+     shrub (the command-to-type function picks one of the five shrub commands).
 
   None of the menu changes patch code. The landscape editor's menu items are a static table
   handed to the Menu constructor by a CRT initializer (push table / mov ecx, menu / call
@@ -62,8 +83,11 @@ local MODULE_FOLDERS = { "ucp/modules/map-editor-improvements/" }   -- UCP maps 
 local DEFAULTS = {
   counts = { enabled = true, shown = true },
   menu = { always_update = true },
-  trees = { growth_from_brush = true, apple = true, shrubs = true, felled = true },
+  trees = { growth_from_brush = true, apple = true, shrubs = true, felled = true, random_mix = true,
+    obstacles = true, sorted_rows = true },
   textures = { gravel_and_iron = true },
+  rocks = { signpost = true, random_preview = true, variants = true, extra_rock = true },
+  herds = { panel = true },
 }
 
 ---------------------------------------------------------------------------------------
@@ -117,8 +141,87 @@ local GRAVEL_COMMAND, IRON_COMMAND = 13, 16
 -- The rows the module spreads out, by command, left to right (the order of the buttons'
 -- user control positions), and the span of the panel they are spread over.
 local TEXTURE_ROWS = { { 18, 340, 10, 12, GRAVEL_COMMAND }, { 5, 7, 19, 341, IRON_COMMAND } }
-local VEGETATION_ROW = { 41, 42, 40, 43, APPLE_COMMAND, 135 }
+local VEGETATION_TREES = { 41, 42, 40, 43 }            -- the top row's trees
+local TOP_ROW_SHRUB = 135
+local SORTED_SHRUBS = { 130, 135, 153, 154, 155, 156 }  -- the bottom row, sorted by command
 local ROW_LEFT, ROW_RIGHT = 250, 636
+local OBSTACLES_BUTTON = "obstacles"                   -- the check box's key in a row
+
+-- Constants of the later features, in a table: a Lua chunk may have at most 200 locals.
+local K = {}
+
+-- Rocks: the tabs (scenario with signpost, skirmish without) and the tools.
+K.ROCKS_SKIRMISH = 239
+K.FIRST_ROCK_COMMAND = 205
+K.LAST_ROCK_COMMAND = 209
+-- The category button's action: `cmp eax, 237 / jne / cmp [map type], 1 / jl +5 / mov eax, 239`.
+K.AOB_SIGNPOST = "3D ED 00 00 00 75 0E 83 3D ? ? ? ? 01 7C 05 B8 EF 00 00 00"
+K.SIGNPOST_JUMP = 0x0E
+K.JL_SHORT = 0x7C
+K.JMP_SHORT = 0xEB
+-- The random rock button: `... / mov ecx, 5 / mov [rotation mode], ecx / mov [rotation], 0`.
+K.AOB_RANDOM_ROCK = "A3 ? ? ? ? A1 ? ? ? ? 83 F8 02 B9 05 00 00 00 89 0D ? ? ? ? C7 05"
+K.RANDOM_ROCK_MODE = 0x12
+K.RANDOM_ROCK_MODE_SIZE = 6
+-- The click handler's rock placement: `lea ecx,[variant + size*4] / mov [command param 3],ecx /
+-- push 0x1A / ... / call queueCommand / mov eax,[variant]` (the variant cycling).
+K.AOB_ROCK_PLACE = "8D 0C ? 89 0D ? ? ? ? 6A 1A B9 ? ? ? ? C7 05 ? ? ? ? 14 00 00 00 E8 ? ? ? ? A1"
+K.ROCK_PLACE = { size = 9, param = 5, variant = 0x20 }
+-- ... and its preview: `mov reg,[a] / mov reg,[b]` (variant and size, either order),
+-- `lea ecx,[...] / mov edx,[mouse tile y] / ... / mov ecx, TileMapState / call preview`.
+K.AOB_ROCK_PREVIEW = "8D 0C ? 8B 15 ? ? ? ? A1 ? ? ? ? 51 52 50 B9 ? ? ? ? E8"
+K.ROCK_PREVIEW = { size = 9, mouseY = 5, tileMap = 0x12, first = { -0x0B, { 0x8B, 0x15 } },
+  second = { -0x05, { 0xA1 } } }
+-- TileMapState fields: the rock tool's rotation and rotation mode, the map's turn (0, 6, 4,
+-- 2), and what getBuildingSizeIndexMappingData(tile, size) leaves for a footprint tile.
+K.TILE_MAP = { rotation = 0x554890, mode = 0x554894, orientation = 0x55489C,
+  tileX = 0x55498C, tileY = 0x554990, tilePicture = 0x554994 }
+-- The rock stamping in the map renderer: `mov eax,[esi+tileY] / add eax,[esp+10]` right after
+-- the footprint call, and getRandomRockImageOffset (mov eax,[esp+4] / mov eax,[eax*4+table]).
+K.AOB_ROCK_STAMP = "8B 86 90 49 55 00 03 44 24 10"
+K.ROCK_STAMP = { mapping = -0x05, randomOffset = 0xAA }
+K.ROCK_PICTURES = { 0x04, { 0x8B, 0x04, 0x85 } }   -- in getRandomRockImageOffset
+K.ROCK_GM = { 0xA5, { 0x66, 0x8B, 0x14, 0x95 } }    -- in createRock: the gm per rock type
+K.ROCK_VARIANTS = 4
+K.EXTRA_VARIANT = 4
+K.EXTRA_ID = 16
+K.TILE_DIAMOND = { 2, 6, 10, 14, 18, 22, 26, 30, 30, 26, 22, 18, 14, 10, 6, 2 }
+K.TILE_DIAMOND_BYTES = 512
+-- The screen offset of a footprint tile (dx, dy) for each map turn: d = dx - dy, s = dx + dy;
+-- x = xd*d + xs*s, y = yd*d + ys*s (renderMap's transform without its constants).
+K.TURN = {
+  [0] = { xd = 16, xs = 0, yd = 0, ys = 8 }, [6] = { xd = 0, xs = -16, yd = 8, ys = 0 },
+  [4] = { xd = -16, xs = 0, yd = 0, ys = -8 }, [2] = { xd = 0, xs = 16, yd = -8, ys = 0 },
+}
+
+-- Herds: `movzx eax, byte [random] / and eax, MASK / mov edi, UNIT / add eax, BASE`, after
+-- `mov word [herd + 0x42], TROOP TYPE`; deer, lions, rabbits, camels in that order.
+K.AOB_HERD = "0F B6 05 ? ? ? ? 83 E0 ? BF ? 00 00 00 83 C0 ?"
+K.HERD = { site = 7, size = 11, mask = 9, unit = 11, base = 17, group = { -7, { 0x66, 0xC7, 0x44, 0x28, 0x42 } } }
+K.HERD_ANIMALS = { { DEER, "Deer" }, { LION, "Lion" }, { RABBIT, "Rabbit" }, { CAMEL, "Camel" } }
+K.HERD_SEARCH_END = 0x01000000       -- the game's code; the four lie in one function
+
+-- placeTree: `xor ebx,ebx / test eax,eax / mov [esp+0x10],esi / jle <past the check>`.
+K.AOB_OBSTACLES = "33 DB 85 C0 89 74 24 10 7E 50 56 55 8D 44 24 18"
+K.OBSTACLES_SIZE = 10
+K.OBSTACLES_JUMP = 0x09
+K.OBSTACLES_NEAR = 0x400               -- how far from placeTree's start the check lies at most
+
+-- The game's check boxes (interface_icons3 pictures 206 tick / 208 cross, + 1 under the
+-- mouse), by image table index.
+K.CHECKED_IMAGE = 569
+K.UNCHECKED_IMAGE = 570
+K.CHECK_BOX_SIZE = 29
+
+-- Random mixes in the tree panels: the felled tree buttons' choices for a random standing
+-- tree (growth stage 0 up to the brush's, offered for stages 1 .. 4) and a random number of
+-- logs, and the random numbers (a linear congruential generator, high 16 bits used).
+K.RANDOM_STANDING = 0x40
+K.RANDOM_FELLED = 0x41
+K.MOST_RANDOM_STAGE = 4
+K.RANDOM_MULTIPLIER = 1103515245
+K.RANDOM_INCREMENT = 12345
+K.RANDOM_LABEL = "?"
 
 -- MenuItemRenderFunction_MapEditorLandscaping_GeneralButtons: the item position globals
 -- (width follows the position), the hover flag, the open tab, the brush size, the chosen
@@ -269,18 +372,19 @@ local SCREEN_WIDTH_OPERAND = 2
 local MOST_LOGS = 9                      -- buttons in the felled tree panel
 
 -- The unit count, and the limit the editor tests it against before placing more.
-local AOB_UNITS = "81 3D ? ? ? ? ? ? 00 00 7C 03 ? EB 01 ? 6A 1D E8"
-local UNITS_OPERAND, UNITS_LIMIT = 2, 6
+K.AOB_UNITS = "81 3D ? ? ? ? ? ? 00 00 7C 03 ? EB 01 ? 6A 1D E8"
+K.UNITS_OPERAND = 2
+K.UNITS_LIMIT = 6
 
 -- The animal counters, from the animals' update functions.
-local AOB_DEER = "0F BF BE ? ? ? ? BA 01 00 00 00 01 15 ? ? ? ? 66 89 9E"
-local DEER_OPERAND = 0x0E
-local AOB_LIONS = "0F BF BE ? ? ? ? B9 01 00 00 00 01 0D ? ? ? ? 66 89 9E"
-local LIONS_OPERAND = 0x0E
-local AOB_RABBITS = "51 8B 15 ? ? ? ? 83 05 ? ? ? ? 01 53 56 8B F2"
-local RABBITS_OPERAND = 0x09
-local AOB_CAMELS = "83 05 ? ? ? ? 01 53 55 56 57 8B 3D"
-local CAMELS_OPERAND = 0x02
+K.AOB_DEER = "0F BF BE ? ? ? ? BA 01 00 00 00 01 15 ? ? ? ? 66 89 9E"
+K.DEER_OPERAND = 0x0E
+K.AOB_LIONS = "0F BF BE ? ? ? ? B9 01 00 00 00 01 0D ? ? ? ? 66 89 9E"
+K.LIONS_OPERAND = 0x0E
+K.AOB_RABBITS = "51 8B 15 ? ? ? ? 83 05 ? ? ? ? 01 53 56 8B F2"
+K.RABBITS_OPERAND = 0x09
+K.AOB_CAMELS = "83 05 ? ? ? ? 01 53 55 56 57 8B 3D"
+K.CAMELS_OPERAND = 0x02
 
 -- The main loop, where it picks between redrawing the menu and redrawing only the minimap:
 -- cmp [GameCore.countdown], ebx / jne <full redraw> (ebx is 0 here).
@@ -472,8 +576,10 @@ local function resolveMenu(G)
   -- The buttons by command, the render function their groups give them, the block each one
   -- is in (the tab id of the 0x64 marker before it, 0 for the part that is always shown), and
   -- where the always shown part and each tab end.
-  G.buttons, G.blockEnd = {}, {}
-  local groupRender, block = nil, 0
+  -- Rock tool buttons are listed per tab too (they are in both Rocks tabs), with the action
+  -- their group gives them.
+  G.buttons, G.blockEnd, G.rockButtons = {}, {}, {}
+  local groupRender, groupAction, groupIndex, block = nil, nil, nil, 0
   for i = 0, ITEM_COUNT - 1 do
     local itemType = rd32(item(G.table, i, ITEM_TYPE))
     if itemType == TYPE_BLOCK then
@@ -481,26 +587,35 @@ local function resolveMenu(G)
       block = rd32(item(G.table, i, ITEM_PARAM))
     elseif itemType == TYPE_GROUP_START then
       groupRender = rd32(item(G.table, i, ITEM_RENDER))
+      groupAction = rd32(item(G.table, i, ITEM_ACTION))
+      groupIndex = i
     elseif (itemType & TYPE_GROUP_MEMBER_MASK) == TYPE_GROUP_MEMBER then
       local param = rd32(item(G.table, i, ITEM_PARAM))
       if G.buttons[param] == nil then
         local render = rd32(item(G.table, i, ITEM_RENDER))
         if render == 0 then render = groupRender end
-        G.buttons[param] = { index = i, render = render, block = block }
+        local action = rd32(item(G.table, i, ITEM_ACTION))
+        if action == 0 then action = groupAction end
+        G.buttons[param] = { index = i, render = render, block = block, action = action }
+      end
+      if param >= K.FIRST_ROCK_COMMAND and param <= K.LAST_ROCK_COMMAND then
+        local action = rd32(item(G.table, i, ITEM_ACTION))
+        if action == 0 then action = groupAction end
+        table.insert(G.rockButtons, { index = i, action = action, block = block, group = groupIndex })
       end
     end
   end
   if block ~= 0 then G.blockEnd[block] = G.blockEnd[block] or ITEM_COUNT end
   if G.firstBlock == nil or G.blockEnd[ANIMALS] == nil or G.blockEnd[VEGETATION] == nil
-      or G.blockEnd[TEXTURES] == nil then
+      or G.blockEnd[TEXTURES] == nil or G.blockEnd[ROCKS] == nil then
     error(MODULE_NAME .. ": the landscape editor's menu has not got the tabs this module knows")
   end
-  local needed = { DEER, LION, RABBIT, CAMEL, VEGETATION, ANIMALS, ROCKS, IRON_COMMAND,
-    SHRUB_COMMANDS[1], table.unpack(VEGETATION_ROW, 1, 4) }
+  local needed = { DEER, LION, RABBIT, CAMEL, VEGETATION, ANIMALS, ROCKS, IRON_COMMAND, TOP_ROW_SHRUB,
+    table.unpack(SORTED_SHRUBS) }
   for _, row in ipairs(TEXTURE_ROWS) do
     for i = 1, 4 do needed[#needed + 1] = row[i] end
   end
-  needed[#needed + 1] = VEGETATION_ROW[6]
+  for _, param in ipairs(VEGETATION_TREES) do needed[#needed + 1] = param end
   for _, param in ipairs(needed) do
     if G.buttons[param] == nil then
       error(string.format("%s: button %d is missing from the landscape editor's menu", MODULE_NAME, param))
@@ -581,14 +696,14 @@ local function resolveDrawing(G)
 end
 
 local function resolveCounters(G)
-  local unitTest = scan(AOB_UNITS, "the unit count")
-  G.units = rd32(unitTest + UNITS_OPERAND)
-  G.unitLimit = rd32(unitTest + UNITS_LIMIT)
+  local unitTest = scan(K.AOB_UNITS, "the unit count")
+  G.units = rd32(unitTest + K.UNITS_OPERAND)
+  G.unitLimit = rd32(unitTest + K.UNITS_LIMIT)
   G.animals = {
-    [DEER] = rd32(scan(AOB_DEER, "the deer count") + DEER_OPERAND),
-    [LION] = rd32(scan(AOB_LIONS, "the lion count") + LIONS_OPERAND),
-    [RABBIT] = rd32(scan(AOB_RABBITS, "the rabbit count") + RABBITS_OPERAND),
-    [CAMEL] = rd32(scan(AOB_CAMELS, "the camel count") + CAMELS_OPERAND),
+    [DEER] = rd32(scan(K.AOB_DEER, "the deer count") + K.DEER_OPERAND),
+    [LION] = rd32(scan(K.AOB_LIONS, "the lion count") + K.LIONS_OPERAND),
+    [RABBIT] = rd32(scan(K.AOB_RABBITS, "the rabbit count") + K.RABBITS_OPERAND),
+    [CAMEL] = rd32(scan(K.AOB_CAMELS, "the camel count") + K.CAMELS_OPERAND),
   }
 
   local placeTree = scan(AOB_PLACE_TREE, "the tree placement")
@@ -636,6 +751,56 @@ local function resolveCounters(G)
     G.plantTypes[param] = treeType(G.landscape, param) & (TREE_TYPES - 1)
   end
   G.plantTypes[APPLE_COMMAND] = APPLE_TYPE
+end
+
+-- Rocks: the rock tool's state, the placement and preview sites, and what the module needs to
+-- draw rocks the way the map renderer does.
+local function resolveRocks(G)
+  G.rockPlace = scan(K.AOB_ROCK_PLACE, "the rock placement")
+  G.rockParam = rd32(G.rockPlace + K.ROCK_PLACE.param)
+  G.rockVariant = rd32(G.rockPlace + K.ROCK_PLACE.variant)
+  G.chosenRockSize = G.rockVariant + 4
+  G.rockPreview = scan(K.AOB_ROCK_PREVIEW, "the rock preview")
+  G.mouseTileY = rd32(G.rockPreview + K.ROCK_PREVIEW.mouseY)
+  G.tileMap = rd32(G.rockPreview + K.ROCK_PREVIEW.tileMap)
+  local a = readOperand(G.rockPreview, K.ROCK_PREVIEW.first, "the rock preview")
+  local b = readOperand(G.rockPreview, K.ROCK_PREVIEW.second, "the rock preview")
+  if not ((a == G.rockVariant and b == G.chosenRockSize) or (b == G.rockVariant and a == G.chosenRockSize)) then
+    error(MODULE_NAME .. ": the rock variant and size are not where the module expects them")
+  end
+  if G.tileMap + 0x5548F4 ~= G.rockVariant then
+    error(MODULE_NAME .. ": the map tile state is not laid out as the module expects")
+  end
+  local stamp = scan(K.AOB_ROCK_STAMP, "the rock drawing")
+  G.footprint = readCallTarget(stamp, K.ROCK_STAMP.mapping, "the footprint layout")
+  local randomOffset = readCallTarget(stamp, K.ROCK_STAMP.randomOffset, "the rock pictures")
+  G.rockBases = readOperand(randomOffset, K.ROCK_PICTURES, "the rock pictures")
+  local newRock = scan(AOB_NEW_ROCK, "the rock slot search")
+  G.rockGm = rd16(readOperand(newRock, K.ROCK_GM, "createRock") + 4)
+end
+
+-- Herds: per animal the herd code site and what it does.
+local function resolveHerds(G)
+  local sites, start = {}, 0x400000
+  while #sites < #K.HERD_ANIMALS + 1 do
+    local ok, found = pcall(core.scanForAOB, K.AOB_HERD, start, K.HERD_SEARCH_END)
+    if not ok or found == nil or found == 0 then break end
+    sites[#sites + 1] = found
+    start = found + 1
+  end
+  if #sites ~= #K.HERD_ANIMALS then
+    error(MODULE_NAME .. ": the herd code is not the one this module knows")
+  end
+  G.herds = {}
+  for i, site in ipairs(sites) do
+    local herd = { command = K.HERD_ANIMALS[i][1], name = K.HERD_ANIMALS[i][2], site = site + K.HERD.site }
+    herd.mask = rd8(site + K.HERD.mask) & 0xFF
+    herd.unit = rd32(site + K.HERD.unit)
+    herd.base = rd8(site + K.HERD.base) & 0xFF
+    expectBytes(site + K.HERD.group[1], K.HERD.group[2], "the herd code")
+    herd.group = rd16(site + K.HERD.group[1] + #K.HERD.group[2])
+    G.herds[herd.command] = herd
+  end
 end
 
 ---------------------------------------------------------------------------------------
@@ -700,42 +865,161 @@ local function makeSpriteBoxes(G)
   end
 end
 
+-- A picture for the blit routine from raw screen pixels (the game's own pixel values, the
+-- same for both pixel formats): pixels[y * width + x + 1] or nil for see-through.
+local function storeRawPicture(width, height, pixels)
+  local count = width * height
+  local base = core.allocate(0x14 + count * 3, true)
+  local words, mask = {}, {}
+  for index = 1, count do
+    local value = pixels[index]
+    words[index * 2 - 1], words[index * 2] = (value or 0) & 0xFF, ((value or 0) >> 8) & 0xFF
+    mask[index] = value ~= nil and 255 or 0
+  end
+  wr32(base, width)
+  wr32(base + 4, height)
+  wr32(base + 8, base + 0x14)
+  wr32(base + 0xC, base + 0x14)
+  wr32(base + 0x10, base + 0x14 + count * 2)
+  core.writeBytes(base + 0x14, words)
+  core.writeBytes(base + 0x14 + count * 2, mask)
+  return base
+end
+
+-- Rocks as the map renderer draws them: per footprint tile (getBuildingSizeIndexMappingData:
+-- the tile's offset and picture number for the map's current turn) the picture
+-- first + base + tile picture + rotation step * tiles - 1 of the rock gm, a 30 x 16 diamond
+-- (512 bytes of pixels) and above it a TGX picture of the tall part. The tiles are laid out
+-- with renderMap's transform for the turn and composed into one picture, cached.
+local function makeRockPictures(G)
+  local footprint = core.exposeCode(G.footprint, 3, 1)
+  local cache, tiles = {}, {}
+
+  local function tile(frame)
+    if tiles[frame] ~= nil then return tiles[frame] end
+    local header = G.pictureHeights - 2 + frame * PICTURE_SIZE
+    local width, height = rd16(header), rd16(header + 2)
+    local tileY, partX = rd16(header + 10), rd8(header + 13) & 0xFF
+    if width <= 0 or height <= 0 then return nil end
+    local data = rd32(G.pictureOffsets + frame * 4) + rd32(G.textures + TEXTURES_DATA)
+    local canvas = math.max(32, partX + width)
+    local pixels = {}
+    local diamond = core.readBytes(data, K.TILE_DIAMOND_BYTES)
+    local i = 1
+    for row, n in ipairs(K.TILE_DIAMOND) do
+      local left = 16 - n // 2
+      for k = 0, n - 1 do
+        pixels[(tileY + row - 1) * canvas + left + k + 1] = (diamond[i] & 0xFF) | ((diamond[i + 1] & 0xFF) << 8)
+        i = i + 2
+      end
+    end
+    -- The tall part: n literal pixels, a repeated pixel, n see-through, new line.
+    local chunk, chunkStart = nil, 0
+    local function byte(offset)
+      if chunk == nil or offset >= chunkStart + #chunk then
+        chunkStart = offset
+        chunk = core.readBytes(data + K.TILE_DIAMOND_BYTES + offset, 4096)
+      end
+      return chunk[offset - chunkStart + 1] & 0xFF
+    end
+    local x, y, offset = 0, 0, 0
+    while y < height and offset < width * height * 4 do
+      local token = byte(offset)
+      offset = offset + 1
+      local n, flag = (token & 0x1F) + 1, token >> 5
+      if flag == 0 then
+        for _ = 1, n do
+          pixels[y * canvas + partX + x + 1] = byte(offset) | (byte(offset + 1) << 8)
+          offset, x = offset + 2, x + 1
+        end
+      elseif flag == 4 then
+        x, y = 0, y + 1
+      elseif flag == 2 then
+        local value = byte(offset) | (byte(offset + 1) << 8)
+        offset = offset + 2
+        for _ = 1, n do
+          pixels[y * canvas + partX + x + 1] = value
+          x = x + 1
+        end
+      elseif flag == 1 then
+        x = x + n
+      else
+        break
+      end
+    end
+    local result = { width = canvas, height = math.max(height, tileY + 16), tileY = tileY, pixels = pixels }
+    tiles[frame] = result
+    return result
+  end
+
+  -- size: footprint tiles per side (1 .. 4); base: the rock's first picture.
+  return function(size, base, rotation)
+    local tileMap = G.tileMap
+    local turn = rd32(tileMap + K.TILE_MAP.orientation)
+    if rd32(tileMap + K.TILE_MAP.mode) ~= 5 then turn = turn + rotation end
+    local step = (turn % 8) // 2
+    local view = rd32(tileMap + K.TILE_MAP.orientation)
+    local key = string.format("%d/%d/%d/%d", size, base, step, view)
+    if cache[key] ~= nil then return cache[key] end
+    local first = rd32(G.firstPictures + G.rockGm * 4)
+    local t = K.TURN[view]
+    if first <= 0 or t == nil then return nil end
+    local parts, left, top, right, bottom = {}, math.huge, math.huge, -math.huge, -math.huge
+    for k = 0, size * size - 1 do
+      footprint(tileMap, k, size)
+      local dx, dy = rd32(tileMap + K.TILE_MAP.tileX), rd32(tileMap + K.TILE_MAP.tileY)
+      local picture = rd32(tileMap + K.TILE_MAP.tilePicture)
+      local part = tile(first + base + picture + step * size * size - 1)
+      if part == nil then return nil end
+      local d, s = dx - dy, dx + dy
+      local x = t.xd * d + t.xs * s
+      local y = t.yd * d + t.ys * s - part.tileY
+      parts[#parts + 1] = { part = part, x = x, y = y, order = y + part.tileY }
+      left, top = math.min(left, x), math.min(top, y)
+      right, bottom = math.max(right, x + part.width), math.max(bottom, y + part.height)
+    end
+    table.sort(parts, function(a, b) return a.order < b.order end)
+    local width, height = right - left, bottom - top
+    local pixels = {}
+    for _, p in ipairs(parts) do
+      local ox, oy = p.x - left, p.y - top
+      for index, value in pairs(p.part.pixels) do
+        local px, py = (index - 1) % p.part.width, (index - 1) // p.part.width
+        pixels[(oy + py) * width + ox + px + 1] = value
+      end
+    end
+    local picture = { address = storeRawPicture(width, height, pixels), width = width, height = height }
+    cache[key] = picture
+    return picture
+  end
+end
+
 ---------------------------------------------------------------------------------------
 -- Map counts: the tooltip
 ---------------------------------------------------------------------------------------
 
-local function makeTooltip(G, newTable, moved, data)
+-- candidates: { item = button, lines = function returning text lines or nil }.
+local function makeTooltip(G, candidates)
   local isMouseInside = core.exposeCode(G.isMouseInside, 5, 1)
   local roundedBox = core.exposeCode(G.roundedBox, 6, 1)
   local textWidth = core.exposeCode(G.textWidth, 4, 1)
   local shadowedText = core.exposeCode(G.shadowedText, 10, 1)
   local lineBuffers = { core.allocate(96, true), core.allocate(96, true) }
 
-  local function lines(param)
-    if param == ANIMALS then
-      return {
-        { "Animals and units", rd32(G.units), G.unitLimit },
-        { "Herds and troops", rd32(data.totals + 8), G.groupSlots },
-      }
-    elseif param == VEGETATION then
-      return { { "Trees and shrubs", rd32(data.totals), G.treeSlots } }
-    end
-    return { { "Rocks", rd32(data.totals + 4), G.rockSlots } }
-  end
-
   -- Like the description line, the tooltip is drawn on the map surface (at the screen
   -- position plus the camera offset), which is drawn afresh every frame: nothing of it stays
   -- behind once the mouse leaves the button. Lines are added upwards, away from the panel.
   return function()
-    for _, param in ipairs({ ANIMALS, VEGETATION, ROCKS }) do
-      local button = item(newTable, moved(G.buttons[param].index))
+    for _, candidate in ipairs(candidates) do
+      local button = candidate.item
       local x = rd32(G.menu + MENU_X) + rd32(button + ITEM_X)
       local y = rd32(G.menu + MENU_Y) + rd32(button + ITEM_Y)
-      if rd16(button + ITEM_HOVERED) ~= 0
-          and isMouseInside(G.mouse, x, y, rd32(button + ITEM_WIDTH), rd32(button + ITEM_HEIGHT)) ~= 0 then
-        local shown, widest = lines(param), 0
-        for i, line in ipairs(shown) do
-          local text = string.format("%s: %d/%d", line[1], line[2], line[3])
+      local shown = rd16(button + ITEM_HOVERED) ~= 0
+        and isMouseInside(G.mouse, x, y, rd32(button + ITEM_WIDTH), rd32(button + ITEM_HEIGHT)) ~= 0
+        and candidate.lines()
+      if shown then
+        local widest = 0
+        for i, text in ipairs(shown) do
           writeCString(lineBuffers[i], text)
           widest = math.max(widest, textWidth(G.textManager, lineBuffers[i], #text, TOOLTIP_FONT))
         end
@@ -762,49 +1046,124 @@ local function makeTooltip(G, newTable, moved, data)
 end
 
 ---------------------------------------------------------------------------------------
--- Trees: the shrub and felled tree panels
+-- Rows of buttons above the panel: trees, shrubs, rocks
 ---------------------------------------------------------------------------------------
 
-local function makePanel(G, O, data, panel)
-  local roundedBox = core.exposeCode(G.roundedBox, 6, 1)
-  local colourBox = core.exposeCode(G.colourBox, 6, 1)
-  local renderGM = core.exposeCode(G.renderGM, 5, 1)
-  local renderNumber = core.exposeCode(G.renderNumber, 10, 1)
-  local spriteBox = makeSpriteBoxes(G)
-
+-- What the tree panel shows for the chosen tool: the felled trees of the chosen tree, or the
+-- five shrubs, and with random mixes on a random standing tree (the tree's own button picture),
+-- a random felled tree and a random shrub. Each entry: its item, a game sprite (gm, picture,
+-- palette) or button image, the param its click gets, whether it is the chosen one, a label and
+-- the counter to show on it.
+local function makeTreeEntries(G, O, data, panel)
   local function stage()
     if not O.growth then return PLACED_STAGE end
     return math.max(0, math.min(MAX_STAGE, rd32(G.brush) - 1))
   end
-
-  local function hideAll()
-    for _, address in ipairs(panel.items) do wr16(address + ITEM_HIDDEN, 1) end
-  end
-
-  -- What the panel shows for the chosen tool: a list of buttons, each with its item, sprite
-  -- and whether it is the chosen one.
-  local function entries(command)
+  return function(command)
     local list = {}
     if O.felled and command >= FIRST_TREE_COMMAND and command <= LAST_TREE_COMMAND then
       local treeType, treeStage = G.plantTypes[command], stage()
       local most = math.min(rd32(G.logs + (treeType * STAGES + treeStage) * 4), MOST_LOGS)
       local gm = rd16(G.typeGm + treeType * 4)
-      for i = 1, most do
-        local logs = most - i + 1
-        local picture = FELLED_STAGE_0_PICTURE
-        if treeStage > 0 then picture = FELLED_PICTURE_BASE[math.min(treeStage, 4)] - logs end
-        list[i] = { item = panel.felled[i], gm = gm, picture = picture, palette = FELLED_PALETTE,
-          param = logs, chosen = rd32(data.felledLogs) == logs and rd32(data.felledCommand) == command }
+      local felledLogs, felledCommand = rd32(data.felledLogs), rd32(data.felledCommand)
+      local function add(entry)
+        entry.item = panel.felled[#list + 1]
+        entry.chosen = felledLogs == entry.param and felledCommand == command
+        list[#list + 1] = entry
+      end
+      local function felledPicture(logs)
+        if treeStage == 0 then return FELLED_STAGE_0_PICTURE end
+        return FELLED_PICTURE_BASE[math.min(treeStage, 4)] - logs
+      end
+      if O.randomMix and treeStage >= 1 and treeStage <= K.MOST_RANDOM_STAGE then
+        add({ image = panel.images[command], param = K.RANDOM_STANDING, label = K.RANDOM_LABEL })
+      end
+      for logs = most, 1, -1 do
+        add({ gm = gm, picture = felledPicture(logs), palette = FELLED_PALETTE, param = logs })
+      end
+      if O.randomMix and most >= 2 then
+        add({ gm = gm, picture = felledPicture(most), palette = FELLED_PALETTE, param = K.RANDOM_FELLED,
+          label = K.RANDOM_LABEL })
       end
     elseif O.shrubs then
+      local random = O.randomMix and rd8(data.randomShrub) ~= 0
       for i, shrub in ipairs(SHRUB_COMMANDS) do
         local shrubType = G.plantTypes[shrub]
         list[i] = { item = panel.shrubs[i], gm = rd16(G.typeGm + shrubType * 4), picture = SHRUB_PICTURE,
-          palette = SHRUB_PALETTES[shrubType] or 0, chosen = command == shrub,
+          palette = SHRUB_PALETTES[shrubType] or 0, chosen = command == shrub and not random,
           count = data.typeCounts and (data.typeCounts + shrubType * 4) }
+      end
+      if O.randomMix then
+        local shrubType = G.plantTypes[SHRUB_COMMANDS[1]]
+        list[#list + 1] = { item = panel.randomShrub, gm = rd16(G.typeGm + shrubType * 4), picture = SHRUB_PICTURE,
+          palette = SHRUB_PALETTES[shrubType] or 0, chosen = random, label = K.RANDOM_LABEL }
       end
     end
     return list
+  end
+end
+
+-- What the rock panel shows: the four variants of the chosen size, as the map would draw them
+-- now (rotation and turn), and at size 1x1 the extra rock (number 16: type 0, base 0).
+local function makeRockEntries(G, O, data, panel, rockPicture)
+  return function(command)
+    local size = rd32(G.chosenRockSize)
+    if size < 0 or size > 3 then return {} end
+    local lock = rd32(data.rockLock)
+    if lock == K.EXTRA_VARIANT + 1 and size ~= 0 then
+      wr32(data.rockLock, 0)                   -- the extra rock exists at 1x1 only
+      lock = 0
+    end
+    local rotation = rd32(G.tileMap + K.TILE_MAP.rotation)
+    local list = {}
+    for v = 0, K.ROCK_VARIANTS - 1 do
+      local base = rd32(G.rockBases + (size * K.ROCK_VARIANTS + v) * 4)
+      local picture = rockPicture(size + 1, base, rotation)
+      if picture == nil then return {} end
+      list[#list + 1] = { item = panel.rocks[v + 1], picture = picture, param = v + 1, chosen = lock == v + 1 }
+    end
+    if O.extraRock and size == 0 then
+      local picture = rockPicture(1, 0, rotation)
+      if picture == nil then return {} end
+      list[#list + 1] = { item = panel.rocks[K.EXTRA_VARIANT + 1], picture = picture,
+        param = K.EXTRA_VARIANT + 1, chosen = lock == K.EXTRA_VARIANT + 1 }
+    end
+    return list
+  end
+end
+
+-- The tooltip, drawn before the panels, again on top of them (see buildTable).
+local function drawTooltipOnTop(data)
+  if data.tooltip ~= nil then
+    data.tooltipLate = true
+    data.tooltip()
+  end
+end
+
+-- Draws a row of buttons above the panel, centred on the screen (squeezed together when wider
+-- than it), on the map surface like the description line, and lays out the row's items to
+-- match. Every frame while the panel is shown; the panel item hides the items otherwise.
+local function makePanel(G, O, data, panel, entries)
+  local roundedBox = core.exposeCode(G.roundedBox, 6, 1)
+  local colourBox = core.exposeCode(G.colourBox, 6, 1)
+  local renderGM = core.exposeCode(G.renderGM, 5, 1)
+  local renderNumber = core.exposeCode(G.renderNumber, 10, 1)
+  local blit = core.exposeCode(G.blit, 3, 0)
+  local textWidth = core.exposeCode(G.textWidth, 4, 1)
+  local shadowedText = core.exposeCode(G.shadowedText, 10, 1)
+  local labelBuffer = core.allocate(16, true)
+  local spriteBox = makeSpriteBoxes(G)
+
+  -- A button image's gm, picture and size; nil while it is not loaded.
+  local function image(index)
+    local entry = G.buttonImages + index * IMAGE_SIZE
+    local gm, picture = rd32(entry), rd32(entry + 4)
+    local first = rd32(G.firstPictures + gm * 4)
+    if first <= 0 then return nil end
+    local header = G.pictureHeights - 2 + (first + picture - 1) * PICTURE_SIZE
+    local width, height = rd16(header), rd16(header + 2)
+    if width <= 0 or height <= 0 then return nil end
+    return { gm = gm, picture = picture, width = width, height = height }
   end
 
   local function drawSprite(entry, x, y)
@@ -824,17 +1183,23 @@ local function makePanel(G, O, data, panel)
 
   return function()
     local list = entries(rd32(G.subtype))
-    hideAll()
+    for _, address in ipairs(panel.items) do wr16(address + ITEM_HIDDEN, 1) end
     if #list == 0 then return end
     local tallest = 0
     for _, entry in ipairs(list) do
-      entry.box = spriteBox(entry.gm, entry.picture)
-      if entry.box == nil then return end          -- the trees' pictures are not loaded yet
+      if entry.gm ~= nil then
+        entry.box = spriteBox(entry.gm, entry.picture)
+        if entry.box == nil then return end    -- the pictures are not loaded yet
+      elseif entry.image ~= nil then
+        entry.button = image(entry.image)
+        if entry.button == nil then return end
+        entry.box = { x = 0, y = 0, width = entry.button.width, height = entry.button.height }
+      else
+        entry.box = { x = 0, y = 0, width = entry.picture.width, height = entry.picture.height }
+      end
       tallest = math.max(tallest, entry.box.height)
     end
 
-    -- Lay the buttons out left to right, standing on the panel, centred on the screen; when
-    -- wider than the screen, the gaps shrink (below zero, the buttons overlap).
     local height = tallest + 2 * PANEL_PADDING
     local sum = 0
     for _, entry in ipairs(list) do
@@ -863,7 +1228,6 @@ local function makePanel(G, O, data, panel)
     end
     local right = math.floor(x - gap + 0.5)
 
-    -- Draw them on the map surface, like the description line.
     local offsetX = menuX - rd32(G.menu + MENU_SCROLL) + rd32(G.cameraX)
     local offsetY = rd32(G.menu + MENU_Y) + rd32(G.cameraY)
     local white = rd32(G.pixelFormat) == 0x565 and 0xFFFF or 0x7FFF
@@ -872,23 +1236,48 @@ local function makePanel(G, O, data, panel)
     roundedBox(G.pencil, offsetX + left - PANEL_GAP, offsetY + top - PANEL_GAP,
       offsetX + right + PANEL_GAP, offsetY + PANEL_BOTTOM + PANEL_GAP, BOX_BLEND)
     for _, entry in ipairs(list) do
-      local left, right = offsetX + entry.x, offsetX + entry.x + entry.width - 1
+      local l, r = offsetX + entry.x, offsetX + entry.x + entry.width - 1
       local upper, lower = offsetY + top, offsetY + PANEL_BOTTOM - 1
       if rd16(entry.item + ITEM_HOVERED) ~= 0 then
-        roundedBox(G.pencil, left, upper, right, lower, BOX_BLEND)
+        roundedBox(G.pencil, l, upper, r, lower, BOX_BLEND)
       end
       if entry.chosen then
-        colourBox(G.pencil, left, upper, right, upper + 1, white)
-        colourBox(G.pencil, left, lower - 1, right, lower, white)
-        colourBox(G.pencil, left, upper, left + 1, lower, white)
-        colourBox(G.pencil, right - 1, upper, right, lower, white)
+        colourBox(G.pencil, l, upper, r, upper + 1, white)
+        colourBox(G.pencil, l, lower - 1, r, lower, white)
+        colourBox(G.pencil, l, upper, l + 1, lower, white)
+        colourBox(G.pencil, r - 1, upper, r, lower, white)
       end
+    end
+    for _, entry in ipairs(list) do
+      local sx = offsetX + entry.x + PANEL_PADDING - entry.box.x
+      local sy = offsetY + PANEL_BOTTOM - PANEL_PADDING - entry.box.height - entry.box.y
+      if entry.gm == nil and entry.button == nil then blit(entry.picture.address, sx, sy) end
     end
     wr32(G.pencil + PENCIL_TARGET, target)
     for _, entry in ipairs(list) do
-      drawSprite(entry, offsetX + entry.x + PANEL_PADDING - entry.box.x,
-        offsetY + PANEL_BOTTOM - PANEL_PADDING - entry.box.height - entry.box.y)
+      local sx = offsetX + entry.x + PANEL_PADDING - entry.box.x
+      local sy = offsetY + PANEL_BOTTOM - PANEL_PADDING - entry.box.height - entry.box.y
+      if entry.gm ~= nil then
+        drawSprite(entry, sx, sy)
+      elseif entry.button ~= nil then
+        local mode = rd32(G.textures + TEXTURES_MODE)
+        wr32(G.textures + TEXTURES_MODE, MAP_LAYER)
+        renderGM(G.textures, entry.button.gm, entry.button.picture, sx, sy)
+        wr32(G.textures + TEXTURES_MODE, mode)
+      end
     end
+    -- Labels (the random mixes' "?"), at the top of their button.
+    local layer = rd32(G.textLayer)
+    wr32(G.textLayer, MAP_LAYER)
+    for _, entry in ipairs(list) do
+      if entry.label ~= nil then
+        writeCString(labelBuffer, entry.label)
+        local width = textWidth(G.textManager, labelBuffer, #entry.label, TOOLTIP_FONT)
+        shadowedText(G.textManager, labelBuffer, offsetX + entry.x + (entry.width - width) // 2,
+          offsetY + top + PANEL_PADDING, ALIGN_LEFT, TOOLTIP_COLOUR, 0, TOOLTIP_FONT, 0, 0)
+      end
+    end
+    wr32(G.textLayer, layer)
     if O.counts and rd8(data.shown) ~= 0 then
       local layer = rd32(G.textLayer)
       wr32(G.textLayer, MAP_LAYER)
@@ -904,15 +1293,88 @@ local function makePanel(G, O, data, panel)
     -- The "i" was drawn before the panel (it belongs to the part of the menu that is always
     -- shown); draw it again on top, the way its own renderer does (picture + 1 under the mouse).
     if panel.info ~= nil then
-      local entry = G.buttonImages + INFO_IMAGE * IMAGE_SIZE
-      local picture = rd32(entry + 4)
+      local image = G.buttonImages + INFO_IMAGE * IMAGE_SIZE
+      local picture = rd32(image + 4)
       if rd16(panel.info + ITEM_HOVERED) ~= 0 then picture = picture + 1 end
       local mode = rd32(G.textures + TEXTURES_MODE)
       wr32(G.textures + TEXTURES_MODE, MAP_LAYER)
-      renderGM(G.textures, rd32(entry), picture, offsetX + rd32(panel.info + ITEM_X),
+      renderGM(G.textures, rd32(image), picture, offsetX + rd32(panel.info + ITEM_X),
         offsetY + rd32(panel.info + ITEM_Y))
       wr32(G.textures + TEXTURES_MODE, mode)
     end
+    drawTooltipOnTop(data)
+  end
+end
+
+---------------------------------------------------------------------------------------
+-- The herd panel above the Animals menu
+---------------------------------------------------------------------------------------
+
+-- Two lines of text in a box centred on the screen: the chosen animal's herd (base + random
+-- part, or 2 x brush - 1 with the check box on) and troop type, and the check box with its
+-- label. The check box item is placed under its picture.
+local function makeHerdPanel(G, O, data, herd)
+  local roundedBox = core.exposeCode(G.roundedBox, 6, 1)
+  local textWidth = core.exposeCode(G.textWidth, 4, 1)
+  local shadowedText = core.exposeCode(G.shadowedText, 10, 1)
+  local renderGM = core.exposeCode(G.renderGM, 5, 1)
+  local buffers = { core.allocate(128, true), core.allocate(128, true) }
+
+  return function()
+    wr16(herd.checkBox + ITEM_HIDDEN, 1)
+    local animal = G.herds[rd32(G.subtype)]
+    if animal == nil then return end
+    local brush = rd32(G.brush)
+    local size
+    if rd8(data.herdSync) ~= 0 then
+      size = string.format("2 x brush %d - 1 = %d animals", brush, 2 * brush - 1)
+    else
+      size = string.format("%d + 0 to %d animals", animal.base, animal.mask)
+    end
+    local texts = {
+      string.format("%s herd: %s, troop type %d", animal.name, size, animal.group),
+      "Herd size from the brush size: 2 x brush - 1",
+    }
+    local widths = {}
+    for i, text in ipairs(texts) do
+      writeCString(buffers[i], text)
+      widths[i] = textWidth(G.textManager, buffers[i], #text, TOOLTIP_FONT)
+    end
+    local line = math.max(TOOLTIP_LINE, K.CHECK_BOX_SIZE + 2)
+    local width = math.max(widths[1], K.CHECK_BOX_SIZE + TOOLTIP_PADDING + widths[2]) + 2 * TOOLTIP_PADDING
+    local height = TOOLTIP_LINE + line + 2 * TOOLTIP_PADDING
+    local menuX = rd32(G.menu + MENU_X)
+    local left = (rd32(G.screenWidth) - width) // 2 - menuX
+    local top = PANEL_BOTTOM - height
+    local boxX, boxY = left + TOOLTIP_PADDING, top + TOOLTIP_PADDING + TOOLTIP_LINE
+    wr32(herd.checkBox + ITEM_X, boxX)
+    wr32(herd.checkBox + ITEM_Y, boxY)
+    wr32(herd.checkBox + ITEM_WIDTH, K.CHECK_BOX_SIZE)
+    wr32(herd.checkBox + ITEM_HEIGHT, K.CHECK_BOX_SIZE)
+    wr16(herd.checkBox + ITEM_HIDDEN, 0)
+
+    local offsetX = menuX - rd32(G.menu + MENU_SCROLL) + rd32(G.cameraX)
+    local offsetY = rd32(G.menu + MENU_Y) + rd32(G.cameraY)
+    local target = rd32(G.pencil + PENCIL_TARGET)
+    wr32(G.pencil + PENCIL_TARGET, MAP_LAYER)
+    roundedBox(G.pencil, offsetX + left, offsetY + top, offsetX + left + width, offsetY + PANEL_BOTTOM, BOX_BLEND)
+    wr32(G.pencil + PENCIL_TARGET, target)
+    local layer = rd32(G.textLayer)
+    wr32(G.textLayer, MAP_LAYER)
+    shadowedText(G.textManager, buffers[1], offsetX + left + TOOLTIP_PADDING, offsetY + top + TOOLTIP_PADDING // 2,
+      ALIGN_LEFT, TOOLTIP_COLOUR, 0, TOOLTIP_FONT, 0, 0)
+    shadowedText(G.textManager, buffers[2], offsetX + boxX + K.CHECK_BOX_SIZE + TOOLTIP_PADDING,
+      offsetY + boxY + (K.CHECK_BOX_SIZE - TOOLTIP_LINE) // 2 + 2, ALIGN_LEFT, TOOLTIP_COLOUR, 0, TOOLTIP_FONT, 0, 0)
+    wr32(G.textLayer, layer)
+
+    local image = G.buttonImages + (rd8(data.herdSync) ~= 0 and K.CHECKED_IMAGE or K.UNCHECKED_IMAGE) * IMAGE_SIZE
+    local picture = rd32(image + 4)
+    if rd16(herd.checkBox + ITEM_HOVERED) ~= 0 then picture = picture + 1 end
+    local mode = rd32(G.textures + TEXTURES_MODE)
+    wr32(G.textures + TEXTURES_MODE, MAP_LAYER)
+    renderGM(G.textures, rd32(image), picture, offsetX + boxX, offsetY + boxY)
+    wr32(G.textures + TEXTURES_MODE, mode)
+    drawTooltipOnTop(data)
   end
 end
 
@@ -920,41 +1382,55 @@ end
 -- Spreading rows of buttons over the panel
 ---------------------------------------------------------------------------------------
 
--- Once the buttons' pictures are loaded and the menu has placed them, spread the Textures
--- rows (with Gravel and Iron) and the Vegetation menu's top row (with the apple tree) evenly
--- between ROW_LEFT and ROW_RIGHT. Buttons keep their height; new ones (in `added`) take their
--- left neighbour's. Picture buttons have their width in `widthOf`, the others are measured by
--- their gm picture. Moved buttons are taken off the user control table, which would put
--- them back the next time the menu loads.
-local function makeLayout(G, rows, added, widthOf)
+-- Once the buttons' pictures are loaded and the menu has placed them, spread rows of buttons
+-- evenly between ROW_LEFT and ROW_RIGHT. Buttons keep their height; new ones (in `added`) are
+-- centred on their left neighbour. A row with `bottom` set stands its buttons on a common
+-- line instead (the lowest bottom edge among them). Buttons with their own pictures have their
+-- size in `sizeOf`, the others are measured by their gm picture. Moved buttons are taken off
+-- the user control table, which would put them back the next time the menu loads.
+local function makeLayout(G, rows, added, sizeOf)
+  local function measure(address)
+    local size = sizeOf[address]
+    if size ~= nil then return size[1], size[2] end
+    local index = rd32(address + ITEM_IMAGE) & IMAGE_INDEX_MASK
+    local gm = rd32(G.buttonImages + index * IMAGE_SIZE)
+    local first = rd32(G.firstPictures + gm * 4)
+    if first <= 0 then return nil end
+    local header = G.pictureHeights - 2 + (first + rd32(G.buttonImages + index * IMAGE_SIZE + 4) - 1) * PICTURE_SIZE
+    local width, height = rd16(header), rd16(header + 2)
+    if width <= 0 then return nil end
+    return width, height
+  end
+
   return function()
     for _, row in ipairs(rows) do
-      local widths, sum = {}, 0
+      local widths, heights, sum = {}, {}, 0
       for i, address in ipairs(row) do
-        local width = widthOf[address]
-        if width == nil then
-          local index = rd32(address + ITEM_IMAGE) & IMAGE_INDEX_MASK
-          local gm = rd32(G.buttonImages + index * IMAGE_SIZE)
-          local first = rd32(G.firstPictures + gm * 4)
-          if first <= 0 then return false end
-          width = rd16(G.pictureHeights - 2 + (first + rd32(G.buttonImages + index * IMAGE_SIZE + 4) - 1) * PICTURE_SIZE)
-          if width <= 0 then return false end
-        end
+        local width, height = measure(address)
+        if width == nil then return false end
         if not added[address] and (rd32(address + ITEM_X) & 0xFFFFFFFF) == PLACED_BY_CONTROL then
           return false                         -- the menu has not been loaded yet
         end
-        widths[i], sum = width, sum + width
+        widths[i], heights[i], sum = width, height, sum + width
       end
-      row.widths, row.sum = widths, sum
+      row.widths, row.heights, row.sum = widths, heights, sum
     end
     for _, row in ipairs(rows) do
+      local line = nil
+      if row.bottom then
+        for i, address in ipairs(row) do
+          if not added[address] then line = math.max(line or 0, rd32(address + ITEM_Y) + row.heights[i]) end
+        end
+      end
       local gap = (ROW_RIGHT - ROW_LEFT - row.sum) / (#row - 1)
-      local x, y = ROW_LEFT, nil
+      local x, y, h = ROW_LEFT, nil, nil
       for i, address in ipairs(row) do
-        if added[address] then
-          wr32(address + ITEM_Y, y)
+        if line ~= nil then
+          wr32(address + ITEM_Y, line - row.heights[i])
+        elseif added[address] then
+          wr32(address + ITEM_Y, y + (h - row.heights[i]) // 2)
         else
-          y = rd32(address + ITEM_Y)
+          y, h = rd32(address + ITEM_Y), row.heights[i]
         end
         wr32(address + ITEM_X, math.floor(x + 0.5))
         wr16(address + ITEM_CONTROL, -1)
@@ -977,6 +1453,12 @@ local function buildTable(G, O)
   local pictures = {}
   if O.apple then pictures.apple = buttonPictures("apple") end
   if O.textures then pictures.gravel = buttonPictures("gravel") end
+  local rockTabs = {}
+  if O.variants then
+    for _, tab in ipairs({ ROCKS, K.ROCKS_SKIRMISH }) do
+      if G.blockEnd[tab] ~= nil then rockTabs[#rockTabs + 1] = tab end
+    end
+  end
 
   local inserts = {}
   local function insert(before, kind)
@@ -984,24 +1466,34 @@ local function buildTable(G, O)
     table.insert(inserts[before], kind)
   end
   insert(MAP_CLICK_ITEM, "guard")
-  if O.counts then
-    insert(INFO_BEFORE_ITEM, "info")
-    insert(G.firstBlock, "tooltip")
-    insert(G.blockEnd[ANIMALS], "numbers" .. ANIMALS)
+  if O.counts then insert(INFO_BEFORE_ITEM, "info") end
+  if O.counts or O.obstacles then insert(G.firstBlock, "tooltip") end
+  local animalsEnd = G.blockEnd[ANIMALS]
+  if O.herds then
+    insert(animalsEnd, "herdCheck")
+    insert(animalsEnd, "herdPanel")
   end
+  if O.counts then insert(animalsEnd, "numbers" .. ANIMALS) end
   local vegetationEnd = G.blockEnd[VEGETATION]
   if O.apple then insert(vegetationEnd, "apple") end
   if O.shrubs then
     for i = 1, #SHRUB_COMMANDS do insert(vegetationEnd, "shrub" .. i) end
+    if O.randomMix then insert(vegetationEnd, "randomShrub") end
   end
+  local felledButtons = MOST_LOGS + (O.randomMix and 2 or 0)
+  if O.obstacles then insert(vegetationEnd, OBSTACLES_BUTTON) end
   if O.felled then
-    for i = 1, MOST_LOGS do insert(vegetationEnd, "felled" .. i) end
+    for i = 1, felledButtons do insert(vegetationEnd, "felled" .. i) end
   end
   if O.shrubs or O.felled then insert(vegetationEnd, "panel") end
   if O.counts then insert(vegetationEnd, "numbers" .. VEGETATION) end
   if O.textures then
     insert(G.blockEnd[TEXTURES], "gravel")
     insert(G.blockEnd[TEXTURES], "iron")
+  end
+  for _, tab in ipairs(rockTabs) do
+    for v = 1, K.ROCK_VARIANTS + 1 do insert(G.blockEnd[tab], "rock" .. tab .. "/" .. v) end
+    insert(G.blockEnd[tab], "rockPanel" .. tab)
   end
 
   local count = ITEM_COUNT + 1
@@ -1022,11 +1514,49 @@ local function buildTable(G, O)
   local function copyOf(param, into)
     core.writeBytes(into, core.readBytes(item(G.table, G.buttons[param].index), MENU_ITEM_SIZE))
   end
+  -- A lua function called from injected code: a pad that runs it, switched off after an error.
+  local function luaPad(fn, what)
+    local pad = core.allocateCode({ 0x90, 0x90, 0x90, 0x90, 0x90, 0xC3 })
+    local broken = false
+    core.detourCode(function(registers)
+      if not broken then
+        local ok, problem = pcall(fn)
+        if not ok then
+          broken = true
+          log(WARNING, string.format("%s: %s stopped after an error: %s", MODULE_NAME, what, tostring(problem)))
+        end
+      end
+      return registers
+    end, pad, 5)
+    return pad
+  end
+  -- A button with no picture of its own, never drawn by the menu.
+  local function plainButton(into, action)
+    wr32(into + ITEM_TYPE, TYPE_CLICKABLE)
+    wr32(into + ITEM_ACTION, action)
+    wr32(into + ITEM_RENDER_TYPE, RENDER_NONE)
+    wr16(into + ITEM_HIDDEN, 1)
+  end
 
   data.shown = core.allocate(4, true)
   wr32(data.shown, O.shown and 1 or 0)
   data.felledLogs = core.allocate(4, true)
   data.felledCommand = core.allocate(4, true)
+  data.rockLock = core.allocate(4, true)
+  data.herdSync = core.allocate(4, true)
+  data.nearObstacles = core.allocate(4, true)
+  data.randomShrub = core.allocate(4, true)
+  data.seed = core.allocate(4, true)
+  wr32(data.seed, os.time())
+  local unused = core.allocate(8, true)        -- the panel template's felled tree state, for panels without it
+  if next(pictures) ~= nil or #rockTabs > 0 then
+    G.blit = core.allocateAssembly(templates.blit, {
+      PENCIL = G.pencil, SETUP_SURFACE = G.setupSurface, SETUP_PENCIL = G.setupPencil,
+      SCRATCH = core.allocate(32, true), PIXEL_FORMAT = G.pixelFormat,
+    })
+  end
+  local guarded = {}
+  local tooltips = {}
 
   -- Map counts.
   if O.counts then
@@ -1085,42 +1615,31 @@ local function buildTable(G, O)
     wr32(info + ITEM_IMAGE, INFO_IMAGE)
     wr32(info + ITEM_RENDER_TYPE, RENDER_IMAGE)
     wr32(info + ITEM_TEXT, 0)              -- no description, the usual hover sound
+    guarded[#guarded + 1] = info
+    guarded[#guarded + 1] = 0
 
-    -- The tooltip: drawn after everything else that is always shown, never hit by the mouse.
-    local pad = core.allocateCode({ 0x90, 0x90, 0x90, 0x90, 0x90, 0xC3 })
-    local drawTooltip = makeTooltip(G, newTable, moved, data)
-    local broken = false
-    core.detourCode(function(registers)
-      if not broken then
-        local ok, problem = pcall(drawTooltip)
-        if not ok then
-          broken = true
-          log(WARNING, MODULE_NAME .. ": the tooltip stopped after an error: " .. tostring(problem))
-        end
+    -- The category tooltips.
+    local function counts(...)
+      local lines = { ... }
+      return function()
+        if rd8(data.shown) == 0 then return nil end
+        local texts = {}
+        for i, line in ipairs(lines) do texts[i] = string.format("%s: %d/%d", line[1], line[2](), line[3]) end
+        return texts
       end
-      return registers
-    end, pad, 5)
-    local tooltip = added.tooltip
-    wr32(tooltip + ITEM_TYPE, TYPE_CLICKABLE)
-    wr32(tooltip + ITEM_RENDER, core.allocateAssembly(templates.tooltip, {
-      SHOWN = data.shown, PAD = pad,
-      ANIMALS_HOVER = button(ANIMALS) + ITEM_HOVERED,
-      VEGETATION_HOVER = button(VEGETATION) + ITEM_HOVERED,
-      ROCKS_HOVER = button(ROCKS) + ITEM_HOVERED,
-    }))
-    wr32(tooltip + ITEM_RENDER_TYPE, RENDER_SIMPLE)
+    end
+    tooltips[#tooltips + 1] = { item = button(ANIMALS), lines = counts(
+      { "Animals and units", function() return rd32(G.units) end, G.unitLimit },
+      { "Herds and troops", function() return rd32(data.totals + 8) end, G.groupSlots }) }
+    tooltips[#tooltips + 1] = { item = button(VEGETATION), lines = counts(
+      { "Trees and shrubs", function() return rd32(data.totals) end, G.treeSlots }) }
+    tooltips[#tooltips + 1] = { item = button(ROCKS), lines = counts(
+      { "Rocks", function() return rd32(data.totals + 4) end, G.rockSlots }) }
   end
 
   -- Buttons drawn from PNG pictures: a copy of a button of their tab, their own command and
   -- pictures, hidden until laid out.
-  local blit = nil
   local function pictureButton(into, model, command, set)
-    if blit == nil then
-      blit = core.allocateAssembly(templates.blit, {
-        PENCIL = G.pencil, SETUP_SURFACE = G.setupSurface, SETUP_PENCIL = G.setupPencil,
-        SCRATCH = core.allocate(32, true), PIXEL_FORMAT = G.pixelFormat,
-      })
-    end
     copyOf(model, into)
     wr32(into + ITEM_X, 0)
     wr32(into + ITEM_Y, 0)
@@ -1134,24 +1653,58 @@ local function buildTable(G, O)
     wr32(into + ITEM_RENDER, core.allocateAssembly(templates.pictureButton, {
       NORMAL = set.normal, HOVERED = set.hover, CHOSEN = set.chosen, COMMAND = command,
       SUBTYPE = G.subtype, HOVER = G.hover, PENCIL = G.pencil, PENCIL_TARGET = PENCIL_TARGET,
-      ITEM_X = G.itemX, ITEM_Y = G.itemY, BLIT = blit,
+      ITEM_X = G.itemX, ITEM_Y = G.itemY, BLIT = G.blit,
     }))
   end
 
-  local rows, newButtons, rowPictures = {}, {}, {}
+  local rows, newButtons, sizeOf = {}, {}, {}
   if O.apple then
-    pictureButton(added.apple, VEGETATION_ROW[1], APPLE_COMMAND, pictures.apple)
-    rowPictures[added.apple] = pictures.apple.width
+    pictureButton(added.apple, VEGETATION_TREES[1], APPLE_COMMAND, pictures.apple)
+    sizeOf[added.apple] = { pictures.apple.width, pictures.apple.height }
     newButtons[added.apple] = true
-    local row = {}
-    for _, param in ipairs(VEGETATION_ROW) do
-      row[#row + 1] = param == APPLE_COMMAND and added.apple or button(param)
-    end
-    rows[#rows + 1] = row
   end
+
+  -- The obstacles check box: in the Vegetation menu, drawn like the menu's buttons.
+  if O.obstacles then
+    local box = added[OBSTACLES_BUTTON]
+    wr32(box + ITEM_TYPE, TYPE_CLICKABLE)
+    wr32(box + ITEM_WIDTH, K.CHECK_BOX_SIZE)
+    wr32(box + ITEM_HEIGHT, K.CHECK_BOX_SIZE)
+    wr32(box + ITEM_ACTION, core.allocateAssembly(templates.flip, { FLAG = data.nearObstacles }))
+    wr32(box + ITEM_RENDER_TYPE, RENDER_SIMPLE)
+    wr32(box + ITEM_RENDER, core.allocateAssembly(templates.checkBox, {
+      FLAG = data.nearObstacles, ON_IMAGE = G.buttonImages + K.CHECKED_IMAGE * IMAGE_SIZE,
+      OFF_IMAGE = G.buttonImages + K.UNCHECKED_IMAGE * IMAGE_SIZE,
+      HOVER = G.hover, DRAW_MODE = G.drawMode, ITEM_X = G.itemX, ITEM_Y = G.itemY,
+      TEXTURES = G.textures, RENDER_GM = G.renderGM,
+    }))
+    wr16(box + ITEM_HIDDEN, 1)
+    sizeOf[box] = { K.CHECK_BOX_SIZE, K.CHECK_BOX_SIZE }
+    newButtons[box] = true
+    tooltips[#tooltips + 1] = { item = box, lines = function()
+      return { "Trees and shrubs next to obstacles: " .. (rd8(data.nearObstacles) ~= 0 and "allowed" or "not allowed") }
+    end }
+  end
+
+  -- The Vegetation menu's rows: the trees, the apple tree and the check box on top (the
+  -- shrub moves down, unless the rows are left as they are), the shrubs sorted below.
+  if O.apple or O.obstacles or O.sortedRows then
+    local top = {}
+    for _, param in ipairs(VEGETATION_TREES) do top[#top + 1] = button(param) end
+    if O.apple then top[#top + 1] = added.apple end
+    if not O.sortedRows then top[#top + 1] = button(TOP_ROW_SHRUB) end
+    if O.obstacles then top[#top + 1] = added[OBSTACLES_BUTTON] end
+    rows[#rows + 1] = top
+  end
+  if O.sortedRows then
+    local bottom = { bottom = true }
+    for _, param in ipairs(SORTED_SHRUBS) do bottom[#bottom + 1] = button(param) end
+    rows[#rows + 1] = bottom
+  end
+
   if O.textures then
     pictureButton(added.gravel, TEXTURE_ROWS[1][1], GRAVEL_COMMAND, pictures.gravel)
-    rowPictures[added.gravel] = pictures.gravel.width
+    sizeOf[added.gravel] = { pictures.gravel.width, pictures.gravel.height }
     newButtons[added.gravel] = true
     -- Iron: a copy of the Heights menu's iron button, picture and description included.
     copyOf(IRON_COMMAND, added.iron)
@@ -1173,17 +1726,31 @@ local function buildTable(G, O)
       rows[#rows + 1] = row
     end
   end
-  local layout = makeLayout(G, rows, newButtons, rowPictures)
+  local layout = makeLayout(G, rows, newButtons, sizeOf)
+
+  -- A panel item at the end of a tab: shows its panel (lua) while one of its tools is chosen.
+  local function panelItem(into, items, first, last, firstShrub, lastShrub, pad, felledLogs, felledCommand)
+    wr32(into + ITEM_TYPE, TYPE_CLICKABLE)
+    wr32(into + ITEM_RENDER_TYPE, RENDER_SIMPLE)
+    wr32(into + ITEM_RENDER, core.allocateAssembly(templates.panel, {
+      SUBTYPE = G.subtype, FELLED_LOGS = felledLogs or unused, FELLED_COMMAND = felledCommand or unused + 4,
+      FIRST_TREE = first, LAST_TREE = last, FIRST_SHRUB = firstShrub, LAST_SHRUB = lastShrub,
+      PANEL_ITEMS = dwordList(items), ITEM_HIDDEN = ITEM_HIDDEN, PAD = pad,
+    }))
+  end
 
   -- The shrub and felled tree panels.
-  local guarded = {}
-  if O.counts then
-    guarded[#guarded + 1] = added.info
-    guarded[#guarded + 1] = 0
-  end
   if O.shrubs or O.felled then
-    local panel = { items = {}, shrubs = {}, felled = {}, info = added.info }
+    local panel = { items = {}, shrubs = {}, felled = {}, images = {}, info = added.info }
     if O.shrubs then
+      -- With random mixes, choosing a shrub (here or in the menu) ends the random shrub.
+      local shrubAction = nil
+      if O.randomMix then
+        shrubAction = core.allocateAssembly(templates.rockButton, {
+          ROCK_LOCK = data.randomShrub, ACTION = G.buttons[SHRUB_COMMANDS[1]].action,
+        })
+        wr32(button(SHRUB_COMMANDS[1]) + ITEM_ACTION, shrubAction)
+      end
       for i, command in ipairs(SHRUB_COMMANDS) do
         local into = added["shrub" .. i]
         copyOf(SHRUB_COMMANDS[1], into)        -- the shrub button: its group's action and description
@@ -1193,54 +1760,102 @@ local function buildTable(G, O)
         wr32(into + ITEM_IMAGE, 0)
         wr32(into + ITEM_RENDER_TYPE, RENDER_NONE)
         wr16(into + ITEM_HIDDEN, 1)
+        if shrubAction ~= nil then wr32(into + ITEM_ACTION, shrubAction) end
         panel.shrubs[i] = into
         panel.items[#panel.items + 1] = into
+      end
+      if O.randomMix then
+        panel.randomShrub = added.randomShrub
+        plainButton(panel.randomShrub, core.allocateAssembly(templates.flip, { FLAG = data.randomShrub }))
+        panel.items[#panel.items + 1] = panel.randomShrub
       end
     end
     if O.felled then
       local click = core.allocateAssembly(templates.felledClick, {
         SUBTYPE = G.subtype, FELLED_LOGS = data.felledLogs, FELLED_COMMAND = data.felledCommand,
       })
-      for i = 1, MOST_LOGS do
-        local into = added["felled" .. i]
-        wr32(into + ITEM_TYPE, TYPE_CLICKABLE)
-        wr32(into + ITEM_ACTION, click)
-        wr32(into + ITEM_RENDER_TYPE, RENDER_NONE)
-        wr16(into + ITEM_HIDDEN, 1)
-        panel.felled[i] = into
-        panel.items[#panel.items + 1] = into
+      for command = FIRST_TREE_COMMAND, LAST_TREE_COMMAND do
+        panel.images[command] = rd32(item(G.table, G.buttons[command].index, ITEM_IMAGE)) & IMAGE_INDEX_MASK
+      end
+      for i = 1, felledButtons do
+        plainButton(added["felled" .. i], click)
+        panel.felled[i] = added["felled" .. i]
+        panel.items[#panel.items + 1] = added["felled" .. i]
       end
     end
     for _, address in ipairs(panel.items) do
       guarded[#guarded + 1] = address
       guarded[#guarded + 1] = VEGETATION
     end
-
-    local paint = makePanel(G, O, data, panel)
-    local pad = core.allocateCode({ 0x90, 0x90, 0x90, 0x90, 0x90, 0xC3 })
-    local broken = false
-    core.detourCode(function(registers)
-      if not broken then
-        local ok, problem = pcall(paint)
-        if not ok then
-          broken = true
-          log(WARNING, MODULE_NAME .. ": the tree panels stopped after an error: " .. tostring(problem))
-        end
-      end
-      return registers
-    end, pad, 5)
+    local pad = luaPad(makePanel(G, O, data, panel, makeTreeEntries(G, O, data, panel)), "the tree panels")
     local first, last = 1, 0                   -- an empty range when the felled panel is off
     if O.felled then first, last = FIRST_TREE_COMMAND, LAST_TREE_COMMAND end
     local firstShrub, lastShrub = 1, 0
     if O.shrubs then firstShrub, lastShrub = SHRUB_COMMANDS[1], SHRUB_COMMANDS[#SHRUB_COMMANDS] end
-    local painter = added.panel
-    wr32(painter + ITEM_TYPE, TYPE_CLICKABLE)
-    wr32(painter + ITEM_RENDER_TYPE, RENDER_SIMPLE)
-    wr32(painter + ITEM_RENDER, core.allocateAssembly(templates.panel, {
-      SUBTYPE = G.subtype, FELLED_LOGS = data.felledLogs, FELLED_COMMAND = data.felledCommand,
-      FIRST_TREE = first, LAST_TREE = last, FIRST_SHRUB = firstShrub, LAST_SHRUB = lastShrub,
-      PANEL_ITEMS = dwordList(panel.items), ITEM_HIDDEN = ITEM_HIDDEN, PAD = pad,
+    panelItem(added.panel, panel.items, first, last, firstShrub, lastShrub, pad, data.felledLogs, data.felledCommand)
+  end
+
+  -- The rock variant panels (one per Rocks tab), and the Rocks menu's own buttons going back
+  -- to cycling variants.
+  if #rockTabs > 0 then
+    local click = core.allocateAssembly(templates.rockClick, { ROCK_LOCK = data.rockLock })
+    local rockPicture = makeRockPictures(G)
+    for _, tab in ipairs(rockTabs) do
+      local panel = { items = {}, rocks = {}, info = added.info }
+      for v = 1, K.ROCK_VARIANTS + 1 do
+        local into = added["rock" .. tab .. "/" .. v]
+        plainButton(into, click)
+        panel.rocks[v] = into
+        panel.items[#panel.items + 1] = into
+        guarded[#guarded + 1] = into
+        guarded[#guarded + 1] = tab
+      end
+      local pad = luaPad(makePanel(G, O, data, panel, makeRockEntries(G, O, data, panel, rockPicture)),
+        "the rock panel")
+      panelItem(added["rockPanel" .. tab], panel.items, K.FIRST_ROCK_COMMAND, K.LAST_ROCK_COMMAND, 1, 0, pad)
+    end
+    -- The buttons and their groups' headers, whose action the Menu constructor may copy into
+    -- them.
+    local wrapped = {}
+    local function wrap(index, action)
+      if wrapped[index] or action == 0 then return end
+      wrapped[index] = true
+      wr32(item(newTable, moved(index), ITEM_ACTION), core.allocateAssembly(templates.rockButton, {
+        ROCK_LOCK = data.rockLock, ACTION = action,
+      }))
+    end
+    for _, rock in ipairs(G.rockButtons) do
+      wrap(rock.index, rock.action)
+      if rock.group ~= nil then wrap(rock.group, rd32(item(G.table, rock.group, ITEM_ACTION))) end
+    end
+  end
+
+  -- The herd panel.
+  if O.herds then
+    local herd = { checkBox = added.herdCheck }
+    plainButton(herd.checkBox, core.allocateAssembly(templates.flip, { FLAG = data.herdSync }))
+    guarded[#guarded + 1] = herd.checkBox
+    guarded[#guarded + 1] = ANIMALS
+    local pad = luaPad(makeHerdPanel(G, O, data, herd), "the herd panel")
+    panelItem(added.herdPanel, { herd.checkBox }, K.HERD_ANIMALS[1][1], K.HERD_ANIMALS[#K.HERD_ANIMALS][1], 1, 0, pad)
+  end
+
+  -- The tooltip: drawn after everything else that is always shown, never hit by the mouse.
+  if added.tooltip ~= nil then
+    local hoverWords = {}
+    for _, candidate in ipairs(tooltips) do hoverWords[#hoverWords + 1] = candidate.item + ITEM_HOVERED end
+    -- A panel drawn later would cover it: the panels draw it again on top of themselves, and
+    -- then it is left out here the next frame.
+    data.tooltip = makeTooltip(G, tooltips)
+    local function early()
+      if data.tooltipLate then data.tooltipLate = false else data.tooltip() end
+    end
+    local tooltip = added.tooltip
+    wr32(tooltip + ITEM_TYPE, TYPE_CLICKABLE)
+    wr32(tooltip + ITEM_RENDER, core.allocateAssembly(templates.tooltip, {
+      HOVER_WORDS = dwordList(hoverWords), PAD = luaPad(early, "the tooltip"),
     }))
+    wr32(tooltip + ITEM_RENDER_TYPE, RENDER_SIMPLE)
   end
 
   -- The guard, in front of the game's map click handler; it also runs the layout until it
@@ -1266,6 +1881,7 @@ local function buildTable(G, O)
     ITEM_Y = ITEM_Y, MOUSE = G.mouse, IS_MOUSE_INSIDE = G.isMouseInside, ON_MAP = G.onMap,
   }))
 
+  data.rockTabs = #rockTabs
   return newTable, data
 end
 
@@ -1284,35 +1900,85 @@ local function installTable(G, newTable)
 end
 
 ---------------------------------------------------------------------------------------
--- Trees: code patches
+-- Code patches
 ---------------------------------------------------------------------------------------
 
-local function patchTrees(self, G, O, data)
+-- Replaces size bytes at site with a jump to stub, remembering them for disable.
+local function patchJump(self, site, size, stub)
   self.saved = self.saved or {}
-  local function patch(site, size, stub)
-    table.insert(self.saved, { address = site, bytes = core.readBytes(site, size) })
-    core.writeCode(site, jumpTo(site, stub, size))
-  end
-  if O.apple then
-    patch(G.treeTypeOf, #TREE_TYPE_START, core.allocateAssembly(templates.appleType, {
-      APPLE_COMMAND = APPLE_COMMAND, APPLE_TYPE = APPLE_TYPE, CONVERTER_BACK = G.treeTypeOf + #TREE_TYPE_START,
+  table.insert(self.saved, { address = site, bytes = core.readBytes(site, size) })
+  core.writeCode(site, jumpTo(site, stub, size))
+end
+
+local function patchTrees(self, G, O, data)
+  local randomShrubs = O.shrubs and O.randomMix
+  local randomTrees = O.felled and O.randomMix
+  if O.apple or randomShrubs then
+    patchJump(self, G.treeTypeOf, #TREE_TYPE_START, core.allocateAssembly(templates.plantType, {
+      APPLE_COMMAND = O.apple and APPLE_COMMAND or 0xFFFFFFFF, APPLE_TYPE = APPLE_TYPE,
+      RANDOM_SHRUB = data.randomShrub, FIRST_SHRUB = SHRUB_COMMANDS[1],
+      LAST_SHRUB = SHRUB_COMMANDS[#SHRUB_COMMANDS], SEED = data.seed, RANDOM_MULTIPLIER = K.RANDOM_MULTIPLIER,
+      RANDOM_INCREMENT = K.RANDOM_INCREMENT, CONVERTER_BACK = G.treeTypeOf + #TREE_TYPE_START,
     }))
   end
-  if O.growth then
-    patch(G.placeTree, PLACE_TREE.stageSize, core.allocateAssembly(templates.stageFromBrush, {
-      BRUSH = G.brush, MAX_STAGE = MAX_STAGE, STAGE = core.allocate(4, true),
+  if O.growth or randomTrees then
+    local brush = G.brush
+    if not O.growth then                       -- the game's own stage, as a brush size
+      brush = core.allocate(4, true)
+      wr32(brush, PLACED_STAGE + 1)
+    end
+    patchJump(self, G.placeTree, PLACE_TREE.stageSize, core.allocateAssembly(templates.stageFromBrush, {
+      BRUSH = brush, MAX_STAGE = MAX_STAGE, STAGE = core.allocate(4, true),
+      FELLED_LOGS = data.felledLogs, FELLED_COMMAND = data.felledCommand, RANDOM_STANDING = K.RANDOM_STANDING,
+      COMMAND_ON_STACK = PLACE_TREE.command, MOST_RANDOM_STAGE = K.MOST_RANDOM_STAGE, SEED = data.seed,
+      RANDOM_MULTIPLIER = K.RANDOM_MULTIPLIER, RANDOM_INCREMENT = K.RANDOM_INCREMENT,
       BACK = G.placeTree + PLACE_TREE.stageSize,
     }))
   end
   if O.felled then
     local site = G.placeTree + PLACE_TREE.created
-    patch(site, PLACE_TREE.createdSize, core.allocateAssembly(templates.felledTree, {
+    patchJump(self, site, PLACE_TREE.createdSize, core.allocateAssembly(templates.felledTree, {
       FELLED_LOGS = data.felledLogs, FELLED_COMMAND = data.felledCommand,
       COMMAND_ON_STACK = PLACE_TREE.command, TREE_SIZE = G.treeSize,
       TREES = G.landscape + TREES_IN_LANDSCAPE, TREE_TYPE = TREE.TYPE, LAST_TREE_TYPE = LAST_TREE_TYPE,
       STAGES = STAGES, TREE_STAGE = TREE.STAGE, LOGS = G.logs, TREE_LYING = TREE.LYING,
       LYING_FELLED = LYING_FELLED, TREE_LOGS = TREE.LOGS, TREE_CHOPS = TREE.CHOPS,
-      LANDSCAPE = G.landscape, UPDATE_TREE = G.updateTree, BACK = site + PLACE_TREE.createdSize,
+      LANDSCAPE = G.landscape, UPDATE_TREE = G.updateTree, RANDOM_STANDING = K.RANDOM_STANDING,
+      RANDOM_FELLED = K.RANDOM_FELLED, SEED = data.seed, RANDOM_MULTIPLIER = K.RANDOM_MULTIPLIER,
+      RANDOM_INCREMENT = K.RANDOM_INCREMENT, BACK = site + PLACE_TREE.createdSize,
+    }))
+  end
+  if O.obstacles then
+    local site = scan(K.AOB_OBSTACLES, "the tree placement's obstacle check")
+    if site < G.placeTree - K.OBSTACLES_NEAR or site > G.placeTree + K.OBSTACLES_NEAR then
+      error(MODULE_NAME .. ": the obstacle check is not in the tree placement")
+    end
+    local past = site + K.OBSTACLES_SIZE + (rd8(site + K.OBSTACLES_JUMP) & 0xFF)
+    patchJump(self, site, K.OBSTACLES_SIZE, core.allocateAssembly(templates.nearObstacles, {
+      FLAG = data.nearObstacles, CHECK = site + K.OBSTACLES_SIZE, PAST_CHECK = past,
+    }))
+  end
+end
+
+-- The rock number the editor places and previews follows the variant row.
+local function patchRocks(self, G, data)
+  local function rockId(site, size, tail)
+    return core.allocateAssembly(templates.rockId .. tail .. "\njmp BACK\n", {
+      ROCK_LOCK = data.rockLock, SIZE = G.chosenRockSize, VARIANT = G.rockVariant,
+      EXTRA_VARIANT = K.EXTRA_VARIANT, EXTRA_ID = K.EXTRA_ID, PARAM3 = G.rockParam, MOUSE_Y = G.mouseTileY,
+      BACK = site + size,
+    })
+  end
+  patchJump(self, G.rockPlace, K.ROCK_PLACE.size, rockId(G.rockPlace, K.ROCK_PLACE.size, "mov [PARAM3],ecx"))
+  patchJump(self, G.rockPreview, K.ROCK_PREVIEW.size, rockId(G.rockPreview, K.ROCK_PREVIEW.size, "mov edx,[MOUSE_Y]"))
+end
+
+-- Herds of the brush size while the herd panel's check box is on.
+local function patchHerds(self, G, data)
+  for _, herd in pairs(G.herds) do
+    patchJump(self, herd.site, K.HERD.size, core.allocateAssembly(templates.herdSize, {
+      MASK = herd.mask, UNIT = herd.unit, BASE = herd.base, HERD_SYNC = data.herdSync, BRUSH = G.brush,
+      BACK = herd.site + K.HERD.size,
     }))
   end
 end
@@ -1322,12 +1988,46 @@ local function enableMenu(self, O)
   resolveMenu(G)
   resolveDrawing(G)
   resolveCounters(G)
+  if O.variants then
+    local ok, problem = pcall(resolveRocks, G)
+    if not ok then
+      log(WARNING, tostring(problem) .. "; no rock variant row")
+      O.variants = false
+    end
+  end
+  if O.herds then
+    local ok, problem = pcall(resolveHerds, G)
+    if not ok then
+      log(WARNING, tostring(problem) .. "; no herd panel")
+      O.herds = false
+    end
+  end
   local newTable, data = buildTable(G, O)
   installTable(G, newTable)
   patchTrees(self, G, O, data)
+  if data.rockTabs > 0 then patchRocks(self, G, data) end
+  if O.herds then patchHerds(self, G, data) end
   self.shownFlag = data.shown
   log(INFO, string.format("%s: editor menu changed (menu 0x%X, items 0x%X -> 0x%X; %d tree, %d rock, "
     .. "%d group slots)", MODULE_NAME, G.menu, G.table, newTable, G.treeSlots, G.rockSlots, G.groupSlots))
+end
+
+-- Skirmish maps get the Rocks tab with the signpost: the jl past `mov eax, 239` always jumps.
+local function enableSignpost(self)
+  local site = scan(K.AOB_SIGNPOST, "the Rocks button") + K.SIGNPOST_JUMP
+  expectBytes(site, { K.JL_SHORT }, "the Rocks button")
+  self.saved = self.saved or {}
+  table.insert(self.saved, { address = site, bytes = { K.JL_SHORT } })
+  core.writeCode(site, { K.JMP_SHORT })
+end
+
+-- The random rotation button sets mode 0, which the preview follows, instead of 5.
+local function enableRandomPreview(self)
+  local site = scan(K.AOB_RANDOM_ROCK, "the random rock button") + K.RANDOM_ROCK_MODE
+  expectBytes(site, { 0x89, 0x0D }, "the random rock button")
+  patchJump(self, site, K.RANDOM_ROCK_MODE_SIZE, core.allocateAssembly(templates.randomRockMode, {
+    MODE = rd32(site + 2), BACK = site + K.RANDOM_ROCK_MODE_SIZE,
+  }))
 end
 
 ---------------------------------------------------------------------------------------
@@ -1344,9 +2044,7 @@ local function enableRedraw(self)
     FULL = site + MENU_REDRAW_SIZE + rd32(site + 8),
     PARTIAL = site + MENU_REDRAW_SIZE,
   })
-  self.saved = self.saved or {}
-  table.insert(self.saved, { address = site, bytes = core.readBytes(site, MENU_REDRAW_SIZE) })
-  core.writeCode(site, jumpTo(site, stub, MENU_REDRAW_SIZE))
+  patchJump(self, site, MENU_REDRAW_SIZE, stub)
   log(INFO, string.format("%s: menu always kept up to date (0x%X)", MODULE_NAME, site))
 end
 
@@ -1363,11 +2061,26 @@ local function enable(self, config)
     apple = setting(config, "trees", "apple") == true,
     shrubs = setting(config, "trees", "shrubs") == true,
     felled = setting(config, "trees", "felled") == true,
+    obstacles = setting(config, "trees", "obstacles") == true,
+    sortedRows = setting(config, "trees", "sorted_rows") == true,
+    randomMix = setting(config, "trees", "random_mix") == true,
     textures = setting(config, "textures", "gravel_and_iron") == true,
+    variants = setting(config, "rocks", "variants") == true,
+    extraRock = setting(config, "rocks", "extra_rock") == true,
+    herds = setting(config, "herds", "panel") == true,
   }
-  if O.counts or O.growth or O.apple or O.shrubs or O.felled or O.textures then
+  if O.counts or O.growth or O.apple or O.shrubs or O.felled or O.obstacles or O.sortedRows or O.textures
+      or O.variants or O.herds then
     local ok, problem = pcall(enableMenu, self, O)
     if not ok then log(WARNING, tostring(problem) .. "; the editor menu is left as it is") end
+  end
+  if setting(config, "rocks", "signpost") == true then
+    local ok, problem = pcall(enableSignpost, self)
+    if not ok then log(WARNING, tostring(problem) .. "; skirmish maps keep their own Rocks menu") end
+  end
+  if setting(config, "rocks", "random_preview") == true then
+    local ok, problem = pcall(enableRandomPreview, self)
+    if not ok then log(WARNING, tostring(problem) .. "; the random rotation is left as it is") end
   end
   if setting(config, "menu", "always_update") == true then
     local ok, problem = pcall(enableRedraw, self)

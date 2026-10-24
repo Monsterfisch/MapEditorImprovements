@@ -60,6 +60,30 @@ options:
     contents:
       type: boolean
       value: true
+  - url: map-editor-improvements.trees.random_mix
+    name: map-editor-improvements-trees-random-mix
+    text: '{{trees_random_mix}}'
+    tooltip: '{{trees_random_mix_tooltip}}'
+    display: Switch
+    contents:
+      type: boolean
+      value: true
+  - url: map-editor-improvements.trees.obstacles
+    name: map-editor-improvements-trees-obstacles
+    text: '{{trees_obstacles}}'
+    tooltip: '{{trees_obstacles_tooltip}}'
+    display: Switch
+    contents:
+      type: boolean
+      value: true
+  - url: map-editor-improvements.trees.sorted_rows
+    name: map-editor-improvements-trees-sorted-rows
+    text: '{{trees_sorted_rows}}'
+    tooltip: '{{trees_sorted_rows_tooltip}}'
+    display: Switch
+    contents:
+      type: boolean
+      value: true
 
 - display: GroupBox
   category: [Map Editor Improvements]
@@ -71,6 +95,60 @@ options:
     name: map-editor-improvements-textures-gravel-and-iron
     text: '{{textures_gravel_and_iron}}'
     tooltip: '{{textures_gravel_and_iron_tooltip}}'
+    display: Switch
+    contents:
+      type: boolean
+      value: true
+
+- display: GroupBox
+  category: [Map Editor Improvements]
+  header: '{{rocks_group}}'
+  text: '{{rocks_group_descr}}'
+  hasHeader: true
+  children:
+  - url: map-editor-improvements.rocks.signpost
+    name: map-editor-improvements-rocks-signpost
+    text: '{{rocks_signpost}}'
+    tooltip: '{{rocks_signpost_tooltip}}'
+    display: Switch
+    contents:
+      type: boolean
+      value: true
+  - url: map-editor-improvements.rocks.random_preview
+    name: map-editor-improvements-rocks-random-preview
+    text: '{{rocks_random_preview}}'
+    tooltip: '{{rocks_random_preview_tooltip}}'
+    display: Switch
+    contents:
+      type: boolean
+      value: true
+  - url: map-editor-improvements.rocks.variants
+    name: map-editor-improvements-rocks-variants
+    text: '{{rocks_variants}}'
+    tooltip: '{{rocks_variants_tooltip}}'
+    display: Switch
+    contents:
+      type: boolean
+      value: true
+  - url: map-editor-improvements.rocks.extra_rock
+    name: map-editor-improvements-rocks-extra-rock
+    text: '{{rocks_extra_rock}}'
+    tooltip: '{{rocks_extra_rock_tooltip}}'
+    display: Switch
+    contents:
+      type: boolean
+      value: true
+
+- display: GroupBox
+  category: [Map Editor Improvements]
+  header: '{{herds_group}}'
+  text: '{{herds_group_descr}}'
+  hasHeader: true
+  children:
+  - url: map-editor-improvements.herds.panel
+    name: map-editor-improvements-herds-panel
+    text: '{{herds_panel}}'
+    tooltip: '{{herds_panel_tooltip}}'
     display: Switch
     contents:
       type: boolean
