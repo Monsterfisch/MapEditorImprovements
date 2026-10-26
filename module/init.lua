@@ -2175,6 +2175,7 @@ local function enableMenu(self, O)
   if O.herds then patchHerds(self, G, data) end
   if O.invisibleRocks then C.patchInvisibleRocks(self, data) end
   self.shownFlag = data.shown
+  self.landscape = G
   log(INFO, string.format("%s: editor menu changed (menu 0x%X, items 0x%X -> 0x%X; %d tree, %d rock, "
     .. "%d group slots)", MODULE_NAME, G.menu, G.table, newTable, G.treeSlots, G.rockSlots, G.groupSlots))
 end
@@ -2698,9 +2699,14 @@ function C.patchRuinSizes(self, G)
 end
 
 function C.enable(self, O)
-  local G = {}
-  resolveMenu(G)
-  resolveDrawing(G)
+  -- What the landscape menu found, if it ran: its constructor no longer pushes the table the
+  -- search looks for once the module's copy is in.
+  local G = self.landscape
+  if G == nil then
+    G = {}
+    resolveMenu(G)
+    resolveDrawing(G)
+  end
   local B = C.resolve(G)
   local data = nil
   if O.buildingCounts or O.towerRuins or O.armyExtras or O.statues or O.barrier or O.keepParts or O.damagedWalls then
