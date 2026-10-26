@@ -88,7 +88,7 @@ local DEFAULTS = {
   textures = { gravel_and_iron = true },
   rocks = { signpost = true, random_preview = true, variants = true, extra_rock = true, invisible = true },
   castle = { building_counts = true, tower_ruins = true, tunnel_and_tents = true, statues_and_shrines = true,
-    barrier = true, several_keeps = true, several_storage_and_recruitment = true },
+    barrier = true, several_keeps = true, several_storage_and_recruitment = true, tower_engines_anywhere = true },
   herds = { panel = true },
 }
 
@@ -204,7 +204,7 @@ K.TURN = {
 K.AOB_HERD = "0F B6 05 ? ? ? ? 83 E0 ? BF ? 00 00 00 83 C0 ?"
 K.HERD = { site = 7, size = 11, mask = 9, unit = 11, base = 17, group = { -7, { 0x66, 0xC7, 0x44, 0x28, 0x42 } } }
 K.HERD_ANIMALS = { { DEER, "Deer" }, { LION, "Lion" }, { RABBIT, "Rabbit" }, { CAMEL, "Camel" } }
-K.HERD_SEARCH_END = 0x01000000       -- the game's code; the four lie in one function
+K.HERD_SEARCH_END = 0x01000000       -- the end of the game's code for searches with several hits
 
 -- placeTree: `xor ebx,ebx / test eax,eax / mov [esp+0x10],esi / jle <past the check>`.
 K.AOB_OBSTACLES = "33 DB 85 C0 89 74 24 10 7E 50 56 55 8D 44 24 18"
@@ -296,6 +296,19 @@ K.AOB_STORAGE_NEIGHBOURS = {
 }
 K.STORAGE_NEIGHBOUR_CALL = 15
 K.NEIGHBOUR_ARGUMENTS = 0x14
+-- The place-building click for the tower mangonel and the tower ballista (in that order): with
+-- the mouse button let go, `cmp esi, ebx / je <refuse>` (esi: the building on the tile), then
+-- the tower tests and the spawn command (42: spawnUnit at a micro position and height).
+K.AOB_TOWER_ENGINE_CLICK = "3B F3 0F 84 ? ? ? ? 8B 15 ? ? ? ? 69 F6 2C 03 00 00 0F BF 8E"
+K.TOWER_ENGINE = {
+  size = 8, refuse = { 0x02, { 0x3B, 0xF3, 0x0F, 0x84 } }, player = { 0x08, { 0x8B, 0x15 } },
+  buildingSize = { 0x0E, { 0x69, 0xF6 } }, owners = { 0x14, { 0x0F, 0xBF, 0x8E } },
+  types = { 0x23, { 0x0F, 0xB7, 0x8E } }, units = { 0x4B, { 0x66, 0x39, 0x1C, 0x45 } },
+  param0 = { 0xC0, { 0x89, 0x15 } }, param1 = { 0xD5, { 0x89, 0x15 } },
+  heights = { 0xE8, { 0x0F, 0xB6, 0x84, 0x0A } }, command = { 0xF0, { 0x6A } }, sync = { 0xF2, { 0xB9 } },
+  param2 = { 0xF7, { 0xA3 } }, param3 = { 0xFC, { 0xC7, 0x05 } }, queue = 0x106, epilogue = 0x10B,
+}
+K.TOWER_4, K.TOWER_5 = 77, 78            -- the building types a tower engine can stand on
 
 -- MenuItemRenderFunction_MapEditorLandscaping_GeneralButtons: the item position globals
 -- (width follows the position), the hover flag, the open tab, the brush size, the chosen
@@ -2557,6 +2570,37 @@ function C.patchSeveralBuildings(self, G, O)
   end
 end
 
+-- In the map editor the tower mangonel and ballista can also be put on any tile without a unit
+-- (ground, walls, gates, other towers, the keep): the click sends the game's own spawn command
+-- for the clicked tile instead of refusing. The player's own big towers work as before.
+function C.patchTowerEngines(self, G)
+  local T = K.TOWER_ENGINE
+  local from, sites = 0x400000, {}
+  while #sites < 3 do
+    local ok, found = pcall(core.scanForAOB, K.AOB_TOWER_ENGINE_CLICK, from, K.HERD_SEARCH_END)
+    if not ok or found == nil or found == 0 then break end
+    sites[#sites + 1] = found
+    from = found + 1
+  end
+  if #sites ~= 2 then error(MODULE_NAME .. ": the tower engine placement is not the one this module knows") end
+  for _, site in ipairs(sites) do
+    local function operand(field) return readOperand(site, T[field], "the tower engine placement") end
+    expectBytes(site + T.refuse[1] - 2, T.refuse[2], "the tower engine placement")
+    expectBytes(site + T.command[1], T.command[2], "the tower engine placement")
+    local stub = core.allocateAssembly(templates.towerEngineGround, {
+      GAME_MODE = G.gameMode, MAP_EDITOR = K.MAP_EDITOR, BUILDING_SIZE = operand("buildingSize"),
+      OWNERS = operand("owners"), TYPES = operand("types"), CURRENT_PLAYER = operand("player"),
+      TOWER_4 = K.TOWER_4, TOWER_5 = K.TOWER_5, UNIT_TILES = operand("units"), HEIGHTS = operand("heights"),
+      PARAM0 = operand("param0"), PARAM1 = operand("param1"), PARAM2 = operand("param2"),
+      PARAM3 = operand("param3"), UNIT_TYPE = rd32(site + T.param3[1] + 6),
+      COMMAND = rd8(site + T.command[1] + 1) & 0xFF, SYNC = operand("sync"),
+      QUEUE = readCallTarget(site, T.queue, "the command queue"), EPILOGUE = site + T.epilogue,
+      TOWER_PATH = site + T.size, REFUSE = site + T.size + rd32(site + 4),
+    })
+    patchJump(self, site, T.size, stub)
+  end
+end
+
 -- Tower ruins get the size of their tower (the game has none for them) in the map editor.
 function C.patchRuinSizes(self, G)
   local size = scan(K.AOB_BUILDING_SIZE, "the building sizes")
@@ -2584,6 +2628,7 @@ function C.enable(self, O)
   end
   if O.towerRuins then C.patchRuinSizes(self, G) end
   if O.severalKeeps or O.looseBuildings then C.patchSeveralBuildings(self, G, O) end
+  if O.towerEngines then C.patchTowerEngines(self, G) end
   log(INFO, string.format("%s: build menu changed (menu 0x%X, items 0x%X)", MODULE_NAME, B.menu, B.table))
 end
 
@@ -2635,6 +2680,7 @@ local function enable(self, config)
     barrier = setting(config, "castle", "barrier") == true,
     severalKeeps = setting(config, "castle", "several_keeps") == true,
     looseBuildings = setting(config, "castle", "several_storage_and_recruitment") == true,
+    towerEngines = setting(config, "castle", "tower_engines_anywhere") == true,
   }
   if O.counts or O.growth or O.apple or O.shrubs or O.felled or O.obstacles or O.sortedRows or O.textures
       or O.variants or O.herds or O.invisibleRocks then
@@ -2642,7 +2688,7 @@ local function enable(self, config)
     if not ok then log(WARNING, tostring(problem) .. "; the editor menu is left as it is") end
   end
   if castle.buildingCounts or castle.towerRuins or castle.armyExtras or castle.statues or castle.barrier
-      or castle.severalKeeps or castle.looseBuildings then
+      or castle.severalKeeps or castle.looseBuildings or castle.towerEngines then
     local ok, problem = pcall(C.enable, self, castle)
     if not ok then log(WARNING, tostring(problem) .. "; the build menu is left as it is") end
   end

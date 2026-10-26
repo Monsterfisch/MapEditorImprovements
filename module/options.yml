@@ -209,6 +209,14 @@ options:
     contents:
       type: boolean
       value: true
+  - url: map-editor-improvements.castle.tower_engines_anywhere
+    name: map-editor-improvements-castle-tower-engines-anywhere
+    text: '{{castle_tower_engines}}'
+    tooltip: '{{castle_tower_engines_tooltip}}'
+    display: Switch
+    contents:
+      type: boolean
+      value: true
 
 - display: GroupBox
   category: [Map Editor Improvements]

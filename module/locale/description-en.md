@@ -1,7 +1,7 @@
 # Map Editor Improvements
 
 **Author**: Monsterfish
-**Version**: 1.0.10
+**Version**: 1.0.11
 
 Makes the map editor show more about the map you are working on and adds tools the editor
 lacks: tree growth stages, apple trees, more shrubs, felled trees, gravel and iron, rock
@@ -119,6 +119,9 @@ In the building menu of the map editor's castle mode:
   other buildings a player normally has only one of are no longer removed when another one is
   placed, and further stockpiles, granaries and armouries can stand anywhere instead of having
   to touch the first one.
+- **Tower mangonels and ballistae anywhere.** The tower mangonel and tower ballista of the army
+  buildings menu can be put on any tile where no unit stands: the ground, walls, gates, any
+  tower or the keep. On the player's own square and round towers they work as before.
 - **Barrier.** The Ruins menu gets a Barrier button in its free spot at the bottom right: a
   1x1 barrier that can be deleted again.
 

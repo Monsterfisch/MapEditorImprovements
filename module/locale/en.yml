@@ -126,6 +126,11 @@ castle_several_storage_tooltip: |
   Barracks, mercenary posts, guilds and the other buildings a player has only one of are no
   longer removed when another one is placed, and further stockpiles, granaries and armouries
   need not touch the first one.
+castle_tower_engines: Tower mangonels and ballistae anywhere
+castle_tower_engines_tooltip: |
+  The tower mangonel and tower ballista of the army buildings menu can be put wherever no unit
+  stands: on the ground, walls, gates, any tower or the keep, not only on the player's own
+  square and round towers.
 
 herds_group: Herds
 herds_group_descr: |

@@ -785,4 +785,45 @@ ask_game:
 jmp HAS_NEIGHBOUR
 ]]
 
+-- The tower engine click with the mouse button let go, replacing `cmp esi,ebx / je REFUSE`
+-- (esi: the building on the tile, eax: the tile, ebp/edi: its x/y): in the map editor any tile
+-- but the player's own big towers gets the spawn command straight away, if no unit stands
+-- there; the towers go on to the game's own tests (TOWER_PATH).
+templates.towerEngineGround = [[
+cmp dword [GAME_MODE],MAP_EDITOR
+jne in_game
+test esi,esi
+je on_ground
+imul ecx,esi,BUILDING_SIZE
+movsx edx,word [ecx+OWNERS]
+cmp edx,[CURRENT_PLAYER]
+jne on_ground
+movzx edx,word [ecx+TYPES]
+cmp edx,TOWER_4
+je on_tower
+cmp edx,TOWER_5
+je on_tower
+on_ground:
+cmp word [UNIT_TILES+eax*2],0
+jne refuse
+lea edx,[ebp*8+4]
+mov [PARAM0],edx
+lea edx,[edi*8+4]
+mov [PARAM1],edx
+movzx edx,byte [HEIGHTS+eax]
+mov [PARAM2],edx
+mov dword [PARAM3],UNIT_TYPE
+push COMMAND
+mov ecx,SYNC
+call QUEUE
+jmp EPILOGUE
+in_game:
+test esi,esi
+je refuse
+on_tower:
+jmp TOWER_PATH
+refuse:
+jmp REFUSE
+]]
+
 return templates
