@@ -193,6 +193,22 @@ options:
     contents:
       type: boolean
       value: true
+  - url: map-editor-improvements.castle.several_keeps
+    name: map-editor-improvements-castle-several-keeps
+    text: '{{castle_several_keeps}}'
+    tooltip: '{{castle_several_keeps_tooltip}}'
+    display: Switch
+    contents:
+      type: boolean
+      value: true
+  - url: map-editor-improvements.castle.several_storage_and_recruitment
+    name: map-editor-improvements-castle-several-storage-and-recruitment
+    text: '{{castle_several_storage}}'
+    tooltip: '{{castle_several_storage_tooltip}}'
+    display: Switch
+    contents:
+      type: boolean
+      value: true
 
 - display: GroupBox
   category: [Map Editor Improvements]

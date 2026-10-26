@@ -1,7 +1,7 @@
 # Map Editor Improvements
 
 **Author**: Monsterfish
-**Version**: 1.0.9
+**Version**: 1.0.10
 
 Makes the map editor show more about the map you are working on and adds tools the editor
 lacks: tree growth stages, apple trees, more shrubs, felled trees, gravel and iron, rock
@@ -112,6 +112,13 @@ In the building menu of the map editor's castle mode:
   the six siege tents.
 - **Statue and shrines.** While the menu of good things is open, a row above it offers the
   unused 2x2 statue, 2x2 shrine and 1x1 shrine.
+- **Several keeps.** Placing a keep no longer removes the player's earlier keep (or its
+  campfire). The newest keep is the player's active one; the others stay on the map as
+  buildings.
+- **Several storage and recruitment buildings.** Barracks, mercenary posts, guilds and the
+  other buildings a player normally has only one of are no longer removed when another one is
+  placed, and further stockpiles, granaries and armouries can stand anywhere instead of having
+  to touch the first one.
 - **Barrier.** The Ruins menu gets a Barrier button in its free spot at the bottom right: a
   1x1 barrier that can be deleted again.
 

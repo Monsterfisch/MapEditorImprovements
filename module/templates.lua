@@ -764,4 +764,25 @@ add eax,SIZE_BASE
 jmp BACK
 ]]
 
+-- Called instead of destroyBuilding where a new keep or unique building removes the player's
+-- earlier one: in the map editor the earlier one stays.
+templates.keepEarlier = [[
+cmp dword [GAME_MODE],MAP_EDITOR
+je keep_it
+jmp DESTROY
+keep_it:
+ret DESTROY_ARGUMENTS
+]]
+
+-- Called instead of hasBuildingAsNeighbour for a further storage building: in the map editor
+-- it may stand anywhere.
+templates.anyNeighbour = [[
+cmp dword [GAME_MODE],MAP_EDITOR
+jne ask_game
+mov eax,1
+ret NEIGHBOUR_ARGUMENTS
+ask_game:
+jmp HAS_NEIGHBOUR
+]]
+
 return templates

@@ -117,6 +117,15 @@ castle_barrier: Barrier in the Ruins menu
 castle_barrier_tooltip: |
   Adds a Barrier button in the free spot at the bottom right of the Ruins menu: a 1x1 barrier
   that can be deleted again.
+castle_several_keeps: Several keeps per player
+castle_several_keeps_tooltip: |
+  Placing a keep no longer removes the player's earlier keep (and its campfire). The newest
+  keep is the player's active one, the others stay as buildings.
+castle_several_storage: Several storage and recruitment buildings
+castle_several_storage_tooltip: |
+  Barracks, mercenary posts, guilds and the other buildings a player has only one of are no
+  longer removed when another one is placed, and further stockpiles, granaries and armouries
+  need not touch the first one.
 
 herds_group: Herds
 herds_group_descr: |

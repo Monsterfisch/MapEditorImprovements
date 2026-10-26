@@ -88,7 +88,7 @@ local DEFAULTS = {
   textures = { gravel_and_iron = true },
   rocks = { signpost = true, random_preview = true, variants = true, extra_rock = true, invisible = true },
   castle = { building_counts = true, tower_ruins = true, tunnel_and_tents = true, statues_and_shrines = true,
-    barrier = true },
+    barrier = true, several_keeps = true, several_storage_and_recruitment = true },
   herds = { panel = true },
 }
 
@@ -278,6 +278,24 @@ K.AOB_PLAYER_BUILDINGS = "0F BF 42 02 83 C0 F6 83 F8 5E 77 0E 0F B6 80 ? ? ? ? F
 -- getBuildingSizeForCommandBuildingType: `mov eax,[esp+4] / add eax,-0x2C / cmp eax,0x146 / ja`.
 K.AOB_BUILDING_SIZE = "8B 44 24 04 83 C0 D4 3D 46 01 00 00 77 75"
 K.BUILDING_SIZE_START = 7
+-- computeBuildingCategoryEntryPointAndDestroyEarlierBuilding(building, player, category): its
+-- `push eax / mov ecx, BuildingsState / call destroyBuilding / mov edx,[esp+0x1C]`, three
+-- times: the player's earlier keep (twice), then the earlier one of the unique buildings.
+K.AOB_EARLIER_BUILDING = "8B 54 24 0C 53 55 56 57 33 FF 33 F6 85 D2 8B E9 C7 05"
+K.EARLIER_DESTROY = "50 B9 ? ? ? ? E8 ? ? ? ? 8B 54 24 1C"
+K.EARLIER_DESTROY_CALL, K.EARLIER_SEARCH = 6, 0x2D0
+K.EARLIER_KEEP_CALLS = { 1, 2 }
+K.EARLIER_UNIQUE_CALLS = { 3 }
+K.DESTROY_ARGUMENTS = 4
+-- checkBuildingCanBePlacedHere: a second stockpile, granary or armoury must touch the first
+-- (`push type / ... / call hasBuildingAsNeighbour / test eax,eax / jne <allowed>`).
+K.AOB_STORAGE_NEIGHBOURS = {
+  "8B 44 24 50 6A 0A 50 55 57 53 B9 ? ? ? ? E8 ? ? ? ? 85 C0 0F 85",
+  "8B 54 24 50 6A 13 52 55 57 53 B9 ? ? ? ? E8 ? ? ? ? 85 C0 0F 85",
+  "8B 4C 24 50 6A 0B 51 55 57 53 B9 ? ? ? ? E8 ? ? ? ? 85 C0 0F 85",
+}
+K.STORAGE_NEIGHBOUR_CALL = 15
+K.NEIGHBOUR_ARGUMENTS = 0x14
 
 -- MenuItemRenderFunction_MapEditorLandscaping_GeneralButtons: the item position globals
 -- (width follows the position), the hover flag, the open tab, the brush size, the chosen
@@ -2499,6 +2517,46 @@ function C.luaPad(fn, what)
   return pad
 end
 
+-- Replaces the call at site with a call to stub, remembering it for disable.
+function C.patchCall(self, site, stub)
+  self.saved = self.saved or {}
+  table.insert(self.saved, { address = site, bytes = core.readBytes(site, 5) })
+  core.writeCode(site, { 0xE8, core.itob(core.getRelativeAddress(site, stub, -5)) })
+end
+
+-- In the map editor, a player's new keep (and unique buildings: barracks, guilds, ...) no longer
+-- destroys the earlier one, and further storage buildings need not touch the first.
+function C.patchSeveralBuildings(self, G, O)
+  local start = scan(K.AOB_EARLIER_BUILDING, "the earlier building removal")
+  local calls, from = {}, start
+  while #calls < 3 do
+    local ok, found = pcall(core.scanForAOB, K.EARLIER_DESTROY, from, start + K.EARLIER_SEARCH)
+    if not ok or found == nil or found == 0 then break end
+    calls[#calls + 1] = found + K.EARLIER_DESTROY_CALL
+    from = found + 1
+  end
+  if #calls ~= 3 then error(MODULE_NAME .. ": the earlier building removal is not the one this module knows") end
+  local stub = core.allocateAssembly(templates.keepEarlier, {
+    GAME_MODE = G.gameMode, MAP_EDITOR = K.MAP_EDITOR, DESTROY = readCallTarget(calls[1], 0, "destroyBuilding"),
+    DESTROY_ARGUMENTS = K.DESTROY_ARGUMENTS,
+  })
+  local which = {}
+  if O.severalKeeps then for _, i in ipairs(K.EARLIER_KEEP_CALLS) do which[#which + 1] = i end end
+  if O.looseBuildings then for _, i in ipairs(K.EARLIER_UNIQUE_CALLS) do which[#which + 1] = i end end
+  for _, i in ipairs(which) do C.patchCall(self, calls[i], stub) end
+  if O.looseBuildings then
+    local sites = {}
+    for i, pattern in ipairs(K.AOB_STORAGE_NEIGHBOURS) do
+      sites[i] = scan(pattern, "the storage placement test") + K.STORAGE_NEIGHBOUR_CALL
+    end
+    local neighbour = core.allocateAssembly(templates.anyNeighbour, {
+      GAME_MODE = G.gameMode, MAP_EDITOR = K.MAP_EDITOR, HAS_NEIGHBOUR = readCallTarget(sites[1], 0, "the neighbour test"),
+      NEIGHBOUR_ARGUMENTS = K.NEIGHBOUR_ARGUMENTS,
+    })
+    for _, site in ipairs(sites) do C.patchCall(self, site, neighbour) end
+  end
+end
+
 -- Tower ruins get the size of their tower (the game has none for them) in the map editor.
 function C.patchRuinSizes(self, G)
   local size = scan(K.AOB_BUILDING_SIZE, "the building sizes")
@@ -2525,6 +2583,7 @@ function C.enable(self, O)
     hooks.registerHookCallback("afterInit", ensure)
   end
   if O.towerRuins then C.patchRuinSizes(self, G) end
+  if O.severalKeeps or O.looseBuildings then C.patchSeveralBuildings(self, G, O) end
   log(INFO, string.format("%s: build menu changed (menu 0x%X, items 0x%X)", MODULE_NAME, B.menu, B.table))
 end
 
@@ -2574,13 +2633,16 @@ local function enable(self, config)
     armyExtras = setting(config, "castle", "tunnel_and_tents") == true,
     statues = setting(config, "castle", "statues_and_shrines") == true,
     barrier = setting(config, "castle", "barrier") == true,
+    severalKeeps = setting(config, "castle", "several_keeps") == true,
+    looseBuildings = setting(config, "castle", "several_storage_and_recruitment") == true,
   }
   if O.counts or O.growth or O.apple or O.shrubs or O.felled or O.obstacles or O.sortedRows or O.textures
       or O.variants or O.herds or O.invisibleRocks then
     local ok, problem = pcall(enableMenu, self, O)
     if not ok then log(WARNING, tostring(problem) .. "; the editor menu is left as it is") end
   end
-  if castle.buildingCounts or castle.towerRuins or castle.armyExtras or castle.statues or castle.barrier then
+  if castle.buildingCounts or castle.towerRuins or castle.armyExtras or castle.statues or castle.barrier
+      or castle.severalKeeps or castle.looseBuildings then
     local ok, problem = pcall(C.enable, self, castle)
     if not ok then log(WARNING, tostring(problem) .. "; the build menu is left as it is") end
   end
