@@ -651,4 +651,117 @@ partial:
 jmp PARTIAL
 ]]
 
+---------------------------------------------------------------------------------------
+-- Invisible rocks
+---------------------------------------------------------------------------------------
+
+-- Called instead of createRock from placeRock: with the check box on, act as if the rock list
+-- were full (rock 0), which leaves the tiles taken but no rock drawn - what happens anyway
+-- once 4000 rocks are on the map.
+templates.invisibleRocks = [[
+cmp byte [FLAG],0
+jne no_rock
+jmp CREATE_ROCK
+no_rock:
+xor eax,eax
+ret ROCK_ARGUMENTS
+]]
+
+---------------------------------------------------------------------------------------
+-- Castle mode
+---------------------------------------------------------------------------------------
+
+-- Render function of a panel item in the build menu: lua draws the panel in the map editor,
+-- anywhere else the panel's buttons are hidden.
+templates.editorPanel = [[
+cmp dword [GAME_MODE],MAP_EDITOR
+jne hide
+jmp PAD
+hide:
+mov ecx,PANEL_ITEMS
+hide_next:
+mov eax,[ecx]
+test eax,eax
+je hidden
+mov word [eax+ITEM_HIDDEN],1
+add ecx,4
+jmp hide_next
+hidden:
+ret
+]]
+
+-- Render function of something drawn in the map editor only: FIRST, then lua.
+templates.editorOnly = [[
+cmp dword [GAME_MODE],MAP_EDITOR
+jne quiet
+call FIRST
+jmp PAD
+quiet:
+ret
+]]
+
+-- Counts the buildings: every one in use and not being removed, the players' own
+-- buildings (an owner and a type from PLAYER_TYPES) and those of the current player.
+templates.buildingCounts = [[
+push ebx
+push esi
+push edi
+push ebp
+xor eax,eax
+xor ebx,ebx
+xor edi,edi
+mov esi,FIRST_STATE
+mov ecx,[BUILDINGS+MAX_BUILDINGS]
+dec ecx
+jle counted
+next_building:
+movzx edx,word [esi]
+test edx,edx
+je skip_building
+cmp edx,REMOVED
+je skip_building
+inc eax
+movzx edx,word [esi+TYPE_FROM_STATE]
+cmp edx,255
+ja skip_building
+cmp byte [PLAYER_TYPES+edx],0
+je skip_building
+movsx ebp,word [esi+OWNER_FROM_STATE]
+test ebp,ebp
+je skip_building
+inc ebx
+cmp ebp,[CURRENT_PLAYER]
+jne skip_building
+inc edi
+skip_building:
+add esi,BUILDING_SIZE
+dec ecx
+jne next_building
+counted:
+mov [COUNTS],eax
+mov [COUNTS+4],ebx
+mov [COUNTS+8],edi
+pop ebp
+pop edi
+pop esi
+pop ebx
+ret
+]]
+
+-- getBuildingSizeForCommandBuildingType, replacing `mov eax,[esp+4] / add eax,SIZE_BASE`: in
+-- the map editor a tower ruin's command counts as its tower's.
+templates.ruinSize = [[
+mov eax,[esp+4]
+cmp dword [GAME_MODE],MAP_EDITOR
+jne ruin_plain
+cmp eax,FIRST_RUIN
+jb ruin_plain
+cmp eax,LAST_RUIN
+ja ruin_plain
+sub eax,TOWER_FROM_RUIN
+ruin_plain:
+add eax,SIZE_BASE
+jmp BACK
+]]
+
 return templates

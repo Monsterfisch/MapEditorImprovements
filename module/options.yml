@@ -138,6 +138,61 @@ options:
     contents:
       type: boolean
       value: true
+  - url: map-editor-improvements.rocks.invisible
+    name: map-editor-improvements-rocks-invisible
+    text: '{{rocks_invisible}}'
+    tooltip: '{{rocks_invisible_tooltip}}'
+    display: Switch
+    contents:
+      type: boolean
+      value: true
+
+- display: GroupBox
+  category: [Map Editor Improvements]
+  header: '{{castle_group}}'
+  text: '{{castle_group_descr}}'
+  hasHeader: true
+  children:
+  - url: map-editor-improvements.castle.building_counts
+    name: map-editor-improvements-castle-building-counts
+    text: '{{castle_building_counts}}'
+    tooltip: '{{castle_building_counts_tooltip}}'
+    display: Switch
+    contents:
+      type: boolean
+      value: true
+  - url: map-editor-improvements.castle.tower_ruins
+    name: map-editor-improvements-castle-tower-ruins
+    text: '{{castle_tower_ruins}}'
+    tooltip: '{{castle_tower_ruins_tooltip}}'
+    display: Switch
+    contents:
+      type: boolean
+      value: true
+  - url: map-editor-improvements.castle.tunnel_and_tents
+    name: map-editor-improvements-castle-tunnel-and-tents
+    text: '{{castle_tunnel_and_tents}}'
+    tooltip: '{{castle_tunnel_and_tents_tooltip}}'
+    display: Switch
+    contents:
+      type: boolean
+      value: true
+  - url: map-editor-improvements.castle.statues_and_shrines
+    name: map-editor-improvements-castle-statues-and-shrines
+    text: '{{castle_statues}}'
+    tooltip: '{{castle_statues_tooltip}}'
+    display: Switch
+    contents:
+      type: boolean
+      value: true
+  - url: map-editor-improvements.castle.barrier
+    name: map-editor-improvements-castle-barrier
+    text: '{{castle_barrier}}'
+    tooltip: '{{castle_barrier_tooltip}}'
+    display: Switch
+    contents:
+      type: boolean
+      value: true
 
 - display: GroupBox
   category: [Map Editor Improvements]

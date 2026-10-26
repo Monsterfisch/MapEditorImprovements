@@ -86,6 +86,37 @@ rocks_extra_rock: Extra small rock
 rocks_extra_rock_tooltip: |
   For the smallest rocks, the variant row also offers a fifth one: a small rock the game has
   but the editor never places. It is saved in the map like any other rock.
+rocks_invisible: Invisible rocks check box
+rocks_invisible_tooltip: |
+  Adds a check box to the right of the Rocks menu's buttons. While it is ticked, every rock
+  you place is an "invisible rock" straight away, without placing 4000 rocks first: the
+  tiles are taken (nothing can be built or walk there) but no rock is drawn, so they keep
+  showing what was there before (the "2k stones trick"). Untick it for normal rocks.
+
+castle_group: Castle mode
+castle_group_descr: |
+  The building menu of the map editor's castle mode.
+castle_building_counts: Building counts above the minimap
+castle_building_counts_tooltip: |
+  Shows above the minimap how many buildings the map has against the game's limit (every
+  building counts, including keeps, landscape buildings and the parts some buildings are made
+  of), how many player buildings all players have together, and how many the current player
+  has. Player buildings are the ones an enemy can be sent to destroy.
+castle_tower_ruins: Tower ruins
+castle_tower_ruins_tooltip: |
+  While the Towers menu is open, a row above it offers the ruins of the five towers.
+castle_tunnel_and_tents: Tunnel entrance and siege tents
+castle_tunnel_and_tents_tooltip: |
+  In the army buildings menu: with the tunnelers' guild chosen, a row above the menu offers a
+  tunnel entrance; with the engineers' guild chosen, the six siege tents.
+castle_statues: Statue and shrines
+castle_statues_tooltip: |
+  While the menu of good things is open, a row above it offers the unused 2x2 statue, 2x2
+  shrine and 1x1 shrine.
+castle_barrier: Barrier in the Ruins menu
+castle_barrier_tooltip: |
+  Adds a Barrier button in the free spot at the bottom right of the Ruins menu: a 1x1 barrier
+  that can be deleted again.
 
 herds_group: Herds
 herds_group_descr: |

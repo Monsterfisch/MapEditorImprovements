@@ -86,7 +86,9 @@ local DEFAULTS = {
   trees = { growth_from_brush = true, apple = true, shrubs = true, felled = true, random_mix = true,
     obstacles = true, sorted_rows = true },
   textures = { gravel_and_iron = true },
-  rocks = { signpost = true, random_preview = true, variants = true, extra_rock = true },
+  rocks = { signpost = true, random_preview = true, variants = true, extra_rock = true, invisible = true },
+  castle = { building_counts = true, tower_ruins = true, tunnel_and_tents = true, statues_and_shrines = true,
+    barrier = true },
   herds = { panel = true },
 }
 
@@ -149,9 +151,12 @@ local OBSTACLES_BUTTON = "obstacles"                   -- the check box's key in
 
 -- Constants of the later features, in a table: a Lua chunk may have at most 200 locals.
 local K = {}
+-- Functions of the later features, in a table for the same reason.
+local C = {}
 
 -- Rocks: the tabs (scenario with signpost, skirmish without) and the tools.
 K.ROCKS_SKIRMISH = 239
+K.SIGNPOST = 59
 K.FIRST_ROCK_COMMAND = 205
 K.LAST_ROCK_COMMAND = 209
 -- The category button's action: `cmp eax, 237 / jne / cmp [map type], 1 / jl +5 / mov eax, 239`.
@@ -222,6 +227,57 @@ K.MOST_RANDOM_STAGE = 4
 K.RANDOM_MULTIPLIER = 1103515245
 K.RANDOM_INCREMENT = 12345
 K.RANDOM_LABEL = "?"
+
+-- Invisible rocks: placeRock's `push edx / mov ecx, LandscapeState / call createRock / xor
+-- edi,edi / add eax, 2000 / mov [esp+0x20],eax` (the rock number the tiles get: 2000 + slot,
+-- 2000 when the list is full). createRock takes 5 arguments.
+K.AOB_CREATE_ROCK_CALL = "52 B9 ? ? ? ? E8 ? ? ? ? 33 FF 05 D0 07 00 00 89 44 24 20"
+K.CREATE_ROCK_CALL = 6
+K.CREATE_ROCK_ARGUMENTS = 0x14
+K.CHECK_BOX_GAP = 8
+
+-- Castle mode: the build menu (found by its minimap item, item 17), its tabs (the menu
+-- category values) and the commands (placement ids) the module adds.
+K.AOB_BUILD_MINIMAP = "02 00 80 00 3B 02 00 00 D1 01 00 00 7E 00 00 00 7E 00 00 00 ? ? ? ? 39 30 00 00"
+K.BUILD_MINIMAP_ITEM = 17
+K.BUILD_MOST_ITEMS = 1000
+K.MAP_EDITOR = 1                         -- GameMode2
+K.TAB_TOWERS, K.TAB_KEEPS, K.TAB_ARMY, K.TAB_GOOD, K.TAB_RUINS = 11, 13, 14, 15, 27
+K.TAB_UNIT_COMMANDS = 61                 -- the engineer's siege tent buttons are here
+K.FIRST_TOWER = 110                      -- towers 110 .. 114, their ruins 115 .. 119
+K.TOWER_RUINS = { 115, 116, 117, 118, 119 }
+K.RUIN_LABEL = "Ruin"
+K.ENGINEERS_GUILD, K.TUNNELERS_GUILD = 88, 89
+K.TUNNEL_COMMAND, K.TUNNEL_LABEL = 57, "Tunnel"
+K.TUNNEL_WHEN = { [89] = true, [57] = true }
+K.TENTS = { 190, 191, 192, 193, 194, 358 }
+K.TENTS_WHEN = { [88] = true, [190] = true, [191] = true, [192] = true, [193] = true, [194] = true, [358] = true }
+K.STATUES = { { 320, 313, "2x2" }, { 321, 318, "2x2" }, { 322, 318, "1x1" } }   -- command, picture of, label
+K.FIRST_RUIN = 248
+K.BARRIER_COMMAND, K.BARRIER_LABEL = 58, "Barrier"
+K.SCREEN_LAYER = 0
+K.BUILD_NEEDED = {
+  { 11, 110 }, { 11, 111 }, { 11, 112 }, { 11, 113 }, { 11, 114 }, { 14, 88 }, { 14, 89 }, { 15, 313 }, { 15, 318 },
+  { 27, 248 }, { 61, 190 }, { 61, 191 }, { 61, 192 }, { 61, 193 }, { 61, 194 }, { 61, 358 },
+}
+-- The building list: placeBuilding's `push ebx / mov ecx, BuildingsState / mov [esi+..],edx /
+-- call convertCommandBuildingTypeToBuildingType`; BuildingsState + 8 is the list's size.
+K.AOB_BUILDINGS_STATE = "53 B9 ? ? ? ? 89 96 ? ? ? ? E8 ? ? ? ? 83 3D ? ? ? ? 04"
+K.MAX_BUILDINGS = 8
+K.BUILDING_REMOVED = 3                   -- logical state; 0 is a free slot
+-- The toolbar action's `mov eax, [current player] / mov ecx,eax / imul ecx,ecx,<player size>`.
+K.AOB_CURRENT_PLAYER = "A1 ? ? ? ? 8B C8 69 C9 ? ? 00 00 39 99 ? ? ? ? 74 18"
+-- A walk over the building list: `lea edx,[ecx + first state] / push ebx / movzx eax, word
+-- [edx] / test ax,ax / je / movsx ebx, word [edx + owner]`, ... `add edx, <building size>`.
+K.AOB_PLAYER_LOOP = "8D 91 ? ? ? ? 53 0F B7 02 66 85 C0 74 ? 0F BF 5A ?"
+K.PLAYER_LOOP_OWNER = 18
+K.PLAYER_LOOP_STRIDE = { 0x79, { 0x81, 0xC2 } }
+-- ... and in it the building types it counts: `movsx eax, word [edx + type] / add eax,-first /
+-- cmp eax, last - first / ja <counted> / movzx eax, byte [eax + table] / jmp [eax*4 + jumps]`.
+K.AOB_PLAYER_BUILDINGS = "0F BF 42 02 83 C0 F6 83 F8 5E 77 0E 0F B6 80 ? ? ? ? FF 24 85 ? ? ? ?"
+-- getBuildingSizeForCommandBuildingType: `mov eax,[esp+4] / add eax,-0x2C / cmp eax,0x146 / ja`.
+K.AOB_BUILDING_SIZE = "8B 44 24 04 83 C0 D4 3D 46 01 00 00 77 75"
+K.BUILDING_SIZE_START = 7
 
 -- MenuItemRenderFunction_MapEditorLandscaping_GeneralButtons: the item position globals
 -- (width follows the position), the hover flag, the open tab, the brush size, the chosen
@@ -1387,8 +1443,9 @@ end
 -- centred on their left neighbour. A row with `bottom` set stands its buttons on a common
 -- line instead (the lowest bottom edge among them). Buttons with their own pictures have their
 -- size in `sizeOf`, the others are measured by their gm picture. Moved buttons are taken off
--- the user control table, which would put them back the next time the menu loads.
-local function makeLayout(G, rows, added, sizeOf)
+-- the user control table, which would put them back the next time the menu loads. Each of
+-- `places` puts one more item somewhere once it can (it answers whether it has).
+local function makeLayout(G, rows, added, sizeOf, places)
   local function measure(address)
     local size = sizeOf[address]
     if size ~= nil then return size[1], size[2] end
@@ -1403,6 +1460,9 @@ local function makeLayout(G, rows, added, sizeOf)
   end
 
   return function()
+    for _, place in ipairs(places or {}) do
+      if not place(measure) then return false end
+    end
     for _, row in ipairs(rows) do
       local widths, heights, sum = {}, {}, 0
       for i, address in ipairs(row) do
@@ -1453,10 +1513,11 @@ local function buildTable(G, O)
   local pictures = {}
   if O.apple then pictures.apple = buttonPictures("apple") end
   if O.textures then pictures.gravel = buttonPictures("gravel") end
-  local rockTabs = {}
-  if O.variants then
-    for _, tab in ipairs({ ROCKS, K.ROCKS_SKIRMISH }) do
-      if G.blockEnd[tab] ~= nil then rockTabs[#rockTabs + 1] = tab end
+  local rockTabs, boxTabs = {}, {}
+  for _, tab in ipairs({ ROCKS, K.ROCKS_SKIRMISH }) do
+    if G.blockEnd[tab] ~= nil then
+      if O.variants then rockTabs[#rockTabs + 1] = tab end
+      if O.invisibleRocks then boxTabs[#boxTabs + 1] = tab end
     end
   end
 
@@ -1467,7 +1528,7 @@ local function buildTable(G, O)
   end
   insert(MAP_CLICK_ITEM, "guard")
   if O.counts then insert(INFO_BEFORE_ITEM, "info") end
-  if O.counts or O.obstacles then insert(G.firstBlock, "tooltip") end
+  if O.counts or O.obstacles or O.invisibleRocks then insert(G.firstBlock, "tooltip") end
   local animalsEnd = G.blockEnd[ANIMALS]
   if O.herds then
     insert(animalsEnd, "herdCheck")
@@ -1495,6 +1556,7 @@ local function buildTable(G, O)
     for v = 1, K.ROCK_VARIANTS + 1 do insert(G.blockEnd[tab], "rock" .. tab .. "/" .. v) end
     insert(G.blockEnd[tab], "rockPanel" .. tab)
   end
+  for _, tab in ipairs(boxTabs) do insert(G.blockEnd[tab], "invisible" .. tab) end
 
   local count = ITEM_COUNT + 1
   for _, list in pairs(inserts) do count = count + #list end
@@ -1546,6 +1608,7 @@ local function buildTable(G, O)
   data.herdSync = core.allocate(4, true)
   data.nearObstacles = core.allocate(4, true)
   data.randomShrub = core.allocate(4, true)
+  data.invisibleRocks = core.allocate(4, true)
   data.seed = core.allocate(4, true)
   wr32(data.seed, os.time())
   local unused = core.allocate(8, true)        -- the panel template's felled tree state, for panels without it
@@ -1726,7 +1789,46 @@ local function buildTable(G, O)
       rows[#rows + 1] = row
     end
   end
-  local layout = makeLayout(G, rows, newButtons, sizeOf)
+  -- The invisible rocks check box: right of the Rocks menu's last button.
+  local places = {}
+  for _, tab in ipairs(boxTabs) do
+    local box = added["invisible" .. tab]
+    wr32(box + ITEM_TYPE, TYPE_CLICKABLE)
+    wr32(box + ITEM_WIDTH, K.CHECK_BOX_SIZE)
+    wr32(box + ITEM_HEIGHT, K.CHECK_BOX_SIZE)
+    wr32(box + ITEM_ACTION, core.allocateAssembly(templates.flip, { FLAG = data.invisibleRocks }))
+    wr32(box + ITEM_RENDER_TYPE, RENDER_SIMPLE)
+    wr32(box + ITEM_RENDER, core.allocateAssembly(templates.checkBox, {
+      FLAG = data.invisibleRocks, ON_IMAGE = G.buttonImages + K.CHECKED_IMAGE * IMAGE_SIZE,
+      OFF_IMAGE = G.buttonImages + K.UNCHECKED_IMAGE * IMAGE_SIZE,
+      HOVER = G.hover, DRAW_MODE = G.drawMode, ITEM_X = G.itemX, ITEM_Y = G.itemY,
+      TEXTURES = G.textures, RENDER_GM = G.renderGM,
+    }))
+    wr16(box + ITEM_HIDDEN, 1)
+    tooltips[#tooltips + 1] = { item = box, lines = function()
+      return { "Invisible rocks: " .. (rd8(data.invisibleRocks) ~= 0 and "on" or "off") }
+    end }
+    local buttons = {}
+    for _, rock in ipairs(G.rockButtons) do
+      if rock.block == tab then buttons[#buttons + 1] = item(newTable, moved(rock.index)) end
+    end
+    if tab == ROCKS and G.buttons[K.SIGNPOST] ~= nil then buttons[#buttons + 1] = button(K.SIGNPOST) end
+    places[#places + 1] = function(measure)
+      local right, y, height = nil, 0, 0
+      for _, address in ipairs(buttons) do
+        local x = rd32(address + ITEM_X)
+        if (x & 0xFFFFFFFF) == PLACED_BY_CONTROL then return false end
+        local width, h = measure(address)
+        if width == nil then return false end
+        if right == nil or x + width > right then right, y, height = x + width, rd32(address + ITEM_Y), h end
+      end
+      wr32(box + ITEM_X, right + K.CHECK_BOX_GAP)
+      wr32(box + ITEM_Y, y + (height - K.CHECK_BOX_SIZE) // 2)
+      wr16(box + ITEM_HIDDEN, 0)
+      return true
+    end
+  end
+  local layout = makeLayout(G, rows, newButtons, sizeOf, places)
 
   -- A panel item at the end of a tab: shows its panel (lua) while one of its tools is chosen.
   local function panelItem(into, items, first, last, firstShrub, lastShrub, pad, felledLogs, felledCommand)
@@ -1861,7 +1963,7 @@ local function buildTable(G, O)
   -- The guard, in front of the game's map click handler; it also runs the layout until it
   -- has worked.
   data.laidOut = core.allocate(4, true)
-  wr32(data.laidOut, #rows == 0 and 1 or 0)
+  wr32(data.laidOut, (#rows == 0 and #places == 0) and 1 or 0)
   local layoutPad = core.allocateCode({ 0x90, 0x90, 0x90, 0x90, 0x90, 0xC3 })
   core.detourCode(function(registers)
     local ok, done = pcall(layout)
@@ -1973,6 +2075,18 @@ local function patchRocks(self, G, data)
   patchJump(self, G.rockPreview, K.ROCK_PREVIEW.size, rockId(G.rockPreview, K.ROCK_PREVIEW.size, "mov edx,[MOUSE_Y]"))
 end
 
+-- With the invisible rocks check box on, placeRock gets rock 0 instead of a new rock.
+function C.patchInvisibleRocks(self, data)
+  local site = scan(K.AOB_CREATE_ROCK_CALL, "the rock placement's createRock call") + K.CREATE_ROCK_CALL
+  local stub = core.allocateAssembly(templates.invisibleRocks, {
+    FLAG = data.invisibleRocks, CREATE_ROCK = readCallTarget(site, 0, "createRock"),
+    ROCK_ARGUMENTS = K.CREATE_ROCK_ARGUMENTS,
+  })
+  self.saved = self.saved or {}
+  table.insert(self.saved, { address = site, bytes = core.readBytes(site, 5) })
+  core.writeCode(site, { 0xE8, core.itob(core.getRelativeAddress(site, stub, -5)) })
+end
+
 -- Herds of the brush size while the herd panel's check box is on.
 local function patchHerds(self, G, data)
   for _, herd in pairs(G.herds) do
@@ -2007,6 +2121,7 @@ local function enableMenu(self, O)
   patchTrees(self, G, O, data)
   if data.rockTabs > 0 then patchRocks(self, G, data) end
   if O.herds then patchHerds(self, G, data) end
+  if O.invisibleRocks then C.patchInvisibleRocks(self, data) end
   self.shownFlag = data.shown
   log(INFO, string.format("%s: editor menu changed (menu 0x%X, items 0x%X -> 0x%X; %d tree, %d rock, "
     .. "%d group slots)", MODULE_NAME, G.menu, G.table, newTable, G.treeSlots, G.rockSlots, G.groupSlots))
@@ -2028,6 +2143,389 @@ local function enableRandomPreview(self)
   patchJump(self, site, K.RANDOM_ROCK_MODE_SIZE, core.allocateAssembly(templates.randomRockMode, {
     MODE = rd32(site + 2), BACK = site + K.RANDOM_ROCK_MODE_SIZE,
   }))
+end
+
+---------------------------------------------------------------------------------------
+-- Castle mode: the build menu
+---------------------------------------------------------------------------------------
+
+-- The build menu's item table (found by its minimap item), its constructor, its tabs and
+-- buttons, and what the building counts need.
+function C.resolve(G)
+  local B = {}
+  B.table = scan(K.AOB_BUILD_MINIMAP, "the build menu") - K.BUILD_MINIMAP_ITEM * MENU_ITEM_SIZE
+  local count = 0
+  while rd32(item(B.table, count, ITEM_TYPE)) ~= TYPE_END do
+    count = count + 1
+    if count > K.BUILD_MOST_ITEMS then error(MODULE_NAME .. ": the build menu is not the one this module knows") end
+  end
+  B.count = count
+  B.site = scan("68 " .. bytesOf(B.table) .. " B9 ? ? ? ? E8", "the build menu's constructor")
+  B.menu = rd32(B.site + 6)
+  B.constructor = readCallTarget(B.site, 10, "the Menu constructor")
+  local minimap = item(B.table, K.BUILD_MINIMAP_ITEM)
+  B.minimapX, B.minimapWidth = rd32(minimap + ITEM_X), rd32(minimap + ITEM_WIDTH)
+
+  -- Buttons by tab and command: item index, image table index, the action their group gives.
+  B.buttons, B.blockEnd = {}, {}
+  local block, groupAction = 0, nil
+  for i = 0, count - 1 do
+    local itemType = rd32(item(B.table, i, ITEM_TYPE))
+    if itemType == TYPE_BLOCK then
+      if block == 0 then B.firstBlock = i else B.blockEnd[block] = B.blockEnd[block] or i end
+      block = rd32(item(B.table, i, ITEM_PARAM))
+    elseif itemType == TYPE_GROUP_START then
+      groupAction = rd32(item(B.table, i, ITEM_ACTION))
+    elseif (itemType & TYPE_GROUP_MEMBER_MASK) == TYPE_GROUP_MEMBER then
+      local param = rd32(item(B.table, i, ITEM_PARAM))
+      B.buttons[block] = B.buttons[block] or {}
+      if B.buttons[block][param] == nil then
+        local action = rd32(item(B.table, i, ITEM_ACTION))
+        if action == 0 then action = groupAction end
+        B.buttons[block][param] = { index = i, image = rd32(item(B.table, i, ITEM_IMAGE)) & IMAGE_INDEX_MASK,
+          action = action }
+      end
+    end
+  end
+  if block ~= 0 then B.blockEnd[block] = B.blockEnd[block] or count end
+  for _, need in ipairs(K.BUILD_NEEDED) do
+    local tab = B.buttons[need[1]]
+    if B.blockEnd[need[1]] == nil or tab == nil or tab[need[2]] == nil then
+      error(string.format("%s: button %d of build menu tab %d is missing", MODULE_NAME, need[2], need[1]))
+    end
+  end
+  -- Every building button's group hands its command to the same toolbar action.
+  B.toolbar = B.buttons[K.TAB_TOWERS][K.FIRST_TOWER].action
+
+  G.gameMode = rd32(scan(AOB_GAME_MODE, "the game mode") + GAME_MODE_OPERAND)
+  B.buildings = rd32(scan(K.AOB_BUILDINGS_STATE, "the building list") + 2)
+  B.currentPlayer = rd32(scan(K.AOB_CURRENT_PLAYER, "the current player") + 1)
+  local loop = scan(K.AOB_PLAYER_LOOP, "the building list walk")
+  B.firstState = B.buildings + rd32(loop + 2)
+  B.ownerFromState = rd8(loop + K.PLAYER_LOOP_OWNER) & 0xFF
+  B.buildingSize = readOperand(loop, K.PLAYER_LOOP_STRIDE, "the building list walk")
+  -- Which building types are a player's buildings: the game's own list of buildings an enemy
+  -- can be sent to destroy (`add eax, -first / cmp eax, last / ja <counted> / movzx eax, byte
+  -- [eax + table] / jmp [eax*4 + jumps]`).
+  local list = scan(K.AOB_PLAYER_BUILDINGS, "the player building types")
+  B.typeFromState = rd8(list + 3) & 0xFF
+  local first = -C.signedByte(list + 6)
+  local last = first + (rd8(list + 9) & 0xFF)
+  local counted = list + 12 + (rd8(list + 11) & 0xFF)
+  local bytes, jumps = rd32(list + 15), rd32(list + 22)
+  local types = {}
+  for buildingType = 0, 255 do
+    local yes = buildingType ~= 0
+    if buildingType >= first and buildingType <= last then
+      yes = rd32(jumps + (rd8(bytes + buildingType - first) & 0xFF) * 4) == counted
+    end
+    types[buildingType + 1] = yes and 1 or 0
+  end
+  B.playerTypes = core.allocate(256, true)
+  core.writeBytes(B.playerTypes, types)
+  return B
+end
+
+-- The building counts above the minimap: three lines in the tooltip style, drawn on the map
+-- surface (the minimap's right edge, just above the panel).
+function C.makeCounts(G, B, counts)
+  local roundedBox = core.exposeCode(G.roundedBox, 6, 1)
+  local textWidth = core.exposeCode(G.textWidth, 4, 1)
+  local shadowedText = core.exposeCode(G.shadowedText, 10, 1)
+  local buffers = { core.allocate(96, true), core.allocate(96, true), core.allocate(96, true) }
+  return function()
+    local player = rd32(B.currentPlayer)
+    local texts = {
+      string.format("Buildings: %d/%d", rd32(counts), rd32(B.buildings + K.MAX_BUILDINGS) - 1),
+      string.format("Player buildings, all players: %d", rd32(counts + 4)),
+      string.format("Player buildings, player %d: %d", player, rd32(counts + 8)),
+    }
+    local widest = 0
+    for i, text in ipairs(texts) do
+      writeCString(buffers[i], text)
+      widest = math.max(widest, textWidth(G.textManager, buffers[i], #text, TOOLTIP_FONT))
+    end
+    local right = rd32(B.menu + MENU_X) + B.minimapX + B.minimapWidth + rd32(G.cameraX)
+    local left = right - widest - 2 * TOOLTIP_PADDING
+    local bottom = rd32(B.menu + MENU_Y) + PANEL_BOTTOM - PANEL_GAP + rd32(G.cameraY)
+    local top = bottom - #texts * TOOLTIP_LINE - TOOLTIP_PADDING
+    local target = rd32(G.pencil + PENCIL_TARGET)
+    wr32(G.pencil + PENCIL_TARGET, MAP_LAYER)
+    roundedBox(G.pencil, left, top, right, bottom, BOX_BLEND)
+    wr32(G.pencil + PENCIL_TARGET, target)
+    local layer = rd32(G.textLayer)
+    wr32(G.textLayer, MAP_LAYER)
+    for i = 1, #texts do
+      shadowedText(G.textManager, buffers[i], left + TOOLTIP_PADDING,
+        top + TOOLTIP_PADDING // 2 + (i - 1) * TOOLTIP_LINE, ALIGN_LEFT, TOOLTIP_COLOUR, 0, TOOLTIP_FONT, 0, 0)
+    end
+    wr32(G.textLayer, layer)
+  end
+end
+
+-- The Barrier button in the Ruins tab: a box with its name, on the screen like the tab's
+-- other buttons, brighter under the mouse.
+function C.makeBarrier(G)
+  local roundedBox = core.exposeCode(G.roundedBox, 6, 1)
+  local textWidth = core.exposeCode(G.textWidth, 4, 1)
+  local shadowedText = core.exposeCode(G.shadowedText, 10, 1)
+  local buffer = core.allocate(32, true)
+  return function(barrier)
+    local x, y = rd32(G.itemX), rd32(G.itemY)
+    local width, height = rd32(barrier + ITEM_WIDTH), rd32(barrier + ITEM_HEIGHT)
+    local target = rd32(G.pencil + PENCIL_TARGET)
+    wr32(G.pencil + PENCIL_TARGET, K.SCREEN_LAYER)
+    roundedBox(G.pencil, x, y, x + width - 1, y + height - 1, BOX_BLEND)
+    if rd32(G.hover) ~= 0 then roundedBox(G.pencil, x, y, x + width - 1, y + height - 1, BOX_BLEND) end
+    wr32(G.pencil + PENCIL_TARGET, target)
+    writeCString(buffer, K.BARRIER_LABEL)
+    local textX = x + (width - textWidth(G.textManager, buffer, #K.BARRIER_LABEL, TOOLTIP_FONT)) // 2
+    local layer = rd32(G.textLayer)
+    wr32(G.textLayer, K.SCREEN_LAYER)
+    shadowedText(G.textManager, buffer, textX, y + (height - TOOLTIP_LINE) // 2, ALIGN_LEFT, TOOLTIP_COLOUR, 0,
+      TOOLTIP_FONT, 0, 0)
+    wr32(G.textLayer, layer)
+  end
+end
+
+-- What a castle panel shows for the chosen tool: rows of commands with a game picture and a
+-- label each; `when` says for which chosen tools (nil: whenever its tab is open).
+function C.makeEntries(G, panel, rows)
+  return function(command)
+    for _, row in ipairs(rows) do
+      if row.when == nil or row.when[command] then
+        local list = {}
+        for i, entry in ipairs(row) do
+          list[i] = { item = panel.items[i], image = entry.image, label = entry.label, param = entry.command,
+            chosen = command == entry.command }
+        end
+        return list
+      end
+    end
+    return {}
+  end
+end
+
+-- Copies the build menu's item table with the module's items added, like buildTable.
+function C.build(G, B, O)
+  local data = { shown = core.allocate(4, true) }
+  local inserts = {}
+  local function insert(before, kind)
+    inserts[before] = inserts[before] or {}
+    table.insert(inserts[before], kind)
+  end
+  insert(0, "guard")
+  if O.buildingCounts then insert(B.firstBlock, "counts") end
+  local panels = {}
+  local function lookup(tab, command) return B.buttons[tab][command].image end
+  if O.towerRuins then
+    local row = {}
+    for i, ruin in ipairs(K.TOWER_RUINS) do
+      row[i] = { command = ruin, image = lookup(K.TAB_TOWERS, K.FIRST_TOWER + i - 1), label = K.RUIN_LABEL }
+    end
+    panels[#panels + 1] = { tab = K.TAB_TOWERS, rows = { row } }
+  end
+  if O.armyExtras then
+    local tunnel = { when = K.TUNNEL_WHEN, { command = K.TUNNEL_COMMAND,
+      image = lookup(K.TAB_ARMY, K.TUNNELERS_GUILD), label = K.TUNNEL_LABEL } }
+    local tents = { when = K.TENTS_WHEN }
+    for i, tent in ipairs(K.TENTS) do
+      tents[i] = { command = tent, image = lookup(K.TAB_UNIT_COMMANDS, tent) }
+    end
+    panels[#panels + 1] = { tab = K.TAB_ARMY, rows = { tunnel, tents } }
+  end
+  if O.statues then
+    local row = {}
+    for i, statue in ipairs(K.STATUES) do
+      row[i] = { command = statue[1], image = lookup(K.TAB_GOOD, statue[2]), label = statue[3] }
+    end
+    panels[#panels + 1] = { tab = K.TAB_GOOD, rows = { row } }
+  end
+  for p, panel in ipairs(panels) do
+    local most = 0
+    for _, row in ipairs(panel.rows) do most = math.max(most, #row) end
+    panel.size = most
+    for i = 1, most do insert(B.blockEnd[panel.tab], "panel" .. p .. "/" .. i) end
+    insert(B.blockEnd[panel.tab], "painter" .. p)
+  end
+  if O.barrier then insert(B.blockEnd[K.TAB_RUINS], "barrier") end
+
+  local total = B.count + 1
+  for _, list in pairs(inserts) do total = total + #list end
+  local newTable = core.allocate(total * MENU_ITEM_SIZE, true)
+  local movedTo, added, slot = {}, {}, 0
+  for i = 0, B.count do
+    for _, kind in ipairs(inserts[i] or {}) do
+      added[kind] = item(newTable, slot)
+      slot = slot + 1
+    end
+    core.writeBytes(item(newTable, slot), core.readBytes(item(B.table, i), MENU_ITEM_SIZE))
+    movedTo[i] = slot
+    slot = slot + 1
+  end
+
+  local guarded, places = {}, {}
+  if G.blit == nil then
+    G.blit = core.allocateAssembly(templates.blit, {
+      PENCIL = G.pencil, SETUP_SURFACE = G.setupSurface, SETUP_PENCIL = G.setupPencil,
+      SCRATCH = core.allocate(32, true), PIXEL_FORMAT = G.pixelFormat,
+    })
+  end
+  local GB = setmetatable({ menu = B.menu }, { __index = G })   -- G with the build menu
+  for p, panel in ipairs(panels) do
+    panel.items = {}
+    for i = 1, panel.size do
+      local into = added["panel" .. p .. "/" .. i]
+      wr32(into + ITEM_TYPE, TYPE_CLICKABLE)
+      wr32(into + ITEM_ACTION, B.toolbar)
+      wr32(into + ITEM_RENDER_TYPE, RENDER_NONE)
+      wr16(into + ITEM_HIDDEN, 1)
+      panel.items[i] = into
+      guarded[#guarded + 1] = into
+      guarded[#guarded + 1] = panel.tab
+    end
+    local paint = makePanel(GB, { counts = false }, data, panel, C.makeEntries(GB, panel, panel.rows))
+    local painter = added["painter" .. p]
+    wr32(painter + ITEM_TYPE, TYPE_CLICKABLE)
+    wr32(painter + ITEM_RENDER_TYPE, RENDER_SIMPLE)
+    wr32(painter + ITEM_RENDER, core.allocateAssembly(templates.editorPanel, {
+      GAME_MODE = G.gameMode, MAP_EDITOR = K.MAP_EDITOR, PANEL_ITEMS = dwordList(panel.items),
+      ITEM_HIDDEN = ITEM_HIDDEN, PAD = C.luaPad(paint, "a castle panel"),
+    }))
+  end
+
+  if O.buildingCounts then
+    local counts = core.allocate(12, true)
+    local count = core.allocateAssembly(templates.buildingCounts, {
+      BUILDINGS = B.buildings, MAX_BUILDINGS = K.MAX_BUILDINGS, FIRST_STATE = B.firstState,
+      BUILDING_SIZE = B.buildingSize, TYPE_FROM_STATE = B.typeFromState, OWNER_FROM_STATE = B.ownerFromState,
+      REMOVED = K.BUILDING_REMOVED, PLAYER_TYPES = B.playerTypes, CURRENT_PLAYER = B.currentPlayer, COUNTS = counts,
+    })
+    local into = added.counts
+    wr32(into + ITEM_TYPE, TYPE_CLICKABLE)    -- no size, so never under the mouse
+    wr32(into + ITEM_RENDER_TYPE, RENDER_SIMPLE)
+    wr32(into + ITEM_RENDER, core.allocateAssembly(templates.editorOnly, {
+      GAME_MODE = G.gameMode, MAP_EDITOR = K.MAP_EDITOR, FIRST = count,
+      PAD = C.luaPad(C.makeCounts(G, B, counts), "the building counts"),
+    }))
+  end
+
+  -- The barrier: a copy of the first ruin button with the barrier's command, placed in the
+  -- free spot at the end of the ruins' grid once the menu has placed them.
+  if O.barrier then
+    local barrier = added.barrier
+    local model = B.buttons[K.TAB_RUINS][K.FIRST_RUIN]
+    core.writeBytes(barrier, core.readBytes(item(B.table, model.index), MENU_ITEM_SIZE))
+    wr32(barrier + ITEM_X, 0)
+    wr32(barrier + ITEM_Y, 0)
+    wr32(barrier + ITEM_PARAM, K.BARRIER_COMMAND)
+    wr32(barrier + ITEM_ACTION, B.toolbar)
+    wr32(barrier + ITEM_RENDER_TYPE, RENDER_SIMPLE)
+    wr16(barrier + ITEM_CONTROL, -1)
+    wr16(barrier + ITEM_HIDDEN, 1)
+    local draw = C.makeBarrier(G)
+    wr32(barrier + ITEM_RENDER, C.luaPad(function() draw(barrier) end, "the barrier button"))
+    local ruins = {}
+    for _, button in pairs(B.buttons[K.TAB_RUINS]) do ruins[#ruins + 1] = item(newTable, movedTo[button.index]) end
+    places[#places + 1] = function(measure)
+      local width, height = measure(ruins[1])
+      if width == nil then return false end
+      local xs, ys, taken = {}, {}, {}
+      for _, ruin in ipairs(ruins) do
+        local x, y = rd32(ruin + ITEM_X), rd32(ruin + ITEM_Y)
+        if (x & 0xFFFFFFFF) == PLACED_BY_CONTROL then return false end
+        xs[x], ys[y], taken[x .. "/" .. y] = true, true, true
+      end
+      local columns, rows = {}, {}
+      for x in pairs(xs) do columns[#columns + 1] = x end
+      for y in pairs(ys) do rows[#rows + 1] = y end
+      table.sort(columns)
+      table.sort(rows)
+      local y = rows[#rows]
+      local x = nil
+      for _, column in ipairs(columns) do
+        if not taken[column .. "/" .. y] then x = column end
+      end
+      if x == nil then                         -- no free spot: one column further right
+        x = columns[#columns] + (#columns > 1 and columns[#columns] - columns[#columns - 1] or width)
+      end
+      wr32(barrier + ITEM_X, x)
+      wr32(barrier + ITEM_Y, y)
+      wr32(barrier + ITEM_WIDTH, width)
+      wr32(barrier + ITEM_HEIGHT, height)
+      wr16(barrier + ITEM_HIDDEN, 0)
+      return true
+    end
+  end
+
+  -- The guard in front of the click handlers, which also places the barrier.
+  local laidOut = core.allocate(4, true)
+  wr32(laidOut, #places == 0 and 1 or 0)
+  local layout = makeLayout(G, {}, {}, {}, places)
+  local layoutPad = C.luaPad(function()
+    if layout() then wr32(laidOut, 1) end
+  end, "the castle layout")
+  local guard = added.guard
+  wr32(guard + ITEM_TYPE, TYPE_EVERY_FRAME)
+  wr32(guard + ITEM_ACTION, core.allocateAssembly(templates.guard, {
+    LAID_OUT = laidOut, LAYOUT = layoutPad, GUARDED = dwordList(guarded),
+    ACTIVE_TAB = G.activeTab, ITEM_HIDDEN = ITEM_HIDDEN, ITEM_HEIGHT = ITEM_HEIGHT,
+    ITEM_WIDTH = ITEM_WIDTH, ITEM_MENU = ITEM_MENU, MENU_X = MENU_X, MENU_Y = MENU_Y, ITEM_X = ITEM_X,
+    ITEM_Y = ITEM_Y, MOUSE = G.mouse, IS_MOUSE_INSIDE = G.isMouseInside, ON_MAP = G.onMap,
+  }))
+  return newTable
+end
+
+function C.signedByte(address)
+  local value = rd8(address) & 0xFF
+  if value >= 0x80 then value = value - 0x100 end
+  return value
+end
+
+-- A lua function called from injected code: a pad that runs it, switched off after an error.
+function C.luaPad(fn, what)
+  local pad = core.allocateCode({ 0x90, 0x90, 0x90, 0x90, 0x90, 0xC3 })
+  local broken = false
+  core.detourCode(function(registers)
+    if not broken then
+      local ok, problem = pcall(fn)
+      if not ok then
+        broken = true
+        log(WARNING, string.format("%s: %s stopped after an error: %s", MODULE_NAME, what, tostring(problem)))
+      end
+    end
+    return registers
+  end, pad, 5)
+  return pad
+end
+
+-- Tower ruins get the size of their tower (the game has none for them) in the map editor.
+function C.patchRuinSizes(self, G)
+  local size = scan(K.AOB_BUILDING_SIZE, "the building sizes")
+  patchJump(self, size, K.BUILDING_SIZE_START, core.allocateAssembly(templates.ruinSize, {
+    GAME_MODE = G.gameMode, MAP_EDITOR = K.MAP_EDITOR, FIRST_RUIN = K.TOWER_RUINS[1],
+    LAST_RUIN = K.TOWER_RUINS[#K.TOWER_RUINS], TOWER_FROM_RUIN = K.TOWER_RUINS[1] - K.FIRST_TOWER,
+    SIZE_BASE = C.signedByte(size + 6), BACK = size + K.BUILDING_SIZE_START,
+  }))
+end
+
+function C.enable(self, O)
+  local G = {}
+  resolveMenu(G)
+  resolveDrawing(G)
+  local B = C.resolve(G)
+  if O.buildingCounts or O.towerRuins or O.armyExtras or O.statues or O.barrier then
+    local newTable = C.build(G, B, O)
+    core.writeCodeInteger(B.site + 1, newTable)
+    local construct = core.exposeCode(B.constructor, 2, 1)
+    local function ensure()
+      if rd32(B.menu) == B.table then construct(B.menu, newTable) end
+    end
+    ensure()
+    hooks.registerHookCallback("afterInit", ensure)
+  end
+  if O.towerRuins then C.patchRuinSizes(self, G) end
+  log(INFO, string.format("%s: build menu changed (menu 0x%X, items 0x%X)", MODULE_NAME, B.menu, B.table))
 end
 
 ---------------------------------------------------------------------------------------
@@ -2068,11 +2566,23 @@ local function enable(self, config)
     variants = setting(config, "rocks", "variants") == true,
     extraRock = setting(config, "rocks", "extra_rock") == true,
     herds = setting(config, "herds", "panel") == true,
+    invisibleRocks = setting(config, "rocks", "invisible") == true,
+  }
+  local castle = {
+    buildingCounts = setting(config, "castle", "building_counts") == true,
+    towerRuins = setting(config, "castle", "tower_ruins") == true,
+    armyExtras = setting(config, "castle", "tunnel_and_tents") == true,
+    statues = setting(config, "castle", "statues_and_shrines") == true,
+    barrier = setting(config, "castle", "barrier") == true,
   }
   if O.counts or O.growth or O.apple or O.shrubs or O.felled or O.obstacles or O.sortedRows or O.textures
-      or O.variants or O.herds then
+      or O.variants or O.herds or O.invisibleRocks then
     local ok, problem = pcall(enableMenu, self, O)
     if not ok then log(WARNING, tostring(problem) .. "; the editor menu is left as it is") end
+  end
+  if castle.buildingCounts or castle.towerRuins or castle.armyExtras or castle.statues or castle.barrier then
+    local ok, problem = pcall(C.enable, self, castle)
+    if not ok then log(WARNING, tostring(problem) .. "; the build menu is left as it is") end
   end
   if setting(config, "rocks", "signpost") == true then
     local ok, problem = pcall(enableSignpost, self)

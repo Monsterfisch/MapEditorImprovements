@@ -1,7 +1,7 @@
 # Map Editor Improvements
 
 **Author**: Monsterfish
-**Version**: 1.0.8
+**Version**: 1.0.9
 
 Makes the map editor show more about the map you are working on and adds tools the editor
 lacks: tree growth stages, apple trees, more shrubs, felled trees, gravel and iron, rock
@@ -85,8 +85,35 @@ spread evenly over the panel to make room.
   size, turned the way they would be placed (it follows the random rotation too). Click one
   and every rock you place is that variant. Click it again, or any button of the Rocks menu,
   and the editor goes back to changing the variant after every rock.
+- **Invisible rocks.** A check box to the right of the Rocks menu's buttons. While it is
+  ticked, every rock you place is an invisible rock straight away (the "2k stones trick")
+  instead of only after 4000 rocks: the tiles are taken, so nothing can be built there and
+  nobody walks there, but no rock is drawn, so the tiles keep showing what was there before.
+  Untick it to place normal rocks again. The invisible rocks are saved in the map like the
+  ones the game makes after 4000 rocks.
 - **Extra small rock.** For the smallest rocks the row offers a fifth variant: a small rock
   the game has but the editor never places. It is saved in the map like any other rock.
+
+## Castle mode
+
+In the building menu of the map editor's castle mode:
+
+- **Building counts** above the minimap:
+  - every building on the map against the game's limit. This includes keeps, landscape
+    buildings and the parts some buildings are made of, which take up places in the list too;
+  - the player buildings of all players together;
+  - the player buildings of the current player.
+
+  Player buildings are the ones an enemy can be sent to destroy.
+- **Tower ruins.** While the Towers menu is open, a row above it offers the ruins of all five
+  towers.
+- **Tunnel entrance and siege tents.** In the army buildings menu, with the tunnelers' guild
+  chosen, a row above the menu offers a tunnel entrance; with the engineers' guild chosen,
+  the six siege tents.
+- **Statue and shrines.** While the menu of good things is open, a row above it offers the
+  unused 2x2 statue, 2x2 shrine and 1x1 shrine.
+- **Barrier.** The Ruins menu gets a Barrier button in its free spot at the bottom right: a
+  1x1 barrier that can be deleted again.
 
 ## Herds
 
