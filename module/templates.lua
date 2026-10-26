@@ -826,4 +826,39 @@ refuse:
 jmp REFUSE
 ]]
 
+-- Action of a panel entry that is a way of placing a tool: remember the choice, then choose the
+-- tool (ACTION with the entry's command).
+templates.setChoice = [[
+mov dword [FLAG],VALUE
+jmp ACTION
+]]
+
+-- placeKeep, before a later part of the keep (lua appends the replaced instructions): in the map
+-- editor, with one of the keep choices that leave that part out, go straight to the end.
+templates.keepPart = [[
+cmp dword [GAME_MODE],MAP_EDITOR
+jne keep_part
+cmp dword [KEEP_MODE],FIRST_MODE
+je keep_done
+cmp dword [KEEP_MODE],SECOND_MODE
+jne keep_part
+keep_done:
+jmp EPILOGUE
+keep_part:
+]]
+
+-- placeWalls, after a tile is built or repaired (esi the tile, edi TileMapState), replacing
+-- `mov ecx,[esp+0x44] / push esi`: with the damaged choice on, the tile looks damaged.
+templates.damagedWall = [[
+cmp dword [GAME_MODE],MAP_EDITOR
+jne wall_done
+cmp byte [FLAG],0
+je wall_done
+mov byte [esi+edi+DAMAGE],1
+wall_done:
+mov ecx,[esp+0x44]
+push esi
+jmp BACK
+]]
+
 return templates

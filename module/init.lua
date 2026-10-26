@@ -88,7 +88,8 @@ local DEFAULTS = {
   textures = { gravel_and_iron = true },
   rocks = { signpost = true, random_preview = true, variants = true, extra_rock = true, invisible = true },
   castle = { building_counts = true, tower_ruins = true, tunnel_and_tents = true, statues_and_shrines = true,
-    barrier = true, several_keeps = true, several_storage_and_recruitment = true, tower_engines_anywhere = true },
+    barrier = true, several_keeps = true, several_storage_and_recruitment = true, tower_engines_anywhere = true,
+    keep_parts = true, damaged_walls = true },
   herds = { panel = true },
 }
 
@@ -259,6 +260,7 @@ K.SCREEN_LAYER = 0
 K.BUILD_NEEDED = {
   { 11, 110 }, { 11, 111 }, { 11, 112 }, { 11, 113 }, { 11, 114 }, { 14, 88 }, { 14, 89 }, { 15, 313 }, { 15, 318 },
   { 27, 248 }, { 61, 190 }, { 61, 191 }, { 61, 192 }, { 61, 193 }, { 61, 194 }, { 61, 358 },
+  { 13, 60 }, { 13, 61 }, { 13, 62 }, { 10, 25 }, { 10, 26 }, { 10, 27 }, { 10, 46 },
 }
 -- The building list: placeBuilding's `push ebx / mov ecx, BuildingsState / mov [esi+..],edx /
 -- call convertCommandBuildingTypeToBuildingType`; BuildingsState + 8 is the list's size.
@@ -309,6 +311,25 @@ K.TOWER_ENGINE = {
   param2 = { 0xF7, { 0xA3 } }, param3 = { 0xFC, { 0xC7, 0x05 } }, queue = 0x106, epilogue = 0x10B,
 }
 K.TOWER_4, K.TOWER_5 = 77, 78            -- the building types a tower engine can stand on
+-- Keep parts: placeKeep places the keep and its doors, then (`mov eax,[esp+0x3C] / mov ecx,
+-- [esp+0x48] / add ebx,[eax*8+..]`) the campfire area, then (`mov eax,[esp+0x3C] / mov edi,
+-- [eax*8+..]`) the stockpile; both lead on to the same epilogue.
+K.AOB_KEEP_CAMPFIRE = "8B 44 24 3C 8B 4C 24 48 03 1C C5 ? ? ? ? 03 3C C5"
+K.AOB_KEEP_STOCKPILE = "8B 44 24 3C 8B 3C C5 ? ? ? ? 8B 1C C5 ? ? ? ? 03 7C 24 24"
+K.KEEP_CAMPFIRE_SIZE, K.KEEP_STOCKPILE_SIZE = 8, 11
+K.KEEP_EPILOGUE = { 0x78, { 0x5F, 0x5E, 0x5D, 0x5B, 0x83, 0xC4, 0x1C, 0xC2, 0x1C, 0x00 } }
+K.KEEPS = { 60, 61, 62 }
+K.KEEP_ONLY, K.KEEP_NO_STOCKPILE = 1, 3   -- the keep panel's choices
+K.KEEP_LABELS = { [1] = "Keep only", [3] = "No stockpile" }
+-- Damaged walls: placeWalls, after a tile is built or repaired (`mov ecx,[esp+0x44] / push esi /
+-- push ecx / mov ecx, PathFindingState / call ...`; esi the tile, edi TileMapState), and its
+-- repair test `cmp byte [esi+edi+damage], 0 / jne / test ebp,ebp / je`.
+K.AOB_WALL_TILE_DONE = "8B 4C 24 44 56 51 B9 ? ? ? ? E8 ? ? ? ? 56 8B CF E8"
+K.WALL_TILE_DONE_SIZE = 5
+K.AOB_WALL_DAMAGE = "80 BC 3E ? ? ? ? 00 75 04 85 ED 74 32"
+K.WALLS = { 27, 46, 25, 26 }             -- stairs, low wall, high wall, crenellated wall
+K.TAB_CASTLE = 10
+K.DAMAGED_LABEL = "Damaged"
 
 -- MenuItemRenderFunction_MapEditorLandscaping_GeneralButtons: the item position globals
 -- (width follows the position), the hover flag, the open tab, the brush size, the chosen
@@ -2320,15 +2341,20 @@ function C.makeBarrier(G)
 end
 
 -- What a castle panel shows for the chosen tool: rows of commands with a game picture and a
--- label each; `when` says for which chosen tools (nil: whenever its tab is open).
+-- label each; `when` says for which chosen tools (nil: whenever its tab is open). An entry
+-- with `images` stands for the chosen tool itself (its picture by command); one with `flag`
+-- is a way of placing it, chosen while the flag holds its `value`.
 function C.makeEntries(G, panel, rows)
   return function(command)
     for _, row in ipairs(rows) do
       if row.when == nil or row.when[command] then
         local list = {}
         for i, entry in ipairs(row) do
-          list[i] = { item = panel.items[i], image = entry.image, label = entry.label, param = entry.command,
-            chosen = command == entry.command }
+          local param, image = entry.command, entry.image
+          if entry.images ~= nil then param, image = command, entry.images[command] end
+          local chosen = command == param
+          if entry.flag ~= nil then chosen = chosen and rd32(entry.flag) == entry.value end
+          list[i] = { item = panel.items[i], image = image, label = entry.label, param = param, chosen = chosen }
         end
         return list
       end
@@ -2372,6 +2398,26 @@ function C.build(G, B, O)
     end
     panels[#panels + 1] = { tab = K.TAB_GOOD, rows = { row } }
   end
+  data.keepMode = core.allocate(4, true)
+  data.damagedWalls = core.allocate(4, true)
+  local resets = {}                        -- menu buttons that end a panel choice: { tab, command, flag }
+  local function choices(tab, commands, flag, labels)
+    local images, when, row = {}, {}, {}
+    for _, command in ipairs(commands) do
+      images[command], when[command] = lookup(tab, command), true
+      resets[#resets + 1] = { tab, command, flag }
+    end
+    row.when = when
+    for _, choice in ipairs(labels) do
+      row[#row + 1] = { images = images, label = choice[2], flag = flag, value = choice[1] }
+    end
+    panels[#panels + 1] = { tab = tab, rows = { row } }
+  end
+  if O.keepParts then
+    choices(K.TAB_KEEPS, K.KEEPS, data.keepMode, { { K.KEEP_ONLY, K.KEEP_LABELS[K.KEEP_ONLY] },
+      { K.KEEP_NO_STOCKPILE, K.KEEP_LABELS[K.KEEP_NO_STOCKPILE] } })
+  end
+  if O.damagedWalls then choices(K.TAB_CASTLE, K.WALLS, data.damagedWalls, { { 1, K.DAMAGED_LABEL } }) end
   for p, panel in ipairs(panels) do
     local most = 0
     for _, row in ipairs(panel.rows) do most = math.max(most, #row) end
@@ -2407,8 +2453,13 @@ function C.build(G, B, O)
     panel.items = {}
     for i = 1, panel.size do
       local into = added["panel" .. p .. "/" .. i]
+      local entry = panel.rows[1][i]
+      local action = B.toolbar
+      if #panel.rows == 1 and entry ~= nil and entry.flag ~= nil then
+        action = core.allocateAssembly(templates.setChoice, { FLAG = entry.flag, VALUE = entry.value, ACTION = B.toolbar })
+      end
       wr32(into + ITEM_TYPE, TYPE_CLICKABLE)
-      wr32(into + ITEM_ACTION, B.toolbar)
+      wr32(into + ITEM_ACTION, action)
       wr32(into + ITEM_RENDER_TYPE, RENDER_NONE)
       wr16(into + ITEM_HIDDEN, 1)
       panel.items[i] = into
@@ -2489,6 +2540,13 @@ function C.build(G, B, O)
     end
   end
 
+  for _, reset in ipairs(resets) do
+    local button = B.buttons[reset[1]][reset[2]]
+    wr32(item(newTable, movedTo[button.index], ITEM_ACTION), core.allocateAssembly(templates.rockButton, {
+      ROCK_LOCK = reset[3], ACTION = button.action,
+    }))
+  end
+
   -- The guard in front of the click handlers, which also places the barrier.
   local laidOut = core.allocate(4, true)
   wr32(laidOut, #places == 0 and 1 or 0)
@@ -2504,7 +2562,7 @@ function C.build(G, B, O)
     ITEM_WIDTH = ITEM_WIDTH, ITEM_MENU = ITEM_MENU, MENU_X = MENU_X, MENU_Y = MENU_Y, ITEM_X = ITEM_X,
     ITEM_Y = ITEM_Y, MOUSE = G.mouse, IS_MOUSE_INSIDE = G.isMouseInside, ON_MAP = G.onMap,
   }))
-  return newTable
+  return newTable, data
 end
 
 function C.signedByte(address)
@@ -2601,6 +2659,34 @@ function C.patchTowerEngines(self, G)
   end
 end
 
+-- The keep panel's choices: in the map editor placeKeep stops after the keep and its doors
+-- (keep only) or before the stockpile.
+function C.patchKeepParts(self, G, data)
+  local campfire = scan(K.AOB_KEEP_CAMPFIRE, "the keep's campfire area")
+  local stockpile = scan(K.AOB_KEEP_STOCKPILE, "the keep's stockpile")
+  local epilogue = stockpile + K.KEEP_EPILOGUE[1]
+  expectBytes(epilogue, K.KEEP_EPILOGUE[2], "the end of placeKeep")
+  local function stop(site, size, modes, replay)
+    patchJump(self, site, size, core.allocateAssembly(templates.keepPart .. replay .. "\njmp BACK\n", {
+      GAME_MODE = G.gameMode, MAP_EDITOR = K.MAP_EDITOR, KEEP_MODE = data.keepMode, FIRST_MODE = modes[1],
+      SECOND_MODE = modes[2] or modes[1], EPILOGUE = epilogue, BACK = site + size, TABLE = rd32(site + 7),
+    }))
+  end
+  stop(campfire, K.KEEP_CAMPFIRE_SIZE, { K.KEEP_ONLY }, "mov eax,[esp+0x3C]\nmov ecx,[esp+0x48]")
+  stop(stockpile, K.KEEP_STOCKPILE_SIZE, { K.KEEP_ONLY, K.KEEP_NO_STOCKPILE }, "mov eax,[esp+0x3C]\nmov edi,[eax*8+TABLE]")
+end
+
+-- Damaged walls: in the map editor, with the choice on, every wall tile placeWalls builds or
+-- repairs gets the damaged look (its damage byte; the height stays).
+function C.patchDamagedWalls(self, G, data)
+  local site = scan(K.AOB_WALL_TILE_DONE, "the wall placement")
+  local damage = rd32(scan(K.AOB_WALL_DAMAGE, "the wall repair test") + 3)
+  patchJump(self, site, K.WALL_TILE_DONE_SIZE, core.allocateAssembly(templates.damagedWall, {
+    GAME_MODE = G.gameMode, MAP_EDITOR = K.MAP_EDITOR, FLAG = data.damagedWalls, DAMAGE = damage,
+    BACK = site + K.WALL_TILE_DONE_SIZE,
+  }))
+end
+
 -- Tower ruins get the size of their tower (the game has none for them) in the map editor.
 function C.patchRuinSizes(self, G)
   local size = scan(K.AOB_BUILDING_SIZE, "the building sizes")
@@ -2616,8 +2702,10 @@ function C.enable(self, O)
   resolveMenu(G)
   resolveDrawing(G)
   local B = C.resolve(G)
-  if O.buildingCounts or O.towerRuins or O.armyExtras or O.statues or O.barrier then
-    local newTable = C.build(G, B, O)
+  local data = nil
+  if O.buildingCounts or O.towerRuins or O.armyExtras or O.statues or O.barrier or O.keepParts or O.damagedWalls then
+    local newTable
+    newTable, data = C.build(G, B, O)
     core.writeCodeInteger(B.site + 1, newTable)
     local construct = core.exposeCode(B.constructor, 2, 1)
     local function ensure()
@@ -2629,6 +2717,8 @@ function C.enable(self, O)
   if O.towerRuins then C.patchRuinSizes(self, G) end
   if O.severalKeeps or O.looseBuildings then C.patchSeveralBuildings(self, G, O) end
   if O.towerEngines then C.patchTowerEngines(self, G) end
+  if O.keepParts then C.patchKeepParts(self, G, data) end
+  if O.damagedWalls then C.patchDamagedWalls(self, G, data) end
   log(INFO, string.format("%s: build menu changed (menu 0x%X, items 0x%X)", MODULE_NAME, B.menu, B.table))
 end
 
@@ -2681,6 +2771,8 @@ local function enable(self, config)
     severalKeeps = setting(config, "castle", "several_keeps") == true,
     looseBuildings = setting(config, "castle", "several_storage_and_recruitment") == true,
     towerEngines = setting(config, "castle", "tower_engines_anywhere") == true,
+    keepParts = setting(config, "castle", "keep_parts") == true,
+    damagedWalls = setting(config, "castle", "damaged_walls") == true,
   }
   if O.counts or O.growth or O.apple or O.shrubs or O.felled or O.obstacles or O.sortedRows or O.textures
       or O.variants or O.herds or O.invisibleRocks then
@@ -2688,7 +2780,8 @@ local function enable(self, config)
     if not ok then log(WARNING, tostring(problem) .. "; the editor menu is left as it is") end
   end
   if castle.buildingCounts or castle.towerRuins or castle.armyExtras or castle.statues or castle.barrier
-      or castle.severalKeeps or castle.looseBuildings or castle.towerEngines then
+      or castle.severalKeeps or castle.looseBuildings or castle.towerEngines or castle.keepParts
+      or castle.damagedWalls then
     local ok, problem = pcall(C.enable, self, castle)
     if not ok then log(WARNING, tostring(problem) .. "; the build menu is left as it is") end
   end

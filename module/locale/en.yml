@@ -131,6 +131,17 @@ castle_tower_engines_tooltip: |
   The tower mangonel and tower ballista of the army buildings menu can be put wherever no unit
   stands: on the ground, walls, gates, any tower or the keep, not only on the player's own
   square and round towers.
+castle_keep_parts: Keep without campfire or stockpile
+castle_keep_parts_tooltip: |
+  While one of the keeps is chosen, a row above the keeps menu offers it placed in two more
+  ways: "Keep only" (the keep and its entrance, no campfire area and no stockpile) and "No
+  stockpile" (keep, entrance and campfire area). Choosing a keep in the menu places the whole
+  keep again.
+castle_damaged_walls: Damaged walls and stairs
+castle_damaged_walls_tooltip: |
+  While the stairs, low wall, high wall or crenellated wall is chosen, a row above the castle
+  buildings menu offers it "Damaged": the walls you place get the top of a damaged wall (they
+  keep their height). Choosing the wall in the menu places undamaged walls again.
 
 herds_group: Herds
 herds_group_descr: |

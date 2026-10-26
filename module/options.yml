@@ -217,6 +217,22 @@ options:
     contents:
       type: boolean
       value: true
+  - url: map-editor-improvements.castle.keep_parts
+    name: map-editor-improvements-castle-keep-parts
+    text: '{{castle_keep_parts}}'
+    tooltip: '{{castle_keep_parts_tooltip}}'
+    display: Switch
+    contents:
+      type: boolean
+      value: true
+  - url: map-editor-improvements.castle.damaged_walls
+    name: map-editor-improvements-castle-damaged-walls
+    text: '{{castle_damaged_walls}}'
+    tooltip: '{{castle_damaged_walls_tooltip}}'
+    display: Switch
+    contents:
+      type: boolean
+      value: true
 
 - display: GroupBox
   category: [Map Editor Improvements]
