@@ -256,6 +256,13 @@ K.TENTS_WHEN = { [88] = true, [190] = true, [191] = true, [192] = true, [193] = 
 K.STATUES = { { 320, 313, "2x2" }, { 321, 318, "2x2" }, { 322, 318, "1x1" } }   -- command, picture of, label
 K.FIRST_RUIN = 248
 K.BARRIER_COMMAND, K.BARRIER_LABEL = 58, "Barrier"
+-- The barrier's picture: the "no workers" sign the game floats over buildings, face on (gm
+-- floats_new, picture 80; pictures 65 .. 80 turn it round). The gm number is checked against
+-- the gm list (records of 1000 bytes, by name) and the check boxes' gm, interface_icons3.
+K.NO_WORKERS_GM, K.NO_WORKERS_PICTURE = 172, 80
+K.AOB_GM_NO_WORKERS = "66 6C 6F 61 74 73 5F 6E 65 77 00"           -- "floats_new"
+K.AOB_GM_CHECK_BOXES = "69 6E 74 65 72 66 61 63 65 5F 69 63 6F 6E 73 33 00"   -- "interface_icons3"
+K.GM_RECORD_SIZE = 1000
 K.SCREEN_LAYER = 0
 K.BUILD_NEEDED = {
   { 11, 110 }, { 11, 111 }, { 11, 112 }, { 11, 113 }, { 11, 114 }, { 14, 88 }, { 14, 89 }, { 15, 313 }, { 15, 318 },
@@ -328,9 +335,13 @@ K.KEEP_LABELS = { [1] = "Keep only", [3] = "No stockpile" }
 -- Damaged walls: placeWalls, after a tile is built or repaired (`mov ecx,[esp+0x44] / push esi /
 -- push ecx / mov ecx, PathFindingState / call ...`; esi the tile, edi TileMapState), and its
 -- repair test `cmp byte [esi+edi+damage], 0 / jne / test ebp,ebp / je`.
-K.AOB_WALL_TILE_DONE = "8B 4C 24 44 56 51 B9 ? ? ? ? E8 ? ? ? ? 56 8B CF E8"
-K.WALL_TILE_DONE_SIZE = 5
-K.AOB_WALL_DAMAGE = "80 BC 3E ? ? ? ? 00 75 04 85 ED 74 32"
+K.AOB_WALL_TILE_DONE = "56 8B CF E8 ? ? ? ? 8B 54 24 44 8B 44 24 20 52 50 6A 07"
+K.WALL_TILE_DONE_SIZE, K.WALL_CLEAR_MOAT_CALL = 8, 3
+-- ... and the damage byte the wall drawing reads (updateGfxLayer: `movsx edx, byte [ecx+eax+
+-- damage] / test edx,edx / je`). The repair test inside placeWalls is patched by smarter-walls,
+-- and so is the instruction before the site above, which it also checks.
+K.AOB_WALL_DAMAGE = "0F BE 94 01 ? ? ? ? 85 D2 74"
+K.WALL_DAMAGE_OPERAND = 4
 K.WALLS = { 27, 46, 25, 26 }             -- stairs, low wall, high wall, crenellated wall
 K.TAB_CASTLE = 10
 K.DAMAGED_LABEL = "Damaged"
@@ -2325,20 +2336,87 @@ function C.makeCounts(G, B, counts)
   end
 end
 
--- The Barrier button in the Ruins tab: a box with its name, on the screen like the tab's
--- other buttons, brighter under the mouse.
+-- The Barrier button in the Ruins tab: the game's "no workers" sign, on the screen like the
+-- tab's other buttons, on a box while under the mouse; its name in a box if the sign cannot
+-- be had.
 function C.makeBarrier(G)
   local roundedBox = core.exposeCode(G.roundedBox, 6, 1)
   local textWidth = core.exposeCode(G.textWidth, 4, 1)
   local shadowedText = core.exposeCode(G.shadowedText, 10, 1)
+  local blit = core.exposeCode(G.blit, 3, 0)
   local buffer = core.allocate(32, true)
+  local gm = nil
+  local ok, names = pcall(function()
+    return { scan(K.AOB_GM_NO_WORKERS, "the gm list"), scan(K.AOB_GM_CHECK_BOXES, "the gm list") }
+  end)
+  local boxes = rd32(G.buttonImages + K.CHECKED_IMAGE * IMAGE_SIZE)
+  if ok and (names[1] - names[2]) == (K.NO_WORKERS_GM - boxes) * K.GM_RECORD_SIZE then gm = K.NO_WORKERS_GM end
+  local sign = nil                         -- the sign, cut out of its picture once it is loaded
+
+  -- The picture's pixels (16-bit TGX: n literal pixels, a repeated pixel, n see-through, new
+  -- line), cropped to the first run of rows with anything in them (the sign, not the mark
+  -- under it).
+  local function cut()
+    local first = rd32(G.firstPictures + gm * 4)
+    if first <= 0 then return nil end
+    local frame = first + K.NO_WORKERS_PICTURE - 1
+    local header = G.pictureHeights - 2 + frame * PICTURE_SIZE
+    local width, height = rd16(header), rd16(header + 2)
+    if width <= 0 or height <= 0 then return nil end
+    local data = core.readBytes(rd32(G.pictureOffsets + frame * 4) + rd32(G.textures + TEXTURES_DATA), width * height * 3)
+    local rows, x, y, i = {}, 0, 0, 1
+    local function word(at) return (data[at] & 0xFF) | ((data[at + 1] & 0xFF) << 8) end
+    while y < height and i <= #data do
+      local token = data[i] & 0xFF
+      i = i + 1
+      local n, flag = (token & 0x1F) + 1, token >> 5
+      if flag == 0 then
+        for _ = 1, n do
+          rows[y] = rows[y] or {}
+          rows[y][x] = word(i)
+          i, x = i + 2, x + 1
+        end
+      elseif flag == 2 then
+        local value = word(i)
+        i = i + 2
+        rows[y] = rows[y] or {}
+        for _ = 1, n do rows[y][x], x = value, x + 1 end
+      elseif flag == 1 then
+        x = x + n
+      elseif flag == 4 then
+        x, y = 0, y + 1
+      else
+        break
+      end
+    end
+    local top = 0
+    while top < height and rows[top] == nil do top = top + 1 end
+    local bottom = top
+    while bottom + 1 < height and rows[bottom + 1] ~= nil do bottom = bottom + 1 end
+    local left, right = width, -1
+    for row = top, bottom do
+      for column in pairs(rows[row] or {}) do left, right = math.min(left, column), math.max(right, column) end
+    end
+    if right < left then return nil end
+    local w, h, pixels = right - left + 1, bottom - top + 1, {}
+    for row = top, bottom do
+      for column, value in pairs(rows[row] or {}) do pixels[(row - top) * w + column - left + 1] = value end
+    end
+    return { address = storeRawPicture(w, h, pixels), width = w, height = h }
+  end
+
   return function(barrier)
     local x, y = rd32(G.itemX), rd32(G.itemY)
     local width, height = rd32(barrier + ITEM_WIDTH), rd32(barrier + ITEM_HEIGHT)
+    if gm ~= nil and sign == nil then sign = cut() end
     local target = rd32(G.pencil + PENCIL_TARGET)
     wr32(G.pencil + PENCIL_TARGET, K.SCREEN_LAYER)
-    roundedBox(G.pencil, x, y, x + width - 1, y + height - 1, BOX_BLEND)
-    if rd32(G.hover) ~= 0 then roundedBox(G.pencil, x, y, x + width - 1, y + height - 1, BOX_BLEND) end
+    if sign == nil or rd32(G.hover) ~= 0 then roundedBox(G.pencil, x, y, x + width - 1, y + height - 1, BOX_BLEND) end
+    if sign ~= nil then
+      blit(sign.address, x + (width - sign.width) // 2, y + (height - sign.height) // 2)
+      wr32(G.pencil + PENCIL_TARGET, target)
+      return
+    end
     wr32(G.pencil + PENCIL_TARGET, target)
     writeCString(buffer, K.BARRIER_LABEL)
     local textX = x + (width - textWidth(G.textManager, buffer, #K.BARRIER_LABEL, TOOLTIP_FONT)) // 2
@@ -2695,9 +2773,10 @@ end
 -- repairs gets the damaged look (its damage byte; the height stays).
 function C.patchDamagedWalls(self, G, data)
   local site = scan(K.AOB_WALL_TILE_DONE, "the wall placement")
-  local damage = rd32(scan(K.AOB_WALL_DAMAGE, "the wall repair test") + 3)
+  local damage = rd32(scan(K.AOB_WALL_DAMAGE, "the wall drawing") + K.WALL_DAMAGE_OPERAND)
   patchJump(self, site, K.WALL_TILE_DONE_SIZE, core.allocateAssembly(templates.damagedWall, {
     GAME_MODE = G.gameMode, MAP_EDITOR = K.MAP_EDITOR, FLAG = data.damagedWalls, DAMAGE = damage,
+    CLEAR_MOAT = readCallTarget(site, K.WALL_CLEAR_MOAT_CALL, "the wall placement"),
     BACK = site + K.WALL_TILE_DONE_SIZE,
   }))
 end

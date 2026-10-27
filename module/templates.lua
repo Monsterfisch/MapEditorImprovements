@@ -848,7 +848,7 @@ keep_part:
 ]]
 
 -- placeWalls, after a tile is built or repaired (esi the tile, edi TileMapState), replacing
--- `mov ecx,[esp+0x44] / push esi`: with the damaged choice on, the tile looks damaged.
+-- `push esi / mov ecx,edi / call clearMoat`: with the damaged choice on, the tile looks damaged.
 templates.damagedWall = [[
 cmp dword [GAME_MODE],MAP_EDITOR
 jne wall_done
@@ -856,8 +856,9 @@ cmp byte [FLAG],0
 je wall_done
 mov byte [esi+edi+DAMAGE],1
 wall_done:
-mov ecx,[esp+0x44]
 push esi
+mov ecx,edi
+call CLEAR_MOAT
 jmp BACK
 ]]
 
