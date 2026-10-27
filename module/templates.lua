@@ -861,4 +861,24 @@ push esi
 jmp BACK
 ]]
 
+-- Action of a castle panel entry: a command in DIRECT is chosen straight away, any other goes
+-- through the toolbar action as a menu button's would.
+templates.directTool = [[
+mov eax,[esp+4]
+mov ecx,DIRECT
+next_direct:
+mov edx,[ecx]
+test edx,edx
+je through_toolbar
+cmp edx,eax
+je choose_direct
+add ecx,4
+jmp next_direct
+choose_direct:
+mov [SUBTYPE],eax
+ret
+through_toolbar:
+jmp TOOLBAR
+]]
+
 return templates

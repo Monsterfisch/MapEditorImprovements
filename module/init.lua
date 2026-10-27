@@ -266,6 +266,10 @@ K.BUILD_NEEDED = {
 -- call convertCommandBuildingTypeToBuildingType`; BuildingsState + 8 is the list's size.
 K.AOB_BUILDINGS_STATE = "53 B9 ? ? ? ? 89 96 ? ? ? ? E8 ? ? ? ? 83 3D ? ? ? ? 04"
 K.MAX_BUILDINGS = 8
+-- The list's capacity: a walk over every slot, `mov esi, <first state> / ... / add esi,
+-- <building size> / inc edi / cmp esi, <past the last>`.
+K.AOB_BUILDING_SLOTS = "BE ? ? ? ? 8D 64 24 00 66 83 3E 00 74 0B 57 B9 ? ? ? ? E8 ? ? ? ? 81 C6 2C 03 00 00 83 C7 01 81 FE"
+K.BUILDING_SLOTS = { first = 1, past = 0x25 }
 K.BUILDING_REMOVED = 3                   -- logical state; 0 is a free slot
 -- The toolbar action's `mov eax, [current player] / mov ecx,eax / imul ecx,ecx,<player size>`.
 K.AOB_CURRENT_PLAYER = "A1 ? ? ? ? 8B C8 69 C9 ? ? 00 00 39 99 ? ? ? ? 74 18"
@@ -2257,6 +2261,11 @@ function C.resolve(G)
   B.firstState = B.buildings + rd32(loop + 2)
   B.ownerFromState = rd8(loop + K.PLAYER_LOOP_OWNER) & 0xFF
   B.buildingSize = readOperand(loop, K.PLAYER_LOOP_STRIDE, "the building list walk")
+  local slots = scan(K.AOB_BUILDING_SLOTS, "the building list's size")
+  if rd32(slots + K.BUILDING_SLOTS.first) ~= B.firstState then
+    error(MODULE_NAME .. ": the building list is not where the module expects it")
+  end
+  B.capacity = (rd32(slots + K.BUILDING_SLOTS.past) - B.firstState) // B.buildingSize
   -- Which building types are a player's buildings: the game's own list of buildings an enemy
   -- can be sent to destroy (`add eax, -first / cmp eax, last / ja <counted> / movzx eax, byte
   -- [eax + table] / jmp [eax*4 + jumps]`).
@@ -2289,7 +2298,7 @@ function C.makeCounts(G, B, counts)
   return function()
     local player = rd32(B.currentPlayer)
     local texts = {
-      string.format("Buildings: %d/%d", rd32(counts), rd32(B.buildings + K.MAX_BUILDINGS) - 1),
+      string.format("Buildings: %d/%d", rd32(counts), B.capacity),
       string.format("Player buildings, all players: %d", rd32(counts + 4)),
       string.format("Player buildings, player %d: %d", player, rd32(counts + 8)),
     }
@@ -2450,12 +2459,17 @@ function C.build(G, B, O)
     })
   end
   local GB = setmetatable({ menu = B.menu }, { __index = G })   -- G with the build menu
+  -- The toolbar action takes the siege tents for an order to selected engineers: those are
+  -- chosen straight away, like the game's hotkeys do.
+  local direct = core.allocateAssembly(templates.directTool, {
+    DIRECT = dwordList(K.TENTS), SUBTYPE = G.subtype, TOOLBAR = B.toolbar,
+  })
   for p, panel in ipairs(panels) do
     panel.items = {}
     for i = 1, panel.size do
       local into = added["panel" .. p .. "/" .. i]
       local entry = panel.rows[1][i]
-      local action = B.toolbar
+      local action = direct
       if #panel.rows == 1 and entry ~= nil and entry.flag ~= nil then
         action = core.allocateAssembly(templates.setChoice, { FLAG = entry.flag, VALUE = entry.value, ACTION = B.toolbar })
       end
@@ -2694,7 +2708,7 @@ function C.patchRuinSizes(self, G)
   patchJump(self, size, K.BUILDING_SIZE_START, core.allocateAssembly(templates.ruinSize, {
     GAME_MODE = G.gameMode, MAP_EDITOR = K.MAP_EDITOR, FIRST_RUIN = K.TOWER_RUINS[1],
     LAST_RUIN = K.TOWER_RUINS[#K.TOWER_RUINS], TOWER_FROM_RUIN = K.TOWER_RUINS[1] - K.FIRST_TOWER,
-    SIZE_BASE = C.signedByte(size + 6), BACK = size + K.BUILDING_SIZE_START,
+    SIZE_BASE = C.signedByte(size + 6) & 0xFFFFFFFF, BACK = size + K.BUILDING_SIZE_START,
   }))
 end
 
@@ -2720,11 +2734,17 @@ function C.enable(self, O)
     ensure()
     hooks.registerHookCallback("afterInit", ensure)
   end
-  if O.towerRuins then C.patchRuinSizes(self, G) end
-  if O.severalKeeps or O.looseBuildings then C.patchSeveralBuildings(self, G, O) end
-  if O.towerEngines then C.patchTowerEngines(self, G) end
-  if O.keepParts then C.patchKeepParts(self, G, data) end
-  if O.damagedWalls then C.patchDamagedWalls(self, G, data) end
+  -- Each patch on its own, so that one the game does not match leaves the others working.
+  local function try(wanted, patch, what, ...)
+    if not wanted then return end
+    local ok, problem = pcall(patch, self, ...)
+    if not ok then log(WARNING, tostring(problem) .. "; " .. what .. " left out") end
+  end
+  try(O.towerRuins, C.patchRuinSizes, "tower ruins", G)
+  try(O.severalKeeps or O.looseBuildings, C.patchSeveralBuildings, "several keeps and storage buildings", G, O)
+  try(O.towerEngines, C.patchTowerEngines, "tower engines anywhere", G)
+  try(O.keepParts, C.patchKeepParts, "the keep choices", G, data)
+  try(O.damagedWalls, C.patchDamagedWalls, "damaged walls", G, data)
   log(INFO, string.format("%s: build menu changed (menu 0x%X, items 0x%X)", MODULE_NAME, B.menu, B.table))
 end
 
