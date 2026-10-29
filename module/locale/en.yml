@@ -34,9 +34,10 @@ trees_shrubs_tooltip: |
   all five of them.
 trees_felled: Felled trees
 trees_felled_tooltip: |
-  While a tree is chosen, a row above the Vegetation menu offers that tree felled, with every
-  number of logs it can still hold (9 down to 1 for a fully grown tree). Click one to place
-  felled trees, click it again to go back to standing trees.
+  While a tree is chosen, a row above the Vegetation menu offers that tree standing (first) and
+  felled, with every number of logs it can still hold (9 down to 1 for a fully grown tree; the
+  smallest trees are felled with 1 log). Click one to place felled trees; click the standing
+  tree, the felled one again or the tree in the menu to go back to standing trees.
 
 trees_random_mix: Random mixes in the tree rows
 trees_random_mix_tooltip: |
@@ -49,9 +50,9 @@ trees_random_mix_tooltip: |
   Click one again, or choose another button, to stop mixing.
 trees_obstacles: Check box for trees next to obstacles
 trees_obstacles_tooltip: |
-  Adds a check box to the top row of the Vegetation menu. While it is ticked, trees and
-  shrubs can be placed right next to buildings, rocks, walls and other trees, which the game
-  normally keeps them away from. Point at it to see whether it is on.
+  Adds a check box to the top row of the Vegetation menu. While it is ticked, trees can be
+  placed right next to buildings, rocks, walls and other trees, which the game normally keeps
+  them away from (shrubs can stand there anyway). Point at it to see whether it is on.
 trees_sorted_rows: Tidy the Vegetation menu's rows
 trees_sorted_rows_tooltip: |
   Moves the shrub from the top row to the bottom row and sorts the bottom row's shrubs, so
@@ -142,6 +143,7 @@ castle_keep_parts_tooltip: |
   ways: "Keep only" (the keep and its entrance, no campfire area and no stockpile) and "No
   stockpile" (keep, entrance and campfire area). Choosing a keep in the menu places the whole
   keep again.
+  The preview and the check for room show only those parts.
 castle_damaged_walls: Damaged walls and stairs
 castle_damaged_walls_tooltip: |
   While the stairs, low wall, high wall or crenellated wall is chosen, a row above the castle
@@ -154,7 +156,7 @@ herds_group_descr: |
 herds_panel: Herd panel
 herds_panel_tooltip: |
   While the deer, lion, rabbit or camel is chosen, a panel above the Animals menu shows how
-  many animals a herd gets (a fixed part plus a random part) and which troop type the herd
+  many animals a herd gets (a fixed part plus a random part) and which group behaviour type the herd
   uses. Its check box makes herds as big as the brush: 2 x brush size - 1 animals (1 to 13),
   with no random part.
 

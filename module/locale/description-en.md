@@ -1,7 +1,7 @@
 # Map Editor Improvements
 
 **Author(s)**: Monsterfish, Heroesflorian
-**Version**: 1.0.16
+**Version**: 1.0.17
 
 Makes the map editor show more about the map you are working on and adds tools the editor
 lacks: tree growth stages, apple trees, more shrubs, felled trees, gravel and iron, rock
@@ -42,13 +42,16 @@ right to make room for it.
   | 7 | dead tree that disappears sooner |
 
   Shrubs always come out the same.
-- **Apple tree button** in the Vegetation menu.
+- **Apple tree button** in the Vegetation menu (named on the description line like the other
+  plants: "Apple tree", in German "Apfelbaum").
 - **More shrubs.** While the shrub that comes in five colours is chosen, a row above the
   Vegetation menu offers all five colours.
 - **Felled trees.** While a tree is chosen, a row above the Vegetation menu shows that tree
-  felled, once for every number of logs it can still hold: 9 down to 1 for a fully grown
-  tree, fewer for smaller ones, none for dead ones. Click one, and the trees you place lie
-  felled with that many logs. Click it again to place standing trees again.
+  standing, then felled, once for every number of logs it can still hold: 9 down to 1 for a
+  fully grown tree, fewer for smaller ones, none for dead ones (the smallest trees are felled
+  with 1 log, as a tree of the next stage). Click one, and the trees you place lie felled with
+  that many logs. Click it again, the standing tree or the tree in the menu to place standing
+  trees again.
 
 - **Random mixes.** The rows above the Vegetation menu get buttons marked "?":
   - **Random tree**, first in the felled tree row: every tree you place gets a random growth
@@ -60,7 +63,8 @@ right to make room for it.
 
   Click it again, or choose another button, to stop mixing.
 - **Trees next to obstacles.** A check box at the end of the top row. While it is ticked,
-  trees and shrubs can be placed right next to buildings, rocks, walls and other trees.
+  trees can be placed right next to buildings, rocks, walls and other trees (shrubs can stand
+  there anyway).
   Point at it to see whether it is on.
 - **Tidier rows.** The top row holds the trees (and the apple tree and the check box); the
   shrub that sat there moves to the bottom row, whose shrubs are sorted.
@@ -127,7 +131,8 @@ In the building menu of the map editor's castle mode:
   tower or the keep. On the player's own square and round towers they work as before.
 - **Keep without campfire or stockpile.** While a keep is chosen, a row above the keeps menu
   offers it in two more ways: **Keep only** (the keep and its entrance) and **No stockpile**
-  (keep, entrance and campfire area). Choosing the keep in the menu places the whole keep again.
+  (keep, entrance and campfire area). The preview and the check for room cover only those
+  parts. Choosing the keep in the menu places the whole keep again.
 - **Damaged walls.** While the stairs, low wall, high wall or crenellated wall is chosen, a row
   above the castle buildings menu offers it **Damaged**: the walls you place get the top of a
   damaged wall and keep their height. Choosing the wall in the menu places normal walls again.
@@ -137,7 +142,7 @@ In the building menu of the map editor's castle mode:
 ## Herds
 
 While the deer, lion, rabbit or camel is chosen, a panel above the Animals menu shows how
-big that animal's herds are (a fixed number plus a random number) and which troop type the
+big that animal's herds are (a fixed number plus a random number) and which group behaviour type the
 herd uses. Tick its check box and herds come out as big as the brush: 2 x brush size - 1
 animals, so brush 1 places single animals and brush 7 herds of 13.
 

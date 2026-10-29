@@ -237,6 +237,16 @@ K.AOB_CREATE_ROCK_CALL = "52 B9 ? ? ? ? E8 ? ? ? ? 33 FF 05 D0 07 00 00 89 44 24
 K.CREATE_ROCK_CALL = 6
 K.CREATE_ROCK_ARGUMENTS = 0x14
 K.CHECK_BOX_GAP = 8
+-- Tooltips of the check boxes sit higher than the category tooltips (clear of the menu's top).
+K.CHECK_BOX_TOOLTIP_RAISE = 20
+-- Names the game has no text for, shown on the description line in the game's language
+-- (German when the game's text for iron, cr.tex group 8 text 337, is "Eisen").
+K.NAMES = { apple = { en = "Apple tree", de = "Apfelbaum" }, gravel = { en = "Gravel", de = "Kies" } }
+K.TEXT_FILE, K.TEXT_GROUP, K.TEXT_INDEX, K.GERMAN_TEXT = "cr.tex", 8, 337, "Eisen"
+K.TEXT_GROUPS, K.TEXT_START = 250, 1000
+-- A felled tree placed at the smallest growth stage is placed at the next one, with 1 log (the
+-- smallest stage has no felled picture).
+K.SMALLEST_FELLED_STAGE, K.SMALLEST_FELLED_LOGS = 1, 1
 -- Erasing invisible rocks: the eraser brush (and the brush the other tools erase with) takes a
 -- tile's rock off by its number: `cmp eax, 2000 / mov ecx, LandscapeState / jl <tree> / add
 -- eax, -2000 / push eax / call removeRock`. An invisible rock's tiles have number 2000, an
@@ -302,6 +312,26 @@ K.AOB_PLAYER_BUILDINGS = "0F BF 42 02 83 C0 F6 83 F8 5E 77 0E 0F B6 80 ? ? ? ? F
 -- getBuildingSizeForCommandBuildingType: `mov eax,[esp+4] / add eax,-0x2C / cmp eax,0x146 / ja`.
 K.AOB_BUILDING_SIZE = "8B 44 24 04 83 C0 D4 3D 46 01 00 00 77 75"
 K.BUILDING_SIZE_START = 7
+-- The preview's building pictures: `call convertCommandBuildingTypeToBuildingType / mov eax,
+-- [eax*4 + gm per building type] / mov [esi+..],eax / movsx eax,bx / push eax / mov ecx,
+-- BuildingsState / call getSpriteID` (the building's first picture).
+K.AOB_BUILDING_SPRITES = "E8 ? ? ? ? 8B 04 85 ? ? ? ? 89 86 ? ? ? ? 0F BF C3 50 B9 ? ? ? ? E8"
+K.BUILDING_SPRITES = { gms = 8, sprite = 0x1B }
+K.TUNNEL_SIZE = 3
+-- Panels moved left of the screen's middle.
+K.PANEL_SHIFT = { [11] = -50, [13] = -50, [15] = -50 }
+K.TENTS_SHIFT = -200
+-- Keep parts in the placement check (checkBuildingCanBePlacedHere: after the door tiles `mov
+-- eax,[esp+0x48] / shl eax,5`, before the stockpile `mov eax,[esp+0x4C] / mov ebx,[eax+..]`)
+-- and in the preview colours (setConstructionGFXLayerBasedOnPlacementChecks: after the doors
+-- `shl edx,5 / add ebp,[edx+..]`, before the stockpile `mov eax,[esp+0x38] / mov ebp,[eax+..]`).
+K.AOB_KEEP_CHECK = "8B 44 24 48 C1 E0 05 03 B8 ? ? ? ? 03 A8"
+K.KEEP_CHECK = { size = 7, stockpile = 0xBF, stockpileSize = 10, table = 6, done = 0xB1,
+  doneBytes = { 0x5F, 0x5E, 0x5D, 0x5B, 0x83, 0xC4, 0x2C, 0xC2, 0x14, 0x00 } }
+K.AOB_KEEP_PREVIEW = "C1 E2 05 03 AA ? ? ? ? 03 BA ? ? ? ? 89 54 24 38"
+K.AOB_KEEP_PREVIEW_STOCKPILE = "8B 44 24 38 8B A8 ? ? ? ? 8B 80 ? ? ? ? 03 44 24 18"
+K.KEEP_PREVIEW = { size = 9, table = 5, stockpileSize = 10, stockpileTable = 6, done = 0x83,
+  doneBytes = { 0x66, 0x8B, 0x44, 0x24, 0x34 } }
 -- computeBuildingCategoryEntryPointAndDestroyEarlierBuilding(building, player, category): its
 -- `push eax / mov ecx, BuildingsState / call destroyBuilding / mov edx,[esp+0x1C]`, three
 -- times: the player's earlier keep (twice), then the earlier one of the unique buildings.
@@ -1086,16 +1116,18 @@ local function makeRockPictures(G)
     return result
   end
 
-  -- size: footprint tiles per side (1 .. 4); base: the rock's first picture.
-  return function(size, base, rotation)
+  -- size: footprint tiles per side (1 .. 4); base: the rock's first picture. Other objects
+  -- made of tiles the same way (buildings) give their gm, and `fixed`: no turned sets.
+  return function(size, base, rotation, gm, fixed)
+    gm = gm or G.rockGm
     local tileMap = G.tileMap
     local turn = rd32(tileMap + K.TILE_MAP.orientation)
     if rd32(tileMap + K.TILE_MAP.mode) ~= 5 then turn = turn + rotation end
-    local step = (turn % 8) // 2
+    local step = fixed and 0 or (turn % 8) // 2
     local view = rd32(tileMap + K.TILE_MAP.orientation)
-    local key = string.format("%d/%d/%d/%d", size, base, step, view)
+    local key = string.format("%d/%d/%d/%d/%d", size, base, step, view, gm)
     if cache[key] ~= nil then return cache[key] end
-    local first = rd32(G.firstPictures + G.rockGm * 4)
+    local first = rd32(G.firstPictures + gm * 4)
     local t = K.TURN[view]
     if first <= 0 or t == nil then return nil end
     local parts, left, top, right, bottom = {}, math.huge, math.huge, -math.huge, -math.huge
@@ -1150,7 +1182,16 @@ local function makeTooltip(G, candidates)
       local y = rd32(G.menu + MENU_Y) + rd32(button + ITEM_Y)
       local shown = rd16(button + ITEM_HOVERED) ~= 0
         and isMouseInside(G.mouse, x, y, rd32(button + ITEM_WIDTH), rd32(button + ITEM_HEIGHT)) ~= 0
-        and candidate.lines()
+        and (candidate.name or candidate.lines())
+      if shown and candidate.name ~= nil then   -- a name on the description line, like the game's
+        writeCString(lineBuffers[1], shown)
+        local layer = rd32(G.textLayer)
+        wr32(G.textLayer, MAP_LAYER)
+        shadowedText(G.textManager, lineBuffers[1], rd32(G.menu + MENU_X) + G.describeAt[1] + rd32(G.cameraX),
+          rd32(G.menu + MENU_Y) + G.describeAt[2] + rd32(G.cameraY), ALIGN_LEFT, TOOLTIP_COLOUR, 0, TOOLTIP_FONT, 0, 0)
+        wr32(G.textLayer, layer)
+        return
+      end
       if shown then
         local widest = 0
         for i, text in ipairs(shown) do
@@ -1159,7 +1200,7 @@ local function makeTooltip(G, candidates)
         end
         local left = x + rd32(G.cameraX)
         local right = left + widest + 2 * TOOLTIP_PADDING
-        local bottom = rd32(G.menu + MENU_Y) + TOOLTIP_BOTTOM + rd32(G.cameraY)
+        local bottom = rd32(G.menu + MENU_Y) + TOOLTIP_BOTTOM + rd32(G.cameraY) - (candidate.raise or 0)
         local top = bottom - #shown * TOOLTIP_LINE - TOOLTIP_PADDING
         local target = rd32(G.pencil + PENCIL_TARGET)
         wr32(G.pencil + PENCIL_TARGET, MAP_LAYER)
@@ -1198,6 +1239,7 @@ local function makeTreeEntries(G, O, data, panel)
     if O.felled and command >= FIRST_TREE_COMMAND and command <= LAST_TREE_COMMAND then
       local treeType, treeStage = G.plantTypes[command], stage()
       local most = math.min(rd32(G.logs + (treeType * STAGES + treeStage) * 4), MOST_LOGS)
+      if treeStage == 0 then most = K.SMALLEST_FELLED_LOGS end
       local gm = rd16(G.typeGm + treeType * 4)
       local felledLogs, felledCommand = rd32(data.felledLogs), rd32(data.felledCommand)
       local function add(entry)
@@ -1206,9 +1248,11 @@ local function makeTreeEntries(G, O, data, panel)
         list[#list + 1] = entry
       end
       local function felledPicture(logs)
-        if treeStage == 0 then return FELLED_STAGE_0_PICTURE end
-        return FELLED_PICTURE_BASE[math.min(treeStage, 4)] - logs
+        local shown = math.max(treeStage, K.SMALLEST_FELLED_STAGE)   -- see stageFromBrush
+        return FELLED_PICTURE_BASE[math.min(shown, 4)] - logs
       end
+      add({ image = panel.images[command], param = 0 })   -- the standing tree
+      list[1].chosen = felledLogs == 0 or felledCommand ~= command
       if O.randomMix and treeStage >= 1 and treeStage <= K.MOST_RANDOM_STAGE then
         add({ image = panel.images[command], param = K.RANDOM_STANDING, label = K.RANDOM_LABEL })
       end
@@ -1348,7 +1392,7 @@ local function makePanel(G, O, data, panel, entries)
     local total = sum + gap * (#list - 1)
     local menuX = rd32(G.menu + MENU_X)
     local top = PANEL_BOTTOM - height
-    local x = (screen - total) / 2 - menuX
+    local x = (screen - total) / 2 - menuX + (list.shift or 0)
     local left = math.floor(x + 0.5)
     for _, entry in ipairs(list) do
       entry.x = math.floor(x + 0.5)
@@ -1466,7 +1510,7 @@ local function makeHerdPanel(G, O, data, herd)
       size = string.format("%d + 0 to %d animals", animal.base, animal.mask)
     end
     local texts = {
-      string.format("%s herd: %s, troop type %d", animal.name, size, animal.group),
+      string.format("%s herd: %s, group behaviour type %d", animal.name, size, animal.group),
       "Herd size from the brush size: 2 x brush - 1",
     }
     local widths = {}
@@ -1606,7 +1650,7 @@ local function buildTable(G, O)
   end
   insert(MAP_CLICK_ITEM, "guard")
   if O.counts then insert(INFO_BEFORE_ITEM, "info") end
-  if O.counts or O.obstacles or O.invisibleRocks then insert(G.firstBlock, "tooltip") end
+  if O.counts or O.obstacles or O.invisibleRocks or O.apple or O.textures then insert(G.firstBlock, "tooltip") end
   local animalsEnd = G.blockEnd[ANIMALS]
   if O.herds then
     insert(animalsEnd, "herdCheck")
@@ -1619,7 +1663,7 @@ local function buildTable(G, O)
     for i = 1, #SHRUB_COMMANDS do insert(vegetationEnd, "shrub" .. i) end
     if O.randomMix then insert(vegetationEnd, "randomShrub") end
   end
-  local felledButtons = MOST_LOGS + (O.randomMix and 2 or 0)
+  local felledButtons = 1 + MOST_LOGS + (O.randomMix and 2 or 0)
   if O.obstacles then insert(vegetationEnd, OBSTACLES_BUTTON) end
   if O.felled then
     for i = 1, felledButtons do insert(vegetationEnd, "felled" .. i) end
@@ -1799,7 +1843,11 @@ local function buildTable(G, O)
   end
 
   local rows, newButtons, sizeOf = {}, {}, {}
+  local language = C.language()
+  local hoverText = item(newTable, moved(HOVER_TEXT_ITEM))
+  G.describeAt = { rd32(hoverText + ITEM_X), rd32(hoverText + ITEM_Y) }
   if O.apple then
+    tooltips[#tooltips + 1] = { item = added.apple, name = K.NAMES.apple[language] }
     pictureButton(added.apple, VEGETATION_TREES[1], APPLE_COMMAND, pictures.apple)
     sizeOf[added.apple] = { pictures.apple.width, pictures.apple.height }
     newButtons[added.apple] = true
@@ -1823,8 +1871,8 @@ local function buildTable(G, O)
     sizeOf[box] = { K.CHECK_BOX_SIZE, K.CHECK_BOX_SIZE }
     newButtons[box] = true
     tooltips[#tooltips + 1] = { item = box, lines = function()
-      return { "Trees and shrubs next to obstacles: " .. (rd8(data.nearObstacles) ~= 0 and "allowed" or "not allowed") }
-    end }
+      return { "Trees next to obstacles: " .. (rd8(data.nearObstacles) ~= 0 and "allowed" or "not allowed") }
+    end, raise = K.CHECK_BOX_TOOLTIP_RAISE }
   end
 
   -- The Vegetation menu's rows: the trees, the apple tree and the check box on top (the
@@ -1844,6 +1892,7 @@ local function buildTable(G, O)
   end
 
   if O.textures then
+    tooltips[#tooltips + 1] = { item = added.gravel, name = K.NAMES.gravel[language] }
     pictureButton(added.gravel, TEXTURE_ROWS[1][1], GRAVEL_COMMAND, pictures.gravel)
     sizeOf[added.gravel] = { pictures.gravel.width, pictures.gravel.height }
     newButtons[added.gravel] = true
@@ -1885,7 +1934,7 @@ local function buildTable(G, O)
     wr16(box + ITEM_HIDDEN, 1)
     tooltips[#tooltips + 1] = { item = box, lines = function()
       return { "Invisible rocks: " .. (rd8(data.invisibleRocks) ~= 0 and "on" or "off") }
-    end }
+    end, raise = K.CHECK_BOX_TOOLTIP_RAISE }
     local buttons = {}
     for _, rock in ipairs(G.rockButtons) do
       if rock.block == tab then buttons[#buttons + 1] = item(newTable, moved(rock.index)) end
@@ -1956,6 +2005,10 @@ local function buildTable(G, O)
       })
       for command = FIRST_TREE_COMMAND, LAST_TREE_COMMAND do
         panel.images[command] = rd32(item(G.table, G.buttons[command].index, ITEM_IMAGE)) & IMAGE_INDEX_MASK
+        -- The menu's tree buttons place standing trees again.
+        wr32(button(command) + ITEM_ACTION, core.allocateAssembly(templates.rockButton, {
+          ROCK_LOCK = data.felledLogs, ACTION = G.buttons[command].action,
+        }))
       end
       for i = 1, felledButtons do
         plainButton(added["felled" .. i], click)
@@ -2111,6 +2164,7 @@ local function patchTrees(self, G, O, data)
       BRUSH = brush, MAX_STAGE = MAX_STAGE, STAGE = core.allocate(4, true),
       FELLED_LOGS = data.felledLogs, FELLED_COMMAND = data.felledCommand, RANDOM_STANDING = K.RANDOM_STANDING,
       COMMAND_ON_STACK = PLACE_TREE.command, MOST_RANDOM_STAGE = K.MOST_RANDOM_STAGE, SEED = data.seed,
+      SMALLEST_FELLED_STAGE = K.SMALLEST_FELLED_STAGE,
       RANDOM_MULTIPLIER = K.RANDOM_MULTIPLIER, RANDOM_INCREMENT = K.RANDOM_INCREMENT,
       BACK = G.placeTree + PLACE_TREE.stageSize,
     }))
@@ -2476,7 +2530,12 @@ function C.makeEntries(G, panel, rows)
           local chosen = command == param
           if entry.flag ~= nil then chosen = chosen and rd32(entry.flag) == entry.value end
           list[i] = { item = panel.items[i], image = image, label = entry.label, param = param, chosen = chosen }
+          if entry.compose ~= nil then
+            list[i].image, list[i].picture = nil, entry.compose()
+            if list[i].picture == nil then return {} end     -- its pictures are not loaded yet
+          end
         end
+        list.shift = row.shift or panel.shift
         return list
       end
     end
@@ -2501,12 +2560,20 @@ function C.build(G, B, O)
     for i, ruin in ipairs(K.TOWER_RUINS) do
       row[i] = { command = ruin, image = lookup(K.TAB_TOWERS, K.FIRST_TOWER + i - 1), label = K.RUIN_LABEL }
     end
-    panels[#panels + 1] = { tab = K.TAB_TOWERS, rows = { row } }
+    panels[#panels + 1] = { tab = K.TAB_TOWERS, rows = { row }, shift = K.PANEL_SHIFT[K.TAB_TOWERS] }
   end
   if O.armyExtras then
-    local tunnel = { when = K.TUNNEL_WHEN, { command = K.TUNNEL_COMMAND,
-      image = lookup(K.TAB_ARMY, K.TUNNELERS_GUILD), label = K.TUNNEL_LABEL } }
-    local tents = { when = K.TENTS_WHEN }
+    -- The tunnel entrance as the map shows it, composed from its tiles like a rock.
+    local sprites = scan(K.AOB_BUILDING_SPRITES, "the building pictures")
+    local convert = core.exposeCode(readCallTarget(sprites, 0, "the building types"), 2, 1)
+    local firstPicture = core.exposeCode(readCallTarget(sprites, K.BUILDING_SPRITES.sprite, "the building pictures"), 2, 1)
+    local tunnelGm = rd32(rd32(sprites + K.BUILDING_SPRITES.gms) + (convert(B.buildings, K.TUNNEL_COMMAND) & 0xFFFF) * 4)
+    local tunnelBase = firstPicture(B.buildings, K.TUNNEL_COMMAND)
+    if G.footprint == nil then resolveRocks(G) end
+    local tilePicture = makeRockPictures(G)
+    local tunnel = { when = K.TUNNEL_WHEN, { command = K.TUNNEL_COMMAND, label = K.TUNNEL_LABEL,
+      compose = function() return tilePicture(K.TUNNEL_SIZE, tunnelBase, 0, tunnelGm, true) end } }
+    local tents = { when = K.TENTS_WHEN, shift = K.TENTS_SHIFT }
     for i, tent in ipairs(K.TENTS) do
       tents[i] = { command = tent, image = lookup(K.TAB_UNIT_COMMANDS, tent) }
     end
@@ -2517,7 +2584,7 @@ function C.build(G, B, O)
     for i, statue in ipairs(K.STATUES) do
       row[i] = { command = statue[1], image = lookup(K.TAB_GOOD, statue[2]), label = statue[3] }
     end
-    panels[#panels + 1] = { tab = K.TAB_GOOD, rows = { row } }
+    panels[#panels + 1] = { tab = K.TAB_GOOD, rows = { row }, shift = K.PANEL_SHIFT[K.TAB_GOOD] }
   end
   data.keepMode = core.allocate(4, true)
   data.damagedWalls = core.allocate(4, true)
@@ -2532,7 +2599,7 @@ function C.build(G, B, O)
     for _, choice in ipairs(labels) do
       row[#row + 1] = { images = images, label = choice[2], flag = flag, value = choice[1] }
     end
-    panels[#panels + 1] = { tab = tab, rows = { row } }
+    panels[#panels + 1] = { tab = tab, rows = { row }, shift = K.PANEL_SHIFT[tab] }
   end
   if O.keepParts then
     choices(K.TAB_KEEPS, K.KEEPS, data.keepMode, { { K.KEEP_ONLY, K.KEEP_LABELS[K.KEEP_ONLY] },
@@ -2800,6 +2867,50 @@ function C.patchKeepParts(self, G, data)
   end
   stop(campfire, K.KEEP_CAMPFIRE_SIZE, { K.KEEP_ONLY }, "mov eax,[esp+0x3C]\nmov ecx,[esp+0x48]")
   stop(stockpile, K.KEEP_STOCKPILE_SIZE, { K.KEEP_ONLY, K.KEEP_NO_STOCKPILE }, "mov eax,[esp+0x3C]\nmov edi,[eax*8+TABLE]")
+
+  -- The placement check and the preview leave out the same parts.
+  local function leaveOut(site, size, modes, replay, done, table)
+    patchJump(self, site, size, core.allocateAssembly(templates.keepPart .. replay .. "\njmp BACK\n", {
+      GAME_MODE = G.gameMode, MAP_EDITOR = K.MAP_EDITOR, KEEP_MODE = data.keepMode, FIRST_MODE = modes[1],
+      SECOND_MODE = modes[2] or modes[1], EPILOGUE = done, BACK = site + size, TABLE = table,
+    }))
+  end
+  local KC, KP = K.KEEP_CHECK, K.KEEP_PREVIEW
+  local check = scan(K.AOB_KEEP_CHECK, "the keep placement check")
+  local checkStockpile = check + KC.stockpile
+  expectBytes(checkStockpile, { 0x8B, 0x44, 0x24, 0x4C, 0x8B, 0x98 }, "the keep placement check")
+  expectBytes(checkStockpile + KC.done, KC.doneBytes, "the end of the placement check")
+  local preview = scan(K.AOB_KEEP_PREVIEW, "the keep preview")
+  local previewStockpile = scan(K.AOB_KEEP_PREVIEW_STOCKPILE, "the keep preview")
+  expectBytes(previewStockpile + KP.done, KP.doneBytes, "the keep preview")
+  leaveOut(check, KC.size, { K.KEEP_ONLY }, "mov eax,[esp+0x48]\nshl eax,5", checkStockpile + KC.done, 0)
+  leaveOut(checkStockpile, KC.stockpileSize, { K.KEEP_ONLY, K.KEEP_NO_STOCKPILE }, "mov eax,[esp+0x4C]\nmov ebx,[eax+TABLE]",
+    checkStockpile + KC.done, rd32(checkStockpile + KC.table))
+  leaveOut(preview, KP.size, { K.KEEP_ONLY }, "shl edx,5\nadd ebp,[edx+TABLE]", previewStockpile + KP.done,
+    rd32(preview + KP.table))
+  leaveOut(previewStockpile, KP.stockpileSize, { K.KEEP_ONLY, K.KEEP_NO_STOCKPILE }, "mov eax,[esp+0x38]\nmov ebp,[eax+TABLE]",
+    previewStockpile + KP.done, rd32(previewStockpile + KP.stockpileTable))
+end
+
+-- The game's language for the names it has no text for: German or English.
+function C.language()
+  local file = io.open(K.TEXT_FILE, "rb")
+  if file == nil then return "en" end
+  local data = file:read("a")
+  file:close()
+  if #data < K.TEXT_START + 4 * K.TEXT_GROUPS then return "en" end
+  local at = K.TEXT_START + 1 + 2 * string.unpack("<I4", data, 1 + 4 * K.TEXT_GROUP)
+  local index = 0
+  while index < K.TEXT_INDEX and at < #data do
+    if data:byte(at) == 0 and data:byte(at + 1) == 0 then index = index + 1 end
+    at = at + 2
+  end
+  local chars = {}
+  while at < #data and not (data:byte(at) == 0 and data:byte(at + 1) == 0) and #chars < 32 do
+    chars[#chars + 1] = data:sub(at, at)
+    at = at + 2
+  end
+  return table.concat(chars) == K.GERMAN_TEXT and "de" or "en"
 end
 
 -- Damaged walls: in the map editor, with the choice on, every wall tile placeWalls builds or

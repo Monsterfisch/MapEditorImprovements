@@ -529,7 +529,7 @@ jmp CONVERTER_BACK
 -- placeTree, `push 3 / push 0 / movzx eax,ax`: the growth stage handed to createTree is the
 -- brush size minus one (0 .. 6; BRUSH may be a constant instead) instead of 3, and with the
 -- random tree chosen for this tree tool (FELLED_LOGS = RANDOM_STANDING) a stage from 0 up to
--- that one. The command is on the stack as at the felled tree site (createTree cleans up its
+-- that one. A felled tree of the smallest stage (which has no felled picture) gets the next. The command is on the stack as at the felled tree site (createTree cleans up its
 -- arguments).
 templates.stageFromBrush = [[
 push eax
@@ -544,6 +544,18 @@ cmp eax,MAX_STAGE
 jle stage_high_ok
 mov eax,MAX_STAGE
 stage_high_ok:
+test eax,eax
+jne stage_grown
+mov ecx,[FELLED_LOGS]
+test ecx,ecx
+je stage_grown
+cmp ecx,RANDOM_STANDING
+je stage_grown
+movsx ecx,word [esp+COMMAND_ON_STACK+12]
+cmp ecx,[FELLED_COMMAND]
+jne stage_grown
+mov eax,SMALLEST_FELLED_STAGE
+stage_grown:
 cmp dword [FELLED_LOGS],RANDOM_STANDING
 jne stage_done
 movsx ecx,word [esp+COMMAND_ON_STACK+12]
