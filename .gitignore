@@ -5,3 +5,6 @@ __pycache__/
 failed_script.asm
 bench/fasm_cache/
 run_*.txt
+
+# publish.py: the local game folder
+tools/publish-config.json

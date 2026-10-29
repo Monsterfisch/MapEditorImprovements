@@ -1,4 +1,4 @@
-"""Publish module/ into the game's module folder under the version in definition.yml.
+r"""Publish module/ into the game's module folder under the version in definition.yml.
 
 The UCP GUI notices a new version on F5 and moves the pin with its apply button, so a build
 is always *copied* to a new folder and older folders are left alone until they are safe to
@@ -6,18 +6,59 @@ remove. `ucp-config.yml` is never written here - the apply button owns it - but 
 because the version it pins must still exist on disk. Deleting a pinned folder is what makes
 the GUI refuse the whole config with MISSING_DEPENDENCIES.
 
-    python tools/publish.py            # copy module/ to map-editor-improvements-<version>
-    python tools/publish.py --bump     # raise the last version slot first
-    python tools/publish.py --keep     # publish and clear nothing
-"""
-import os, re, shutil, sys
+    python tools/publish.py                    # copy module/ to map-editor-improvements-<version>
+    python tools/publish.py --bump             # raise the last version slot first
+    python tools/publish.py --keep             # publish and clear nothing
+    python tools/publish.py --game "C:\path"   # publish into this game folder
 
-HERE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+The game folder (the one holding ucp-config.yml and ucp/modules) comes from --game, or else
+from publish-config.json next to this script. The script creates that file the first time it
+runs, and stores the --game path in it when it holds none yet, so after one run with --game
+the plain commands above are enough. To use another game folder later, pass --game again (it
+is used for that run only) or edit the file. The file is personal and not committed.
+"""
+import json, os, re, shutil, sys
+
+TOOLS = os.path.dirname(os.path.abspath(__file__))
+HERE = os.path.dirname(TOOLS)
 MODULE = os.path.join(HERE, 'module')
-GAME = r'H:\steam\steamapps\common\Stronghold Crusader Extreme UCP3 new'
+SETTINGS = os.path.join(TOOLS, 'publish-config.json')
+NAME = 'map-editor-improvements'
+
+
+def game_folder():
+    """The game folder: --game if given, else the one in publish-config.json. Creates the file
+    when it is missing and stores --game in it when it has no game folder yet."""
+    settings = {}
+    if os.path.isfile(SETTINGS):
+        with open(SETTINGS, encoding='utf-8') as f:
+            settings = json.load(f)
+    given = None
+    if '--game' in sys.argv:
+        at = sys.argv.index('--game')
+        if at + 1 >= len(sys.argv):
+            sys.exit('--game needs the game folder after it')
+        given = sys.argv[at + 1]
+    if given and not settings.get('game'):
+        settings['game'] = given
+        print('stored the game folder in', os.path.basename(SETTINGS))
+    if not os.path.isfile(SETTINGS) or (given and settings['game'] == given):
+        settings.setdefault('game', '')
+        with open(SETTINGS, 'w', encoding='utf-8', newline='\n') as f:
+            json.dump(settings, f, indent=2)
+            f.write('\n')
+    game = given or settings.get('game')
+    if not game:
+        sys.exit('no game folder: run once with --game "<the game folder>" (it is then stored in %s)'
+                 % os.path.basename(SETTINGS))
+    if not os.path.isdir(os.path.join(game, 'ucp', 'modules')):
+        sys.exit('%s has no ucp/modules folder - is it the game folder with UCP3 installed?' % game)
+    return game
+
+
+GAME = game_folder()
 MODULES = os.path.join(GAME, 'ucp', 'modules')
 CONFIG = os.path.join(GAME, 'ucp-config.yml')
-NAME = 'map-editor-improvements'
 
 
 def version(text):

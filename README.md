@@ -14,16 +14,34 @@ What the module does, in plain English, is in `module/locale/description-en.md`.
 | Folder | |
 |---|---|
 | `module/` | the module itself - this is the source of truth, edited in place |
-| `tools/publish.py` | copies `module/` into the game's module folder under a new version |
-| `tools/make_icons.py` | makes `module/images/apple*.png` from the game's apple tree, and cuts a stacked gravel picture into its three states |
+| `docs/` | notes on how parts of the game work (`size-4-rocks.md`) |
+| `tools/publish.py` | copies `module/` into a game's `ucp/modules` folder as `map-editor-improvements-<version>`. Options: `--bump` (raise the version first), `--keep` (remove no older copies), `--game "<game folder>"` (where to publish). The comment at the top of the script explains each, and how the game folder is remembered in `tools/publish-config.json` (created by the script, not committed) |
+| `tools/make_icons.py` | made `module/images/apple*.png` and `gravel*.png` once, from the game's own pictures. Only used while building the module, not needed to use or work on it |
 
-## Working on it
+## Development workflow
 
 1. Edit under `module/`.
-2. `python tools/publish.py --bump` - raises the last version slot and copies the module to
-   `ucp/modules/map-editor-improvements-<version>`. Do this with the game closed.
+2. `python tools/publish.py --bump` - raises the last version slot (in `definition.yml` and the
+   description) and copies the module to `ucp/modules/map-editor-improvements-<version>` in the
+   game folder. The first time, add `--game "<game folder>"` (the folder with `ucp-config.yml`);
+   the script stores it in `tools/publish-config.json` and uses it from then on. Older copies
+   are removed, except the newest one and any version the UCP config still uses (`--keep`
+   removes none). Do this with the game closed.
 3. In the UCP GUI press F5, then apply.
 4. Commit and tag: `git commit -am "<version> - <what changed>" && git tag v<version>`.
+
+## How to use
+
+1. Put the module into the game: either run `python tools/publish.py --game "<game folder>"`,
+   which copies the `module/` folder to `ucp/modules/map-editor-improvements-<version>`, or do
+   it by hand: zip the *contents* of `module/` (so `definition.yml` is at the top of the zip)
+   and name the zip `map-editor-improvements-<version>.zip`, with the version from
+   `definition.yml`, then install it from the UCP3 GUI or drop it into `ucp/modules`.
+2. In the UCP3 GUI's Content tab, add Map Editor Improvements to the active extensions and
+   apply. Its entries under "Customisations" switch each feature on or off; by default
+   everything is on.
+3. Start the game and open the map editor: the features are in the landscape editor's menus and
+   the castle mode's building menu.
 
 ## How it works
 
@@ -80,5 +98,9 @@ What the module does, in plain English, is in `module/locale/description-en.md`.
   stub picks 0 .. the brush's) and 0x41 (random logs, in the felled tree stub); the random
   shrub makes the command-to-type hook pick one of commands 130-134. A small linear
   congruential generator gives the numbers.
+* **Invisible rocks.** placeRock's call to createRock answers slot 0 while the check box is on,
+  which is what the game does once its 4000 rocks are used up: the tiles get rock number 2000.
+  The eraser takes a rock off by number - 2000, so for such a tile it would clear empty slot 0;
+  both erase brushes now free the tile itself instead (rock flag 0x80 and the tile's number).
 * Every address is found by pattern scan or read out of the instruction that uses it, and
   checked against the bytes the module expects. Verified offline against both exes.

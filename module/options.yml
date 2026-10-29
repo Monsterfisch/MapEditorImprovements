@@ -146,6 +146,14 @@ options:
     contents:
       type: boolean
       value: true
+  - url: map-editor-improvements.rocks.erase_invisible
+    name: map-editor-improvements-rocks-erase-invisible
+    text: '{{rocks_erase_invisible}}'
+    tooltip: '{{rocks_erase_invisible_tooltip}}'
+    display: Switch
+    contents:
+      type: boolean
+      value: true
 
 - display: GroupBox
   category: [Map Editor Improvements]

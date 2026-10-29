@@ -882,4 +882,20 @@ through_toolbar:
 jmp TOOLBAR
 ]]
 
+-- An eraser brush taking a rock off a tile, replacing `add eax, -ROCK_BASE / push eax / call
+-- removeRock` (eax: the tile's rock number, esi: TileMapState, [esp+0x20]: the tile): rock 0,
+-- an invisible rock, only frees this tile.
+templates.eraseInvisible = [[
+sub eax,ROCK_BASE
+jne real_rock
+mov edx,[esp+0x20]
+and dword [esi+edx*4+FLAGS],KEEP_FLAGS
+mov word [esi+edx*2+NUMBERS],0
+jmp BACK
+real_rock:
+push eax
+call REMOVE_ROCK
+jmp BACK
+]]
+
 return templates

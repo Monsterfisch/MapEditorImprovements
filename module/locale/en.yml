@@ -92,6 +92,11 @@ rocks_invisible_tooltip: |
   you place is an "invisible rock" straight away, without placing 4000 rocks first: the
   tiles are taken (nothing can be built or walk there) but no rock is drawn, so they keep
   showing what was there before (the "2k stones trick"). Untick it for normal rocks.
+rocks_erase_invisible: The eraser removes invisible rocks
+rocks_erase_invisible_tooltip: |
+  The landscape eraser (and the tools that remove rocks with it) frees the tiles of invisible
+  rocks too, the way it removes normal rocks. Without this, each tile needs the shrub trick:
+  place the shrub that ignores obstacles on it and erase that.
 
 castle_group: Castle mode
 castle_group_descr: |

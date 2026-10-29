@@ -1,7 +1,7 @@
 # Map Editor Improvements
 
-**Author**: Monsterfish
-**Version**: 1.0.15
+**Author(s)**: Monsterfish, Heroesflorian
+**Version**: 1.0.16
 
 Makes the map editor show more about the map you are working on and adds tools the editor
 lacks: tree growth stages, apple trees, more shrubs, felled trees, gravel and iron, rock
@@ -91,6 +91,9 @@ spread evenly over the panel to make room.
   nobody walks there, but no rock is drawn, so the tiles keep showing what was there before.
   Untick it to place normal rocks again. The invisible rocks are saved in the map like the
   ones the game makes after 4000 rocks.
+- **Erasing invisible rocks.** The landscape eraser removes invisible rocks too: each tile it
+  touches is freed and shows the ground again, the same as for a normal rock. No need to place
+  and erase a shrub on every tile any more.
 - **Extra small rock.** For the smallest rocks the row offers a fifth variant: a small rock
   the game has but the editor never places. It is saved in the map like any other rock.
 

@@ -86,7 +86,8 @@ local DEFAULTS = {
   trees = { growth_from_brush = true, apple = true, shrubs = true, felled = true, random_mix = true,
     obstacles = true, sorted_rows = true },
   textures = { gravel_and_iron = true },
-  rocks = { signpost = true, random_preview = true, variants = true, extra_rock = true, invisible = true },
+  rocks = { signpost = true, random_preview = true, variants = true, extra_rock = true, invisible = true,
+    erase_invisible = true },
   castle = { building_counts = true, tower_ruins = true, tunnel_and_tents = true, statues_and_shrines = true,
     barrier = true, several_keeps = true, several_storage_and_recruitment = true, tower_engines_anywhere = true,
     keep_parts = true, damaged_walls = true },
@@ -236,6 +237,16 @@ K.AOB_CREATE_ROCK_CALL = "52 B9 ? ? ? ? E8 ? ? ? ? 33 FF 05 D0 07 00 00 89 44 24
 K.CREATE_ROCK_CALL = 6
 K.CREATE_ROCK_ARGUMENTS = 0x14
 K.CHECK_BOX_GAP = 8
+-- Erasing invisible rocks: the eraser brush (and the brush the other tools erase with) takes a
+-- tile's rock off by its number: `cmp eax, 2000 / mov ecx, LandscapeState / jl <tree> / add
+-- eax, -2000 / push eax / call removeRock`. An invisible rock's tiles have number 2000, an
+-- empty slot. The tile is in [esp+0x20], the map tables are named a little before.
+K.AOB_ERASE_ROCK = "3D D0 07 00 00 B9 ? ? ? ? 7C 15 05 30 F8 FF FF 50 E8"
+K.ERASE_ROCK = { base = 1, site = 12, size = 11, call = 6 }
+K.AOB_ERASE_TABLES = "F6 84 86 ? ? ? ? 30 75 ? 0F BF 84 46 ? ? ? ? 85 C0 74"
+K.ERASE_TABLES = { flags = 3, numbers = 14 }
+K.ROCK_TILE_FLAG = 0x80
+K.ERASE_SITES = 2
 
 -- Castle mode: the build menu (found by its minimap item, item 17), its tabs (the menu
 -- category values) and the commands (placement ids) the module adds.
@@ -2154,6 +2165,28 @@ function C.patchInvisibleRocks(self, data)
   core.writeCode(site, { 0xE8, core.itob(core.getRelativeAddress(site, stub, -5)) })
 end
 
+-- The eraser frees an invisible rock's tile the way removing a rock frees the rock's tiles: the
+-- rock flag and the tile's rock number go.
+function C.patchEraser(self)
+  local tables = scan(K.AOB_ERASE_TABLES, "the eraser's map tables")
+  local sites, from = {}, 0x400000
+  while #sites <= K.ERASE_SITES do
+    local ok, found = pcall(core.scanForAOB, K.AOB_ERASE_ROCK, from, K.HERD_SEARCH_END)
+    if not ok or found == nil or found == 0 then break end
+    sites[#sites + 1] = found
+    from = found + 1
+  end
+  if #sites ~= K.ERASE_SITES then error(MODULE_NAME .. ": the eraser is not the one this module knows") end
+  for _, found in ipairs(sites) do
+    local site = found + K.ERASE_ROCK.site
+    patchJump(self, site, K.ERASE_ROCK.size, core.allocateAssembly(templates.eraseInvisible, {
+      ROCK_BASE = rd32(found + K.ERASE_ROCK.base), FLAGS = rd32(tables + K.ERASE_TABLES.flags),
+      NUMBERS = rd32(tables + K.ERASE_TABLES.numbers), KEEP_FLAGS = (~K.ROCK_TILE_FLAG) & 0xFFFFFFFF,
+      REMOVE_ROCK = readCallTarget(site, K.ERASE_ROCK.call, "removeRock"), BACK = site + K.ERASE_ROCK.size,
+    }))
+  end
+end
+
 -- Herds of the brush size while the herd panel's check box is on.
 local function patchHerds(self, G, data)
   for _, herd in pairs(G.herds) do
@@ -2893,6 +2926,10 @@ local function enable(self, config)
   if setting(config, "rocks", "signpost") == true then
     local ok, problem = pcall(enableSignpost, self)
     if not ok then log(WARNING, tostring(problem) .. "; skirmish maps keep their own Rocks menu") end
+  end
+  if setting(config, "rocks", "erase_invisible") == true then
+    local ok, problem = pcall(C.patchEraser, self)
+    if not ok then log(WARNING, tostring(problem) .. "; the eraser leaves invisible rocks") end
   end
   if setting(config, "rocks", "random_preview") == true then
     local ok, problem = pcall(enableRandomPreview, self)
