@@ -1,7 +1,13 @@
 name: map-editor-improvements
 display-name: Map Editor Improvements
 type: module
-version: 1.0.63
+version: 1.0.64
 author: Monsterfish, Heroesflorian
 meta:
-  version: 1.0.63
+  version: 1.0.0
+dependencies:
+  framework: '>=3.0.7'
+  frontend: '>=1.0.2'
+game:
+- SHC==1.41
+- SHCE==1.41
