@@ -211,6 +211,7 @@ end
 -- height list (it opens upwards). The two sliders follow the mouse while its button is held.
 function C.makeHeightPanel(G, data, H, items, leftHeld)
   local rect, listRect = C.takeRect(data), C.takeRect(data)
+  local owner = nil
   local roundedBox = core.exposeCode(G.roundedBox, 6, 1)
   local colourBox = core.exposeCode(G.colourBox, 6, 1)
   local textWidth = core.exposeCode(G.textWidth, 4, 1)
@@ -326,8 +327,8 @@ function C.makeHeightPanel(G, data, H, items, leftHeld)
     local total = panelWidth + 2 * TOOLTIP_PADDING
     local height = #rows * box + (#rows - 1) * P.rowGap + 2 * TOOLTIP_PADDING
     local menuX = rd32(G.menu + MENU_X)
-    for _, address in ipairs(items.all) do data.floating[address] = true end
-    local left, top = lane.spot(G, data, total, height)
+    owner = owner or { items = items.all }      -- what editor/lane.lua places
+    local left, top = lane.spot(G, data, owner, total, height)
     local bottom = top + height
     C.markRect(rect, left, top, total, height)
     for r, row in ipairs(rows) do

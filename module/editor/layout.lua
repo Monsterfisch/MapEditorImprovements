@@ -1039,7 +1039,7 @@ local SHRUB_PALETTES = { [5] = 0, [6] = 3, [7] = 4, [8] = 7, [9] = 8 }
 local SHRUB_PICTURE = 1
 local FELLED_PALETTE = 0
 
--- The panels above the Vegetation menu: centred on the screen, squeezed together when wider.
+-- The panels above the menus: placed by editor/lane.lua, squeezed together when wider than the screen.
 local PANEL_BOTTOM = 444
 local PANEL_PADDING, PANEL_GAP, PANEL_MARGIN = 4, 2, 4
 -- The present function, where it reads the screen size: mov edx,[width] / mov edi,[height].

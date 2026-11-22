@@ -221,8 +221,8 @@ local function drawTooltipOnTop(data)
   end
 end
 
--- Draws a row of buttons above the panel, centred on the screen (squeezed together when wider
--- than it), on the map surface like the description line, and lays out the row's items to
+-- Draws a row of buttons above the panel, where editor/lane.lua places it (squeezed together
+-- when wider than the screen), on the map surface like the description line, and lays out the row's items to
 -- match. Every frame while the panel is shown; the panel item hides the items otherwise.
 -- The variant locks, shared by the castle panels and the pipette: the building variant the
 -- rotation leaves alone (its placement id), and the hovel variant + 1 (0: the game's own).
@@ -402,18 +402,20 @@ local function makePanel(G, O, data, panel, entries)
     end
     local screen = rd32(G.screenWidth)
     local gap = PANEL_GAP
-    if #list > 1 and sum + gap * (#list - 1) > screen - 2 * PANEL_MARGIN then
-      gap = (screen - 2 * PANEL_MARGIN - sum) / (#list - 1)
+    local room = screen - 2 * PANEL_MARGIN - 2 * PANEL_GAP   -- the screen less the box's own edge
+    if #list > 1 and sum + gap * (#list - 1) > room then
+      gap = (room - sum) / (#list - 1)
     end
     local total = sum + gap * (#list - 1)
     local menuX = rd32(G.menu + MENU_X)
-    -- The panel's box (the entries, PANEL_GAP around them, the room above) in the band.
+    -- The panel's box in the band: the entries (or the line above them, when wider: the pipette's),
+    -- PANEL_GAP around them and the room above. The entries sit in its middle.
     local above = list.rectAbove or 0
-    for _, address in ipairs(panel.items) do data.floating[address] = true end
-    local boxLeft, boxTop = lane.spot(G, data, math.ceil(total) + 2 * PANEL_GAP, height + 2 * PANEL_GAP + above)
+    local inside = math.max(math.ceil(total), list.aboveWidth or 0)
+    local boxLeft, boxTop = lane.spot(G, data, panel, inside + 2 * PANEL_GAP, height + 2 * PANEL_GAP + above)
     local top = boxTop + above + PANEL_GAP
     local bottom = top + height
-    local x = boxLeft + PANEL_GAP
+    local x = boxLeft + PANEL_GAP + (inside - total) / 2
     local left = math.floor(x + 0.5)
     for _, entry in ipairs(list) do
       entry.x = math.floor(x + 0.5)
@@ -516,7 +518,7 @@ end
 -- The herd panel above the Animals menu
 ---------------------------------------------------------------------------------------
 
--- Two lines of text in a box centred on the screen: the chosen animal's herd (base + random
+-- Two lines of text in a box placed by editor/lane.lua: the chosen animal's herd (base + random
 -- part, or 2 x brush - 1 with the check box on) and troop type, and the check box with its
 -- label. The check box item is placed under its picture.
 local function makeHerdPanel(G, O, data, herd)
@@ -526,6 +528,7 @@ local function makeHerdPanel(G, O, data, herd)
   local shadowedText = core.exposeCode(G.shadowedText, 10, 1)
   local renderGM = core.exposeCode(G.renderGM, 5, 1)
   local buffers = { core.allocate(128, true), core.allocate(128, true) }
+  local owner = { items = { herd.checkBox } }        -- what editor/lane.lua places
 
   return function()
     wr16(herd.checkBox + ITEM_HIDDEN, 1)
@@ -551,8 +554,7 @@ local function makeHerdPanel(G, O, data, herd)
     local width = math.max(widths[1], K.CHECK_BOX_SIZE + TOOLTIP_PADDING + widths[2]) + 2 * TOOLTIP_PADDING
     local height = TOOLTIP_LINE + line + 2 * TOOLTIP_PADDING
     local menuX = rd32(G.menu + MENU_X)
-    data.floating[herd.checkBox] = true
-    local left, top = lane.spot(G, data, width, height)
+    local left, top = lane.spot(G, data, owner, width, height)
     local bottom = top + height
     local boxX, boxY = left + TOOLTIP_PADDING, top + TOOLTIP_PADDING + TOOLTIP_LINE
     C.markRect(rect, left, top, width, bottom - top)

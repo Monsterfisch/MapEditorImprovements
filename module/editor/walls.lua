@@ -123,7 +123,7 @@ function C.wallControls(G, B, data, click, paint, reset)
   local rect = C.takeRect(data)
   local P = K.WALL_SLIDER
   local GB = setmetatable({ menu = B.menu }, { __index = G })   -- G with the build menu
-  data.floating[click], data.floating[reset] = true, true
+  local laneOwner = { items = { click, reset } }   -- what editor/lane.lua places
   local values, drag, applied = {}, false, {}
   local function width(text)
     writeCString(buffer, text)
@@ -236,8 +236,7 @@ function C.wallControls(G, B, data, click, paint, reset)
       end
       extra[1] = { x = l - PANEL_GAP, y = panelTop - PANEL_GAP, w = r - l + 2 * PANEL_GAP, h = b - panelTop + 2 * PANEL_GAP }
     end
-    local left, top = lane.spot(GB, data, total, P.height, panelTop - 3 * PANEL_GAP, extra)
-    left = math.floor(left)
+    local left, top = lane.spot(GB, data, laneOwner, total, P.height, panelTop - 3 * PANEL_GAP, extra)
     local bottom = top + P.height
     local menuX = rd32(B.menu + MENU_X)
     local trackX = left + TOOLTIP_PADDING + labelWidth + TOOLTIP_PADDING

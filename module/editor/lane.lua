@@ -49,16 +49,18 @@ function M.place(width, height, opts)
   local bottom = opts.bottom
   local left, right, centre = opts.left, opts.right, opts.centre
   local inner = opts.inner
-  if inner ~= nil and inner.right - inner.left >= width then
-    left, right = math.max(left, inner.left), math.min(right, inner.right)
+  if inner ~= nil then
+    local innerLeft, innerRight = math.max(left, inner.left), math.min(right, inner.right)
+    if innerRight - innerLeft >= width then left, right = innerLeft, innerRight end
   end
-  for _ = 1, 64 do
+  -- Each step up clears at least one keep-out for good, so this ends within #keepOut steps.
+  for _ = 1, #opts.keepOut + 2 do
     local top = bottom - height
-    local blocked, lowest = {}, nil
+    local blocked, highest = {}, nil
     for _, r in ipairs(opts.keepOut) do
-      if r.y < bottom + gap and r.y + r.h > top - gap and r.x < right and r.x + r.w > left then
+      if r.y < bottom + gap and r.y + r.h > top - gap and r.x - gap < right and r.x + r.w + gap > left then
         blocked[#blocked + 1] = { r.x - gap, r.x + r.w + gap }
-        lowest = lowest == nil and r.y or math.min(lowest, r.y)
+        highest = highest == nil and r.y or math.max(highest, r.y)
       end
     end
     table.sort(blocked, function(a, b) return a[1] < b[1] end)
@@ -77,10 +79,11 @@ function M.place(width, height, opts)
     end
     consider(from, right)
     if best ~= nil then return math.floor(best + 0.5), top end
-    if lowest == nil then                              -- the span itself is too narrow
+    if highest == nil then                             -- the span itself is too narrow
       return math.floor(math.max(left, centre - width / 2) + 0.5), top
     end
-    bottom = math.min(lowest - gap, bottom - 1)
+    -- Up just past the lowest-lying of what it would cover; the others may still leave room.
+    bottom = highest - gap
   end
   return math.floor(math.max(left, centre - width / 2) + 0.5), bottom - height
 end
@@ -189,36 +192,62 @@ end
 -- How many placements reuse a tab's keep-outs before they are read again from the menu.
 M.REUSE = 60
 
----The menu's own width: from its leftmost to its rightmost item shown with every tab (the
----description line included). nil while none can be measured.
+---The menu's own width: from its leftmost to its rightmost item on the menu bar (from the row
+---above its top down) shown with every tab, the description line included; nil while none can be
+---measured. Items elsewhere on the screen (the undo and redo buttons at its top left) don't count.
+---Also whether every such item could be measured.
+---@return table|nil span, boolean complete
 function M.menuSpan(data, measure)
   local rd32, rd16 = core.readInteger, core.readSmallInteger
-  local low, high = nil, nil
+  local low, high, complete = nil, nil, true
   local function take(x, width)
     low = low == nil and x or math.min(low, x)
     high = high == nil and x + width or math.max(high, x + width)
   end
   for _, address in ipairs(data.laneBlocks[0] or {}) do
     local x = rd32(address + ITEM_X)
-    if not data.floating[address] and rd16(address + ITEM_HIDDEN) == 0 and (x & 0xFFFFFFFF) ~= PLACED_BY_CONTROL then
-      local width = measure(address)
-      if width ~= nil then take(x, width) end
+    if not data.floating[address] and rd16(address + ITEM_HIDDEN) == 0 then
+      if (x & 0xFFFFFFFF) == PLACED_BY_CONTROL then
+        complete = false
+      elseif rd32(address + ITEM_Y) >= PANEL_BOTTOM - K.DESCRIPTION_ROW then
+        local width = measure(address)
+        if width ~= nil then
+          take(x, width)
+        elseif rd32(address + ITEM_RENDER_TYPE) == RENDER_IMAGE then
+          complete = false
+        end
+      end
     end
   end
   if data.description ~= nil then
     take(rd32(data.description + ITEM_X), rd32(data.description + ITEM_WIDTH))
   end
-  if low == nil then return nil end
-  return { left = low, right = high }
+  if low == nil then return nil, complete end
+  return { left = low, right = high }, complete
+end
+
+---Whether any of these items is shown.
+local function anyShown(items)
+  local rd16 = core.readSmallInteger
+  for _, address in ipairs(items) do
+    if rd16(address + ITEM_HIDDEN) == 0 then return true end
+  end
+  return false
 end
 
 ---The spot for a floating box of this menu: centred over the menu, as low as it can sit at its
 ---preferred bottom (PANEL_BOTTOM unless given) without covering anything in the band, within the
----menu's width when it fits there.
+---menu's width when it fits there. `owner` is what places it (a panel): its `items` are the
+---floating ones it moves, and its box stays clear of the other owners' boxes while theirs show
+---(the pipette panel and a Vegetation panel can be up at once).
 ---@param extra table[]|nil more rects to keep clear of (the panel a slider stands on)
 ---@return number left, number top
-function M.spot(G, data, width, height, bottom, extra)
+function M.spot(G, data, owner, width, height, bottom, extra)
   local rd32 = core.readInteger
+  if not owner.laneRegistered then
+    for _, address in ipairs(owner.items) do data.floating[address] = true end
+    owner.laneRegistered = true
+  end
   local menuX = rd32(G.menu + MENU_X)
   local screen = rd32(G.screenWidth)
   local function measure(address) return M.measure(G, address) end
@@ -227,7 +256,8 @@ function M.spot(G, data, width, height, bottom, extra)
   local cache = data.laneCache
   if cache == nil or cache.tab ~= tab or cache.uses >= M.REUSE then
     local list, complete = M.keepOuts(data, tab, measure)
-    cache = { tab = tab, list = list, span = M.menuSpan(data, measure), uses = complete and 0 or M.REUSE }
+    local span, spanComplete = M.menuSpan(data, measure)
+    cache = { tab = tab, list = list, span = span, uses = (complete and spanComplete) and 0 or M.REUSE }
     data.laneCache = cache
   end
   cache.uses = cache.uses + 1
@@ -235,10 +265,16 @@ function M.spot(G, data, width, height, bottom, extra)
   for _, rect in ipairs(cache.list) do keepOut[#keepOut + 1] = rect end
   for _, rect in ipairs(M.extras(data)) do keepOut[#keepOut + 1] = rect end
   for _, rect in ipairs(extra or {}) do keepOut[#keepOut + 1] = rect end
-  return M.place(width, height, {
+  data.lanePlaced = data.lanePlaced or {}
+  for other, placed in pairs(data.lanePlaced) do
+    if other ~= owner and anyShown(other.items) then keepOut[#keepOut + 1] = placed end
+  end
+  local left, top = M.place(width, height, {
     left = PANEL_MARGIN - menuX, right = screen - PANEL_MARGIN - menuX, centre = screen / 2 - menuX,
     inner = cache.span, bottom = bottom or PANEL_BOTTOM, keepOut = keepOut, gap = PANEL_GAP,
   })
+  data.lanePlaced[owner] = { x = left, y = top, w = width, h = height }
+  return left, top
 end
 
 ---Set up a menu's lane once its item table is complete: its items by block and its description

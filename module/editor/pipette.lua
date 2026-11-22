@@ -520,6 +520,12 @@ function C.pipette(G, O, data, added, guarded, places, button)
       entries[i].picture = { address = pictures.normal, width = pictures.width, height = pictures.height }
     end
   end
+  local storedLine                                 -- (below) the line drawn above the panel
+  local function lineWidth()
+    local line = storedLine()
+    writeCString(text, line:sub(1, 250))
+    return textWidth(G.textManager, text, math.min(#line, 250), TOOLTIP_FONT)
+  end
   local paint = makePanel(G, { counts = false }, data, panel, function()
     local list = {}
     for i, entry in ipairs(entries) do
@@ -528,9 +534,10 @@ function C.pipette(G, O, data, added, guarded, places, button)
     end
     list.labelRoom = K.PIPETTE_LABEL_ROOM
     list.rectAbove = K.PIPETTE_TEXT_ABOVE
+    list.aboveWidth = lineWidth()                  -- the panel's place leaves room for its line
     return list
   end)
-  local function storedLine()
+  function storedLine()
     local mode = K.PIPETTE_MODES[P.mode]
     if P.stored == nil then
       if P.mode == K.PIPETTE_OBJECTS and P.nothing then
