@@ -151,8 +151,9 @@ function C.resolve(G)
 end
 
 -- The building counts above the minimap: three lines in the tooltip style, drawn on the map
--- surface (the minimap's right edge, just above the panel).
-function C.makeCounts(G, B, counts)
+-- surface (the minimap's right edge, just above the panel). Its box is kept in data.laneExtra
+-- (menu coordinates), so the floating panels keep clear of it (editor/lane.lua).
+function C.makeCounts(G, B, counts, data)
   local roundedBox = core.exposeCode(G.roundedBox, 6, 1)
   local textWidth = core.exposeCode(G.textWidth, 4, 1)
   local shadowedText = core.exposeCode(G.shadowedText, 10, 1)
@@ -169,10 +170,16 @@ function C.makeCounts(G, B, counts)
       writeCString(buffers[i], text)
       widest = math.max(widest, textWidth(G.textManager, buffers[i], #text, TOOLTIP_FONT))
     end
+    local width = widest + 2 * TOOLTIP_PADDING
+    local height = #texts * TOOLTIP_LINE + TOOLTIP_PADDING
+    if data ~= nil then
+      data.laneExtra.counts = { x = B.minimapX + B.minimapWidth - width, y = PANEL_BOTTOM - PANEL_GAP - height,
+        w = width, h = height }
+    end
     local right = rd32(B.menu + MENU_X) + B.minimapX + B.minimapWidth + rd32(G.cameraX)
-    local left = right - widest - 2 * TOOLTIP_PADDING
+    local left = right - width
     local bottom = rd32(B.menu + MENU_Y) + PANEL_BOTTOM - PANEL_GAP + rd32(G.cameraY)
-    local top = bottom - #texts * TOOLTIP_LINE - TOOLTIP_PADDING
+    local top = bottom - height
     local target = rd32(G.pencil + PENCIL_TARGET)
     wr32(G.pencil + PENCIL_TARGET, MAP_LAYER)
     roundedBox(G.pencil, left, top, right, bottom, BOX_BLEND)
@@ -366,7 +373,6 @@ function C.makeEntries(G, panel, rows)
             if picture then list[i].image, list[i].picture = nil, picture end   -- false: the menu's
           end
         end
-        list.shift = row.shift or panel.shift
         return list
       end
     end

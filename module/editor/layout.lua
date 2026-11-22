@@ -347,8 +347,9 @@ K.BUILDING_SIZE_START = 7
 K.AOB_BUILDING_SPRITES = "E8 ? ? ? ? 8B 04 85 ? ? ? ? 89 86 ? ? ? ? 0F BF C3 50 B9 ? ? ? ? E8"
 K.BUILDING_SPRITES = { gms = 8, sprite = 0x1B }
 K.TUNNEL_SIZE = 3
--- Panels moved left of the screen's middle.
-K.PANEL_SHIFT = { [11] = -50, [12] = -100, [13] = -50, [15] = -100, [30] = -100, [33] = -100 }
+-- The row kept free above the game's description line (editor/lane.lua): a check box row with its
+-- padding, where controls that belong to the description go.
+K.DESCRIPTION_ROW = K.CHECK_BOX_SIZE + 12
 -- Buildings with variants. Placement gives setupBuildingData the variant (placement id - the
 -- group's first), which keeps a value from its group's table at building +0x29C (BuildingsState
 -- + id * stride + 0x2B0): `mov ecx,[esp+0x30] / mov edx,[ecx*4+GARDENS] / mov [edi+esi+0x2B0],
@@ -397,7 +398,6 @@ K.GUARD_RECTS, K.RECT_SIZE = 64, 20
 -- cmp eax, LIMIT / jge <refused> / mov reg,[esp+0x50] / push type`; three sites.
 K.AOB_EMPTY_STORAGE = "53 B9 ? ? ? ? E8 ? ? ? ? 83 F8 ? 0F 8D ? ? ? ? 8B ? 24 50 6A"
 K.EMPTY_STORAGE = { site = 11, size = 9, limit = 13, failRel = 16, sites = 3 }
-K.TENTS_SHIFT = -200
 -- Keep parts in the placement check (checkBuildingCanBePlacedHere: after the door tiles `mov
 -- eax,[esp+0x48] / shl eax,5`, before the stockpile `mov eax,[esp+0x4C] / mov ebx,[eax+..]`)
 -- and in the preview colours (setConstructionGFXLayerBasedOnPlacementChecks: after the doors

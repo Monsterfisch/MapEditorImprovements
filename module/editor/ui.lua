@@ -6,12 +6,10 @@ local ITEM_Y = layout.ITEM_Y
 local ITEM_WIDTH = layout.ITEM_WIDTH
 local ITEM_HEIGHT = layout.ITEM_HEIGHT
 local ITEM_PARAM = layout.ITEM_PARAM
-local ITEM_IMAGE = layout.ITEM_IMAGE
 local ITEM_CONTROL = layout.ITEM_CONTROL
 local ITEM_HOVERED = layout.ITEM_HOVERED
 local ITEM_HIDDEN = layout.ITEM_HIDDEN
 local PLACED_BY_CONTROL = layout.PLACED_BY_CONTROL
-local IMAGE_INDEX_MASK = layout.IMAGE_INDEX_MASK
 local MENU_X = layout.MENU_X
 local MENU_Y = layout.MENU_Y
 local MENU_SCROLL = layout.MENU_SCROLL
@@ -46,7 +44,6 @@ local FELLED_PICTURE_BASE = layout.FELLED_PICTURE_BASE
 local SHRUB_PALETTES = layout.SHRUB_PALETTES
 local SHRUB_PICTURE = layout.SHRUB_PICTURE
 local FELLED_PALETTE = layout.FELLED_PALETTE
-local PANEL_BOTTOM = layout.PANEL_BOTTOM
 local PANEL_PADDING = layout.PANEL_PADDING
 local PANEL_GAP = layout.PANEL_GAP
 local PANEL_MARGIN = layout.PANEL_MARGIN
@@ -63,6 +60,7 @@ local rd8 = memory.rd8
 local wr32 = memory.wr32
 local wr16 = memory.wr16
 local makeSpriteBoxes = require("editor.sprites").makeSpriteBoxes
+local lane = require("editor.lane")
 
 ---------------------------------------------------------------------------------------
 -- Map counts: the tooltip
@@ -309,6 +307,8 @@ function C.guardRects(data)
   data.rects = core.allocate((K.GUARD_RECTS + 1) * K.RECT_SIZE, true)
   wr32(data.rects + K.GUARD_RECTS * K.RECT_SIZE, -1)
   data.nextRect = 0
+  -- The floating items, which editor/lane.lua places, and the module's fixed boxes there.
+  data.floating, data.laneExtra = {}, {}
 end
 function C.takeRect(data)
   if data == nil or data.rects == nil or data.nextRect >= K.GUARD_RECTS then return nil end
@@ -407,8 +407,13 @@ local function makePanel(G, O, data, panel, entries)
     end
     local total = sum + gap * (#list - 1)
     local menuX = rd32(G.menu + MENU_X)
-    local top = PANEL_BOTTOM - height
-    local x = (screen - total) / 2 - menuX + (list.shift or 0)
+    -- The panel's box (the entries, PANEL_GAP around them, the room above) in the band.
+    local above = list.rectAbove or 0
+    for _, address in ipairs(panel.items) do data.floating[address] = true end
+    local boxLeft, boxTop = lane.spot(G, data, math.ceil(total) + 2 * PANEL_GAP, height + 2 * PANEL_GAP + above)
+    local top = boxTop + above + PANEL_GAP
+    local bottom = top + height
+    local x = boxLeft + PANEL_GAP
     local left = math.floor(x + 0.5)
     for _, entry in ipairs(list) do
       entry.x = math.floor(x + 0.5)
@@ -421,9 +426,8 @@ local function makePanel(G, O, data, panel, entries)
       x = x + entry.width + gap
     end
     local right = math.floor(x - gap + 0.5)
-    local above = list.rectAbove or 0
     C.markRect(rect, left - PANEL_GAP, top - PANEL_GAP - above, right - left + 2 * PANEL_GAP,
-      PANEL_BOTTOM - top + 2 * PANEL_GAP + above)
+      bottom - top + 2 * PANEL_GAP + above)
 
     local offsetX = menuX - rd32(G.menu + MENU_SCROLL) + rd32(G.cameraX)
     local offsetY = rd32(G.menu + MENU_Y) + rd32(G.cameraY)
@@ -431,10 +435,10 @@ local function makePanel(G, O, data, panel, entries)
     local target = rd32(G.pencil + PENCIL_TARGET)
     wr32(G.pencil + PENCIL_TARGET, MAP_LAYER)
     roundedBox(G.pencil, offsetX + left - PANEL_GAP, offsetY + top - PANEL_GAP,
-      offsetX + right + PANEL_GAP, offsetY + PANEL_BOTTOM + PANEL_GAP, BOX_BLEND)
+      offsetX + right + PANEL_GAP, offsetY + bottom + PANEL_GAP, BOX_BLEND)
     for _, entry in ipairs(list) do
       local l, r = offsetX + entry.x, offsetX + entry.x + entry.width - 1
-      local upper, lower = offsetY + top, offsetY + PANEL_BOTTOM - 1
+      local upper, lower = offsetY + top, offsetY + bottom - 1
       if rd16(entry.item + ITEM_HOVERED) ~= 0 then
         roundedBox(G.pencil, l, upper, r, lower, BOX_BLEND)
       end
@@ -447,13 +451,13 @@ local function makePanel(G, O, data, panel, entries)
     end
     for _, entry in ipairs(list) do
       local sx = offsetX + entry.x + entry.inset - entry.box.x
-      local sy = offsetY + PANEL_BOTTOM - PANEL_PADDING - entry.box.height - entry.box.y
+      local sy = offsetY + bottom - PANEL_PADDING - entry.box.height - entry.box.y
       if entry.gm == nil and entry.button == nil then blit(entry.picture.address, sx, sy) end
     end
     wr32(G.pencil + PENCIL_TARGET, target)
     for _, entry in ipairs(list) do
       local sx = offsetX + entry.x + entry.inset - entry.box.x
-      local sy = offsetY + PANEL_BOTTOM - PANEL_PADDING - entry.box.height - entry.box.y
+      local sy = offsetY + bottom - PANEL_PADDING - entry.box.height - entry.box.y
       if entry.gm ~= nil then
         drawSprite(entry, sx, sy)
       elseif entry.button ~= nil then
@@ -486,7 +490,7 @@ local function makePanel(G, O, data, panel, entries)
       for _, entry in ipairs(list) do
         if entry.count ~= nil then
           renderNumber(G.textManager, rd32(entry.count), offsetX + entry.x + entry.width // 2,
-            offsetY + PANEL_BOTTOM - NUMBER_FROM_BOTTOM, 1, NUMBER_COLOUR, 0, NUMBER_FONT, 0, 0)
+            offsetY + bottom - NUMBER_FROM_BOTTOM, 1, NUMBER_COLOUR, 0, NUMBER_FONT, 0, 0)
         end
       end
       wr32(G.textLayer, layer)
@@ -547,10 +551,11 @@ local function makeHerdPanel(G, O, data, herd)
     local width = math.max(widths[1], K.CHECK_BOX_SIZE + TOOLTIP_PADDING + widths[2]) + 2 * TOOLTIP_PADDING
     local height = TOOLTIP_LINE + line + 2 * TOOLTIP_PADDING
     local menuX = rd32(G.menu + MENU_X)
-    local left = (rd32(G.screenWidth) - width) // 2 - menuX
-    local top = PANEL_BOTTOM - height
+    data.floating[herd.checkBox] = true
+    local left, top = lane.spot(G, data, width, height)
+    local bottom = top + height
     local boxX, boxY = left + TOOLTIP_PADDING, top + TOOLTIP_PADDING + TOOLTIP_LINE
-    C.markRect(rect, left, top, width, PANEL_BOTTOM - top)
+    C.markRect(rect, left, top, width, bottom - top)
     wr32(herd.checkBox + ITEM_X, boxX)
     wr32(herd.checkBox + ITEM_Y, boxY)
     wr32(herd.checkBox + ITEM_WIDTH, K.CHECK_BOX_SIZE)
@@ -561,7 +566,7 @@ local function makeHerdPanel(G, O, data, herd)
     local offsetY = rd32(G.menu + MENU_Y) + rd32(G.cameraY)
     local target = rd32(G.pencil + PENCIL_TARGET)
     wr32(G.pencil + PENCIL_TARGET, MAP_LAYER)
-    roundedBox(G.pencil, offsetX + left, offsetY + top, offsetX + left + width, offsetY + PANEL_BOTTOM, BOX_BLEND)
+    roundedBox(G.pencil, offsetX + left, offsetY + top, offsetX + left + width, offsetY + bottom, BOX_BLEND)
     wr32(G.pencil + PENCIL_TARGET, target)
     local layer = rd32(G.textLayer)
     wr32(G.textLayer, MAP_LAYER)
@@ -597,14 +602,7 @@ local function makeLayout(G, rows, added, sizeOf, places, finishes)
   local function measure(address)
     local size = sizeOf[address]
     if size ~= nil then return size[1], size[2] end
-    local index = rd32(address + ITEM_IMAGE) & IMAGE_INDEX_MASK
-    local gm = rd32(G.buttonImages + index * IMAGE_SIZE)
-    local first = rd32(G.firstPictures + gm * 4)
-    if first <= 0 then return nil end
-    local header = G.pictureHeights - 2 + (first + rd32(G.buttonImages + index * IMAGE_SIZE + 4) - 1) * PICTURE_SIZE
-    local width, height = rd16(header), rd16(header + 2)
-    if width <= 0 then return nil end
-    return width, height
+    return lane.measurePicture(G, address)
   end
 
   return function()

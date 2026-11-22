@@ -38,6 +38,7 @@ local rd16 = memory.rd16
 local rd8 = memory.rd8
 local wr32 = memory.wr32
 local wr16 = memory.wr16
+local lane = require("editor.lane")
 local patchJump = require("editor.menu_install").patchJump
 
 -- Wall tools (features 35): the words the crenellation hook reads, made once.
@@ -121,6 +122,8 @@ function C.wallControls(G, B, data, click, paint, reset)
   local buffer = core.allocate(64, true)
   local rect = C.takeRect(data)
   local P = K.WALL_SLIDER
+  local GB = setmetatable({ menu = B.menu }, { __index = G })   -- G with the build menu
+  data.floating[click], data.floating[reset] = true, true
   local values, drag, applied = {}, false, {}
   local function width(text)
     writeCString(buffer, text)
@@ -215,16 +218,28 @@ function C.wallControls(G, B, data, click, paint, reset)
     local resetWidth = width(P.reset) + 2 * TOOLTIP_PADDING
     local total = TOOLTIP_PADDING + labelWidth + TOOLTIP_PADDING + P.track + TOOLTIP_PADDING + resetWidth
       + TOOLTIP_PADDING
-    -- Above the wall panel when it is shown, else where it would be.
+    -- Above the wall panel when it is shown (clear of its box), else where it would be; placed in
+    -- the band like the panels (editor/lane.lua).
     local panel = tool == K.CRENEL_WALL and data.crenelPanel or data.wallPanel
     local panelTop = PANEL_BOTTOM - P.panelRoom
+    local extra = {}
     if panel ~= nil and panel.items ~= nil and panel.items[1] ~= nil and rd16(panel.items[1] + ITEM_HIDDEN) == 0 then
       panelTop = rd32(panel.items[1] + ITEM_Y)
+      local l, r, b = nil, nil, panelTop
+      for _, address in ipairs(panel.items) do
+        if rd16(address + ITEM_HIDDEN) == 0 then
+          local x = rd32(address + ITEM_X)
+          l = l == nil and x or math.min(l, x)
+          r = r == nil and x + rd32(address + ITEM_WIDTH) or math.max(r, x + rd32(address + ITEM_WIDTH))
+          b = math.max(b, panelTop + rd32(address + ITEM_HEIGHT))
+        end
+      end
+      extra[1] = { x = l - PANEL_GAP, y = panelTop - PANEL_GAP, w = r - l + 2 * PANEL_GAP, h = b - panelTop + 2 * PANEL_GAP }
     end
-    local bottom = panelTop - 3 * PANEL_GAP
-    local top = bottom - P.height
+    local left, top = lane.spot(GB, data, total, P.height, panelTop - 3 * PANEL_GAP, extra)
+    left = math.floor(left)
+    local bottom = top + P.height
     local menuX = rd32(B.menu + MENU_X)
-    local left = math.floor((rd32(G.screenWidth) - total) / 2 - menuX + (K.PANEL_SHIFT[K.TAB_CASTLE] or 0))
     local trackX = left + TOOLTIP_PADDING + labelWidth + TOOLTIP_PADDING
     wr32(click + ITEM_X, trackX)
     wr32(click + ITEM_Y, top)

@@ -38,7 +38,6 @@ local TOOLTIP_PADDING = layout.TOOLTIP_PADDING
 local ALIGN_LEFT = layout.ALIGN_LEFT
 local MAP_LAYER = layout.MAP_LAYER
 local TEXTURES_MODE = layout.TEXTURES_MODE
-local PANEL_BOTTOM = layout.PANEL_BOTTOM
 local memory = require("editor.memory")
 local scan = memory.scan
 local expectBytes = memory.expectBytes
@@ -52,6 +51,7 @@ local wr32 = memory.wr32
 local wr16 = memory.wr16
 local drawTooltipOnTop = require("editor.ui").drawTooltipOnTop
 local keyCode = require("editor.pipette_native").keyCode
+local lane = require("editor.lane")
 
 ---------------------------------------------------------------------------------------
 -- The heights menu: max height, the height tools' options, lost rocks (features 28, 29)
@@ -326,11 +326,12 @@ function C.makeHeightPanel(G, data, H, items, leftHeld)
     local total = panelWidth + 2 * TOOLTIP_PADDING
     local height = #rows * box + (#rows - 1) * P.rowGap + 2 * TOOLTIP_PADDING
     local menuX = rd32(G.menu + MENU_X)
-    local left = (rd32(G.screenWidth) - total) // 2 - menuX
-    local top = PANEL_BOTTOM - height
+    for _, address in ipairs(items.all) do data.floating[address] = true end
+    local left, top = lane.spot(G, data, total, height)
+    local bottom = top + height
     C.markRect(rect, left, top, total, height)
     for r, row in ipairs(rows) do
-      row.y = PANEL_BOTTOM - TOOLTIP_PADDING - r * box - (r - 1) * P.rowGap
+      row.y = bottom - TOOLTIP_PADDING - r * box - (r - 1) * P.rowGap
       local x = left + TOOLTIP_PADDING + (panelWidth - row.width) // 2
       for _, element in ipairs(row) do
         element.x = x
@@ -365,7 +366,7 @@ function C.makeHeightPanel(G, data, H, items, leftHeld)
     end
     local target = rd32(G.pencil + PENCIL_TARGET)
     wr32(G.pencil + PENCIL_TARGET, MAP_LAYER)
-    roundedBox(G.pencil, offsetX + left, offsetY + top, offsetX + left + total, offsetY + PANEL_BOTTOM, BOX_BLEND)
+    roundedBox(G.pencil, offsetX + left, offsetY + top, offsetX + left + total, offsetY + bottom, BOX_BLEND)
     for _, row in ipairs(rows) do
       for _, element in ipairs(row) do
         local address = element.item

@@ -885,6 +885,8 @@ local function buildTable(G, O)
   }))
 
   data.rockTabs = #rockTabs
+  -- The band the floating panels share: this menu's items and its description line.
+  require("editor.lane").prepare(data, newTable, item(newTable, moved(HOVER_TEXT_ITEM)))
   return newTable, data
 end
 

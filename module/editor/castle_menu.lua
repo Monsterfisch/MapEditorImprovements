@@ -39,6 +39,7 @@ local makeRockPictures = require("editor.sprites").makeRockPictures
 local ui = require("editor.ui")
 local makePanel = ui.makePanel
 local makeLayout = ui.makeLayout
+local lane = require("editor.lane")
 
 -- Copies the build menu's item table with the module's items added, like buildTable.
 function C.build(G, B, O)
@@ -91,7 +92,7 @@ function C.build(G, B, O)
     for i, ruin in ipairs(K.TOWER_RUINS) do
       row[i] = { command = ruin, image = lookup(K.TAB_TOWERS, K.FIRST_TOWER + i - 1), label = K.RUIN_LABEL }
     end
-    panels[#panels + 1] = { tab = K.TAB_TOWERS, rows = { row }, shift = K.PANEL_SHIFT[K.TAB_TOWERS] }
+    panels[#panels + 1] = { tab = K.TAB_TOWERS, rows = { row } }
   end
   if O.armyExtras then
     -- The tunnel entrance as the map shows it, composed from its tiles like a rock.
@@ -104,7 +105,7 @@ function C.build(G, B, O)
     local tilePicture = makeRockPictures(G)
     local tunnel = { when = K.TUNNEL_WHEN, { command = K.TUNNEL_COMMAND, label = K.TUNNEL_LABEL,
       compose = function() return tilePicture(K.TUNNEL_SIZE, tunnelBase, 0, tunnelGm, true) end } }
-    local tents = { when = K.TENTS_WHEN, shift = K.TENTS_SHIFT }
+    local tents = { when = K.TENTS_WHEN }
     for i, tent in ipairs(K.TENTS) do
       tents[i] = { command = tent, image = lookup(K.TAB_UNIT_COMMANDS, tent) }
     end
@@ -144,7 +145,7 @@ function C.build(G, B, O)
         rows[#rows + 1] = row
         resets[#resets + 1] = { tab, first, lock }
       end
-      panels[#panels + 1] = { tab = tab, rows = rows, shift = K.PANEL_SHIFT[tab], lock = lock }
+      panels[#panels + 1] = { tab = tab, rows = rows, lock = lock }
     end
     -- The hovel: one of its seven variants every time, instead of the player's next one.
     local hovelLock = C.locks().hovel
@@ -156,13 +157,13 @@ function C.build(G, B, O)
     end
     row.when = { [K.HOVEL_TOOL] = true }
     resets[#resets + 1] = { K.TAB_TOWN, K.HOVEL_TOOL, hovelLock }
-    panels[#panels + 1] = { tab = K.TAB_TOWN, rows = { row }, shift = K.PANEL_SHIFT[K.TAB_TOWN] }
+    panels[#panels + 1] = { tab = K.TAB_TOWN, rows = { row } }
   elseif O.statues then
     local row = {}
     for i, statue in ipairs(K.STATUES) do
       row[i] = { command = statue[1], image = lookup(K.TAB_GOOD, statue[2]), label = statue[3] }
     end
-    panels[#panels + 1] = { tab = K.TAB_GOOD, rows = { row }, shift = K.PANEL_SHIFT[K.TAB_GOOD] }
+    panels[#panels + 1] = { tab = K.TAB_GOOD, rows = { row } }
   end
   data.keepMode = core.allocate(4, true)
   data.damagedWalls = core.allocate(4, true)
@@ -176,7 +177,7 @@ function C.build(G, B, O)
     for _, choice in ipairs(labels) do
       row[#row + 1] = { images = images, label = choice[2], flag = flag, value = choice[1] }
     end
-    panels[#panels + 1] = { tab = tab, rows = { row }, shift = K.PANEL_SHIFT[tab] }
+    panels[#panels + 1] = { tab = tab, rows = { row } }
   end
   if O.keepParts then
     choices(K.TAB_KEEPS, K.KEEPS, data.keepMode, { { K.KEEP_ONLY, K.KEEP_LABELS[K.KEEP_ONLY] },
@@ -221,7 +222,7 @@ function C.build(G, B, O)
         value = kind, minWidth = K.MOAT_ENTRY_WIDTH }
     end
     resets[#resets + 1] = { K.TAB_GATEHOUSES, K.MOAT_BUTTON, data.moatMode }
-    panels[#panels + 1] = { tab = K.TAB_GATEHOUSES, rows = { row }, shift = K.PANEL_SHIFT[K.TAB_GATEHOUSES] }
+    panels[#panels + 1] = { tab = K.TAB_GATEHOUSES, rows = { row } }
   end
   for p, panel in ipairs(panels) do
     local most = 0
@@ -305,7 +306,7 @@ function C.build(G, B, O)
     wr32(into + ITEM_RENDER_TYPE, RENDER_SIMPLE)
     wr32(into + ITEM_RENDER, core.allocateAssembly(templates.editorOnly, {
       GAME_MODE = G.gameMode, MAP_EDITOR = K.MAP_EDITOR, FIRST = count,
-      PAD = C.luaPad(C.makeCounts(G, B, counts), "the building counts"),
+      PAD = C.luaPad(C.makeCounts(G, B, counts, data), "the building counts"),
     }))
   end
 
@@ -398,6 +399,9 @@ function C.build(G, B, O)
     ITEM_Y = ITEM_Y, MOUSE = G.mouse, IS_MOUSE_INSIDE = G.isMouseInside, ON_MAP = G.onMap,
     RECTS = data.rects, THE_MENU = B.menu,
   }))
+  -- The band the floating panels share: this menu's items and its description line, which the
+  -- building hover text move shifts left.
+  lane.prepare(data, newTable, nil, G.hoverRender, O.hoverTextLeft and K.HOVER_TEXT_SHIFT or 0)
   return newTable, data
 end
 

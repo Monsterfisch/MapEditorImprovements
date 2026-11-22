@@ -15,7 +15,9 @@ local TYPE_EVERY_FRAME = layout.TYPE_EVERY_FRAME
 local TYPE_CLICKABLE = layout.TYPE_CLICKABLE
 local RENDER_NONE = layout.RENDER_NONE
 local RENDER_SIMPLE = layout.RENDER_SIMPLE
+local MENU_X = layout.MENU_X
 local MENU_Y = layout.MENU_Y
+local MENU_SCROLL = layout.MENU_SCROLL
 local APPLE_TYPE = layout.APPLE_TYPE
 local K = layout.K
 local C = layout.C
@@ -559,7 +561,16 @@ function C.pipette(G, O, data, added, guarded, places, button)
     local line = storedLine()
     writeCString(text, line:sub(1, 250))
     local width = textWidth(G.textManager, text, math.min(#line, 250), TOOLTIP_FONT)
-    local x = (rd32(G.screenWidth) - width) // 2 + rd32(G.cameraX)
+    -- Centred over the panel, in the room the panel keeps above itself (rectAbove).
+    local panelLeft, panelRight = rd32(first + ITEM_X), rd32(first + ITEM_X)
+    for _, address in ipairs(panel.items) do
+      if rd16(address + ITEM_HIDDEN) == 0 then
+        panelLeft = math.min(panelLeft, rd32(address + ITEM_X))
+        panelRight = math.max(panelRight, rd32(address + ITEM_X) + rd32(address + ITEM_WIDTH))
+      end
+    end
+    local x = rd32(G.menu + MENU_X) - rd32(G.menu + MENU_SCROLL) + (panelLeft + panelRight - width) // 2
+      + rd32(G.cameraX)
     local y = rd32(G.menu + MENU_Y) + rd32(first + ITEM_Y) - K.PIPETTE_TEXT_ABOVE + rd32(G.cameraY)
     local layer = rd32(G.textLayer)
     wr32(G.textLayer, MAP_LAYER)
