@@ -1059,5 +1059,237 @@ options:
       type: boolean
       value: true
     header: '{{menu_dust_clouds}}'
+- display: GroupBox
+  category:
+  - '{{qol}}'
+  - '{{map_editor}}'
+  header: '{{grid_group}}'
+  text: '{{grid_group_descr}}'
+  hasHeader: true
+  children:
+  - url: map-editor-improvements.grid.enabled
+    name: map-editor-improvements-grid-enabled
+    text: '{{grid_enabled_tooltip}}'
+    display: UCP2Switch
+    contents:
+      type: boolean
+      value: true
+    header: '{{grid_enabled}}'
+  - url: map-editor-improvements.grid.key
+    name: map-editor-improvements-grid-key
+    text: '{{grid_key}}'
+    enabled: map-editor-improvements.grid.enabled
+    display: Choice
+    contents:
+      type: string
+      value: letter_g
+      choices:
+      - name: letter_g
+        text: '{{grid_key_letter_g}}'
+      - name: letter_a
+        text: '{{grid_key_letter_a}}'
+      - name: letter_b
+        text: '{{grid_key_letter_b}}'
+      - name: letter_f
+        text: '{{grid_key_letter_f}}'
+      - name: letter_i
+        text: '{{grid_key_letter_i}}'
+      - name: letter_j
+        text: '{{grid_key_letter_j}}'
+      - name: letter_l
+        text: '{{grid_key_letter_l}}'
+      - name: letter_m
+        text: '{{grid_key_letter_m}}'
+      - name: letter_n
+        text: '{{grid_key_letter_n}}'
+      - name: letter_o
+        text: '{{grid_key_letter_o}}'
+      - name: letter_p
+        text: '{{grid_key_letter_p}}'
+      - name: letter_s
+        text: '{{grid_key_letter_s}}'
+      - name: letter_w
+        text: '{{grid_key_letter_w}}'
+      - name: letter_y
+        text: '{{grid_key_letter_y}}'
+      - name: letter_z
+        text: '{{grid_key_letter_z}}'
+      - name: f1
+        text: '{{grid_key_f1}}'
+      - name: f2
+        text: '{{grid_key_f2}}'
+      - name: f3
+        text: '{{grid_key_f3}}'
+      - name: f4
+        text: '{{grid_key_f4}}'
+      - name: f5
+        text: '{{grid_key_f5}}'
+      - name: f6
+        text: '{{grid_key_f6}}'
+      - name: f7
+        text: '{{grid_key_f7}}'
+      - name: f8
+        text: '{{grid_key_f8}}'
+      - name: f9
+        text: '{{grid_key_f9}}'
+      - name: numpad_multiply
+        text: '{{grid_key_numpad_multiply}}'
+      - name: numpad_add
+        text: '{{grid_key_numpad_add}}'
+      - name: numpad_subtract
+        text: '{{grid_key_numpad_subtract}}'
+      - name: numpad_decimal
+        text: '{{grid_key_numpad_decimal}}'
+      - name: numpad_divide
+        text: '{{grid_key_numpad_divide}}'
+      - name: insert
+        text: '{{grid_key_insert}}'
+      - name: delete_key
+        text: '{{grid_key_delete_key}}'
+      - name: home
+        text: '{{grid_key_home}}'
+      - name: end_key
+        text: '{{grid_key_end_key}}'
+      - name: page_up
+        text: '{{grid_key_page_up}}'
+      - name: page_down
+        text: '{{grid_key_page_down}}'
+      - name: caps_lock
+        text: '{{grid_key_caps_lock}}'
+  - url: map-editor-improvements.grid.outside_editor
+    name: map-editor-improvements-grid-outside-editor
+    text: '{{grid_outside_editor}}'
+    enabled: map-editor-improvements.grid.enabled
+    display: Switch
+    contents:
+      type: boolean
+      value: true
+  - url: map-editor-improvements.grid.flattened_only
+    name: map-editor-improvements-grid-flattened-only
+    text: '{{grid_flattened_only}}'
+    enabled: map-editor-improvements.grid.enabled
+    display: Switch
+    contents:
+      type: boolean
+      value: true
+  - url: map-editor-improvements.grid.hide_in_v_view
+    name: map-editor-improvements-grid-hide-in-v-view
+    text: '{{grid_hide_in_v_view}}'
+    enabled: map-editor-improvements.grid.enabled
+    display: Switch
+    contents:
+      type: boolean
+      value: true
+  - url: map-editor-improvements.grid.grid_colour
+    name: map-editor-improvements-grid-grid-colour
+    text: '{{grid_colour}}'
+    enabled: map-editor-improvements.grid.enabled
+    display: Choice
+    contents:
+      type: string
+      value: white
+      choices:
+      - name: white
+        text: '{{grid_colour_white}}'
+      - name: yellow
+        text: '{{grid_colour_yellow}}'
+      - name: cyan
+        text: '{{grid_colour_cyan}}'
+      - name: green
+        text: '{{grid_colour_green}}'
+      - name: magenta
+        text: '{{grid_colour_magenta}}'
+      - name: orange
+        text: '{{grid_colour_orange}}'
+      - name: red
+        text: '{{grid_colour_red}}'
+      - name: black
+        text: '{{grid_colour_black}}'
+  - name: map-editor-improvements-grid-rotation
+    display: GroupBox
+    hasHeader: true
+    header: '{{grid_rotation_group}}'
+    children:
+    - url: map-editor-improvements.grid.rotation_lines
+      name: map-editor-improvements-grid-rotation-lines
+      text: '{{grid_rotation_lines}}'
+      enabled: map-editor-improvements.grid.enabled
+      display: Switch
+      contents:
+        type: boolean
+        value: true
+    - url: map-editor-improvements.grid.rotation_colour
+      name: map-editor-improvements-grid-rotation-colour
+      text: '{{grid_rotation_colour}}'
+      enabled: map-editor-improvements.grid.rotation_lines
+      display: Choice
+      contents:
+        type: string
+        value: cyan
+        choices:
+        - name: cyan
+          text: '{{grid_colour_cyan}}'
+        - name: white
+          text: '{{grid_colour_white}}'
+        - name: yellow
+          text: '{{grid_colour_yellow}}'
+        - name: red
+          text: '{{grid_colour_red}}'
+        - name: green
+          text: '{{grid_colour_green}}'
+        - name: magenta
+          text: '{{grid_colour_magenta}}'
+        - name: orange
+          text: '{{grid_colour_orange}}'
+        - name: black
+          text: '{{grid_colour_black}}'
+  - name: map-editor-improvements-grid-mine
+    display: GroupBox
+    hasHeader: true
+    header: '{{grid_mine_group}}'
+    children:
+    - url: map-editor-improvements.grid.mine_boxes
+      name: map-editor-improvements-grid-mine-boxes
+      text: '{{grid_mine_boxes}}'
+      enabled: map-editor-improvements.grid.enabled
+      display: Switch
+      contents:
+        type: boolean
+        value: true
+    - url: map-editor-improvements.grid.mine_colour
+      name: map-editor-improvements-grid-mine-colour
+      text: '{{grid_mine_colour}}'
+      enabled: map-editor-improvements.grid.mine_boxes
+      display: Choice
+      contents:
+        type: string
+        value: red
+        choices:
+        - name: red
+          text: '{{grid_colour_red}}'
+        - name: white
+          text: '{{grid_colour_white}}'
+        - name: yellow
+          text: '{{grid_colour_yellow}}'
+        - name: cyan
+          text: '{{grid_colour_cyan}}'
+        - name: green
+          text: '{{grid_colour_green}}'
+        - name: magenta
+          text: '{{grid_colour_magenta}}'
+        - name: orange
+          text: '{{grid_colour_orange}}'
+        - name: black
+          text: '{{grid_colour_black}}'
+    - url: map-editor-improvements.grid.mine_size
+      name: map-editor-improvements-grid-mine-size
+      text: '{{grid_mine_size}}'
+      enabled: map-editor-improvements.grid.mine_boxes
+      display: Slider
+      contents:
+        value: 4
+        min: 1
+        max: 5
+        step: 1
 meta:
   version: 1.0.0

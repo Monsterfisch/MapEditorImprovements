@@ -747,3 +747,69 @@ map_settings_group_descr: 'The map''s settings: map type, size, lock and the men
 
   '
 qol: Quality of Life
+grid_group: Resource grid
+grid_key: Overlay shortcut (Alt+key)
+grid_outside_editor: Allow the overlay during games
+grid_flattened_only: Show only in flattened view
+grid_hide_in_v_view: Hide in the V-key view
+grid_colour: Grid color
+grid_rotation_group: Castle orientation
+grid_rotation_lines: Show castle-rotation boundaries
+grid_rotation_colour: Boundary color
+grid_mine_group: Iron mine footprint
+grid_mine_boxes: Show iron mine footprint
+grid_mine_colour: Footprint color
+grid_mine_size: Footprint width (tiles)
+grid_key_letter_g: Alt + G
+grid_key_letter_a: Alt + A
+grid_key_letter_b: Alt + B
+grid_key_letter_f: Alt + F
+grid_key_letter_i: Alt + I
+grid_key_letter_j: Alt + J
+grid_key_letter_l: Alt + L
+grid_key_letter_m: Alt + M
+grid_key_letter_n: Alt + N
+grid_key_letter_o: Alt + O
+grid_key_letter_p: Alt + P
+grid_key_letter_s: Alt + S
+grid_key_letter_w: Alt + W
+grid_key_letter_y: Alt + Y
+grid_key_letter_z: Alt + Z
+grid_key_f1: Alt + F1
+grid_key_f2: Alt + F2
+grid_key_f3: Alt + F3
+grid_key_f4: Alt + F4
+grid_key_f5: Alt + F5
+grid_key_f6: Alt + F6
+grid_key_f7: Alt + F7
+grid_key_f8: Alt + F8
+grid_key_f9: Alt + F9
+grid_key_numpad_multiply: Alt + Numpad *
+grid_key_numpad_add: Alt + Numpad +
+grid_key_numpad_subtract: Alt + Numpad -
+grid_key_numpad_decimal: Alt + Numpad .
+grid_key_numpad_divide: Alt + Numpad /
+grid_key_insert: Alt + Insert
+grid_key_delete_key: Alt + Delete
+grid_key_home: Alt + Home
+grid_key_end_key: Alt + End
+grid_key_page_up: Alt + Page Up
+grid_key_page_down: Alt + Page Down
+grid_key_caps_lock: Alt + Caps Lock
+grid_colour_white: White
+grid_colour_yellow: Yellow
+grid_colour_cyan: Cyan
+grid_colour_green: Green
+grid_colour_magenta: Magenta
+grid_colour_orange: Orange
+grid_colour_red: Red
+grid_colour_black: Black
+map_editor: Map editor
+grid_enabled: Resource grid overlay
+grid_enabled_tooltip: 'Lets you show the resource grid over the map. Off: the grid and its shortcut are
+  not available.'
+grid_group_descr: The AI's 5x5 resource grid, the castle-rotation boundaries and the iron mine footprint,
+  drawn over the map. Formerly the Resource Grid Overlay module. Alt plus the chosen key shows or hides
+  it in the map editor. With a Custom Hotkeys version that lets modules add their own shortcuts, the shortcut
+  is listed there under Map Editor Improvements, where you can change it; the key chosen here is then
+  only its first suggestion.

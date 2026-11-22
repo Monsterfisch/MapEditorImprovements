@@ -5,7 +5,10 @@ show more about the map you are working on: how many animals, units, trees and r
 right on the landscape editor's buttons, with a red "i" button to hide or show the numbers. It
 also keeps the editor's menu up to date while the mouse is on the map, and adds tools: tree
 growth stages, apple trees, more shrubs, felled trees, random mixes, gravel and iron, rock
-variants, herd sizes.
+variants, herd sizes. And it draws the grid the AI reads when it looks for places for its
+resource buildings - 5 x 5 blocks of tiles - over the terrain, with the four lines where a keep's
+rotation changes and the tiles an iron mine would cover in each block; **Alt + G** switches it on
+and off. That resource grid was the separate Resource Grid Overlay module until 1.0.65.
 
 What the module does, in plain English, is in `module/locale/description-en.md`.
 
@@ -14,6 +17,8 @@ What the module does, in plain English, is in `module/locale/description-en.md`.
 | Folder | |
 |---|---|
 | `module/` | the module itself - this is the source of truth, edited in place |
+| `bench/` | the resource grid's emulator bench: the module's own Lua runs against the real exe image, its assembly is assembled with UCP's own fasm.dll and then executed, together with the game's own line drawer |
+| `bench/reference-1.0.0/` | Resource Grid Overlay as 1.0.0 shipped it, which drew through the game's pencil; the bench holds the grid to the same pixels |
 | `docs/` | notes on how parts of the game work: the size 4 rock (`size-4-rocks.md`), the river decorations (`river-decorations.md`) and the ruined cathedral (`ruined-cathedral.md`) |
 | `tools/publish.py` | copies `module/` into a game's `ucp/modules` folder as `map-editor-improvements-<version>`. Options: `--bump` (raise the version first), `--keep` (remove no older copies), `--game "<game folder>"` (where to publish). The comment at the top of the script explains each, and how the game folder is remembered in `tools/publish-config.json` (created by the script, not committed) |
 | `tools/make_icons.py` | made `module/images/apple*.png` and `gravel*.png` once, from the game's own pictures. Only used while building the module, not needed to use or work on it |
@@ -22,7 +27,17 @@ What the module does, in plain English, is in `module/locale/description-en.md`.
 
 ## Development workflow
 
-1. Edit under `module/`.
+1. Edit under `module/`. After a change to the resource grid or the map drawing's patch site
+   (`module/editor/grid*.lua`, `module/editor/frame.lua`), run the bench until it is green:
+   `cd bench && python test_overlay.py` (every zoom level and map rotation, camera edges and
+   off-map cameras, both pixel formats, each option and the hidden tuning values, a
+   frame-by-frame session, the Custom Hotkeys actions, the shared site with the editor's frame
+   work and Resource Grid Overlay still installed), on both executables. `python test_cost.py`
+   prints what a frame costs at 1920x1080. The bench needs Python with `lupa`, `capstone` and
+   `pefile` and a 32-bit PowerShell for fasm.dll. It reads the executables from `SHC_GAME_DIR`
+   and fasm.dll from `UCP_FASM_DLL` (defaults in `bench/shc.py` and `bench/fasm32_margin.ps1`),
+   and gives each script 57600 bytes rather than UCP's own 64000, so anything that assembles
+   there has a tenth of that budget spare.
 2. `python tools/publish.py --bump` - raises the last version slot (in `definition.yml` and the
    description) and copies the module to `ucp/modules/map-editor-improvements-<version>` in the
    game folder. The first time, add `--game "<game folder>"` (the folder with `ucp-config.yml`);
@@ -188,7 +203,8 @@ What the module does, in plain English, is in `module/locale/description-en.md`.
   use). Erase all seagulls calls the game's own unused deleteAllSeagulls; erase all crows clears the
   tree words and deletes crow entities (type 0x1C); erase all animals is Alt + E's call. The real
   unit limit is the "N more units" line's `mov ecx, 2499 / sub ecx, [units]` (9999 in Extreme).
-  The herds and groups line is drawn from the renderMap detour, which counts the group slots.
+  The herds and groups line is drawn from the map drawing's patch site (below), which counts the
+  group slots.
 * **Eraser choice.** useEraserBrush and eraseAreaWithBrush have the same three loops. The first's
   `movsx eax, [organisms]` answers 0 for a tree or rock the choice leaves (with Animals the tree's
   crow words are cleared); the second's building search answers "nothing" (it fills the found
@@ -204,5 +220,36 @@ What the module does, in plain English, is in `module/locale/description-en.md`.
   menu (MapEditorProperties) and the Load dialog get one item each by copying whatever table the
   constructor pushes now (autosave extends the Load dialog first); locked maps stay in the list
   when mapNames_filterMapsIfMapLock's `cmp [lock], 0 / jne` is answered "keep".
+* **The map drawing's patch site.** After `renderMap`'s one call and the floater pass come two
+  loads (`mov eax,[..]`, `mov ecx,[..]`). `module/editor/frame.lua` puts one jump in their place
+  that calls the resource grid's routine and then the editor's own frame work (tree preview,
+  herds and groups line, height tool reset outside the editor), does both loads and goes on.
+  With the grid off only the second load is taken, so Resource Grid Overlay 1.1 can still take
+  the first when it is installed on its own; with that module active, this one leaves the grid
+  to it.
+* **The resource grid.** `AIVState` holds one `HeatMap` record per 5 x 5 block, 80 x 80 of them,
+  and every resource-building decision is a search over those blocks - so the block edges are
+  what a mapper needs to see. `setKeepOffsetAndOrientation` builds the whole AIV turned by the
+  quarter the keep sits in, which gives the four rotation boundaries; the AI puts an iron mine
+  flat in the low corner of its block, which gives the footprint. One linear transform per map
+  rotation, halved exactly when zoomed out, places the lines; they lie at the height the game
+  levels the map to in its flattened view. The frame routine is assembly: with the grid off, a
+  compare; with it on, it compares the values the picture depends on (rotation, zoom, camera,
+  rendered area, pixel format) with the ones it last drew for and only calls into lua when one
+  has changed. The pixels go into the map surface through the module's own Bresenham loop,
+  which follows `PencilRenderCore::drawLine` rule for rule.
+* **The grid's toggle.** With a Custom Hotkeys that offers `registerAction`, the grid registers
+  an editor action (`ext.map-editor-improvements.grid-toggle`, Alt + the chosen key suggested)
+  and, when it may show during games, a game action that starts unbound. Without it, the
+  WM_SYSKEYDOWN arm of the window procedure goes to the module's handler as before: Alt + G sits
+  on that table's do-nothing case in both executables. Leaving the map puts the grid away:
+  `requestScreenChange` is redirected after the pending screen is stored, past every byte
+  Resolution Based Zoom's pattern on that function reads.
 * Every address is found by pattern scan or read out of the instruction that uses it, and
   checked against the bytes the module expects. Verified offline against both exes.
+
+## Credits
+
+Map Editor Improvements is by Monsterfish (GitHub: Monsterfisch) and Heroesflorian. The resource
+grid is Monsterfish's Resource Grid Overlay, merged into this module with both authors'
+agreement. See `module/CREDITS.md`.
