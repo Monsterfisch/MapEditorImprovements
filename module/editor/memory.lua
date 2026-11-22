@@ -18,19 +18,22 @@ local function scan(pattern, purpose)
   return address
 end
 
--- The end of the executable image an address lies in: the image starts on a 64 KiB boundary with
--- its "MZ" header, whose "PE" header gives the image's size. Found from the address itself, so no
+-- The end of the executable's section an address lies in (for the code patterns here, the code
+-- section). The image starts on a 64 KiB boundary with its "MZ" header; its "PE" header and
+-- section table, all in that first page, give the sections. Found from the address itself, so no
 -- address of the game is assumed; nil if no header turns up within 64 MiB below it. Each boundary
 -- is first tested with the framework's scanner, which steps over memory that is not there, and only
--- read once its first page holds the header.
+-- read once its first page holds the header. Without a usable section table the image's end is
+-- used (it also spans the game's large data sections, so it is slower).
 -- Framework 3.0.7 has no scan limited to the main executable. The patching library's unreleased
--- `scanForAOBInMainModule` (RPS branch fix/aob-scan-bounds, 604174b) does exactly this and
--- replaces imageEnd and the bounded second scan below once a framework release offers it.
-local images = {}            -- { first, stop } of each image found
+-- `scanForAOBInMainModule` (RPS branch fix/aob-scan-bounds, 604174b), which looks only at the
+-- executable's code pages, replaces sectionEnd and the bounded second scan below once a framework
+-- release offers it.
+local found = {}             -- { first, stop } of each section found
 local missed = {}            -- 64 KiB boundaries below which no header turned up
-local function imageEnd(inside)
-  for _, image in ipairs(images) do
-    if inside >= image[1] and inside < image[2] then return image[2] end
+local function sectionEnd(inside)
+  for _, range in ipairs(found) do
+    if inside >= range[1] and inside < range[2] then return range[2] end
   end
   local start = inside - inside % 0x10000
   if missed[start] then return nil end
@@ -41,9 +44,23 @@ local function imageEnd(inside)
     local lfanew = mz == base and (rd32(base + 0x3C) & 0xFFFFFFFF) or 0
     local pe = base + lfanew
     if lfanew > 0 and lfanew < 0xF00 and (rd32(pe) & 0xFFFFFFFF) == 0x4550 and (rd16(pe + 4) & 0xFFFF) == 0x14C then
-      local stop = base + (rd32(pe + 0x50) & 0xFFFFFFFF)   -- OptionalHeader.SizeOfImage
-      if stop > inside then
-        images[#images + 1] = { base, stop }
+      local imageStop = base + (rd32(pe + 0x50) & 0xFFFFFFFF)   -- OptionalHeader.SizeOfImage
+      if imageStop > inside then
+        local first, stop = base, imageStop
+        local count = rd16(pe + 6) & 0xFFFF                     -- FileHeader.NumberOfSections
+        local table_ = pe + 0x18 + (rd16(pe + 0x14) & 0xFFFF)   -- after the optional header
+        if table_ + count * 40 <= base + 0x1000 then
+          for index = 0, count - 1 do
+            local section = table_ + index * 40
+            local from = base + (rd32(section + 12) & 0xFFFFFFFF)                    -- VirtualAddress
+            local size = math.max(rd32(section + 8) & 0xFFFFFFFF, rd32(section + 16) & 0xFFFFFFFF)
+            if inside >= from and inside < from + size then
+              first, stop = from, from + size
+              break
+            end
+          end
+        end
+        found[#found + 1] = { first, stop }
         return stop
       end
     end
@@ -55,12 +72,12 @@ local function imageEnd(inside)
   return nil
 end
 
--- scan, and also refused when the pattern matches a second time further on in the executable. The
--- second look ends with the executable's image (its last byte), so it doesn't wander through the
--- rest of the process.
+-- scan, and also refused when the pattern matches a second time further on in the executable's
+-- section that holds it (its last byte), so the second look doesn't wander through the game's data
+-- or the rest of the process.
 local function scanUnique(pattern, purpose)
   local address = scan(pattern, purpose)
-  local stop = imageEnd(address)
+  local stop = sectionEnd(address)
   local again
   if stop ~= nil then
     again = core.scanForAOB(pattern, address + 1, stop - 1)
@@ -135,7 +152,7 @@ end
 return {
   scan = scan,
   scanUnique = scanUnique,
-  imageEnd = imageEnd,
+  sectionEnd = sectionEnd,
   expectBytes = expectBytes,
   readOperand = readOperand,
   readCallTarget = readCallTarget,
