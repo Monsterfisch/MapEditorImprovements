@@ -196,8 +196,9 @@ class Host:
         g.log = lambda level, message: self.logs.append('%s: %s' % (level, message))
         c = lua.table()
         c.AOBScan = self.scan
-        c.scanForAOB = lambda pattern, start=None: next(
-            (hit for hit in self.E.find(pattern) if hit is not None and (start is None or hit >= start)), None)
+        c.scanForAOB = lambda pattern, start=None, stop=None: next(
+            (hit for hit in self.E.find(pattern) if hit is not None and (start is None or hit >= start)
+             and (stop is None or hit < stop)), None)
         c.readInteger = lambda a: self.m.s32(int(a))
         c.writeInteger = lambda a, v: self.m.put32(int(a), int(v))
         c.readByte = lambda a: self.m.read(int(a), 1)[0]
@@ -268,6 +269,11 @@ class Host:
 
     def image(self, base):
         E = self.E
+        if E.imagebase <= base < E.imagebase + E.headersize:
+            page = bytearray(4096)
+            chunk = E.data[base - E.imagebase:base - E.imagebase + 4096]
+            page[:len(chunk)] = chunk
+            return bytes(page)
         for vs, vsz, po, rsz, _ in E.secs:
             if vs <= base < vs + max(vsz, rsz):
                 page = bytearray(4096)

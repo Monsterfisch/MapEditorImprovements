@@ -224,6 +224,9 @@ def main():
             'ok' if n == OFF_COST and clean else 'FAIL', n,
             'only the return address' if clean else repr(writes)))
         failures += not (n == OFF_COST and clean)
+        image_end = h.lua.eval('require("editor.memory").imageEnd')(h.renderSite)
+        expect('uniqueness re-scans end with the executable image (0x%X)' % (image_end or 0),
+               image_end == h.E.imagebase + h.E.imagesize)
 
         print('  -- Custom Hotkeys with module actions')
         p = Pair(exe_path, rt(SMALL), hotkeys=True)

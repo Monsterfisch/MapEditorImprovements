@@ -7,10 +7,15 @@ class Exe:
         self.secs = [(s.VirtualAddress+b, s.Misc_VirtualSize, s.PointerToRawData,
                       s.SizeOfRawData, s.Name.decode().strip('\x00')) for s in pe.sections]
         self.md = capstone.Cs(capstone.CS_ARCH_X86, capstone.CS_MODE_32); self.md.skipdata = True
+        # The headers are mapped at the image base too, as the loader maps them.
+        self.imagebase = b; self.headersize = pe.OPTIONAL_HEADER.SizeOfHeaders
+        self.imagesize = pe.OPTIONAL_HEADER.SizeOfImage
     def va2off(self, va):
+        if self.imagebase <= va < self.imagebase + self.headersize: return va - self.imagebase
         for vs,vsz,po,rsz,_ in self.secs:
             if vs <= va < vs+max(vsz,rsz) and va-vs < rsz: return po+(va-vs)
     def off2va(self, o):
+        if o < self.headersize: return self.imagebase + o
         for vs,vsz,po,rsz,_ in self.secs:
             if po <= o < po+rsz: return vs+(o-po)
     def dis(self, va, n=40):

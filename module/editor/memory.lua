@@ -18,11 +18,45 @@ local function scan(pattern, purpose)
   return address
 end
 
--- scan, and also refused when the pattern matches a second time further on (the framework's own
--- upper bound, as its unbounded scans use).
+-- The end of the executable image an address lies in: the image starts on a 64 KiB boundary with
+-- its "MZ" header, whose "PE" header gives the image's size. Found from the address itself, so no
+-- address of the game is assumed; nil if no header turns up within 64 MiB below it. Each boundary
+-- is first tested with the framework's scanner, which steps over memory that is not there, and only
+-- read once its first page holds the header.
+local imageEnds = {}
+local function imageEnd(inside)
+  local base = inside - inside % 0x10000
+  if imageEnds[base] ~= nil then return imageEnds[base] or nil end
+  local start = base
+  for _ = 1, 0x400 do
+    if base < 0x10000 then break end
+    local mz = core.scanForAOB("4D 5A", base, base + 0x10)
+    local lfanew = mz == base and (rd32(base + 0x3C) & 0xFFFFFFFF) or 0
+    local pe = base + lfanew
+    if lfanew > 0 and lfanew < 0xF00 and (rd32(pe) & 0xFFFFFFFF) == 0x4550 and (rd16(pe + 4) & 0xFFFF) == 0x14C then
+      local stop = base + (rd32(pe + 0x50) & 0xFFFFFFFF)   -- OptionalHeader.SizeOfImage
+      if stop > inside then
+        imageEnds[start] = stop
+        return stop
+      end
+    end
+    base = base - 0x10000
+  end
+  imageEnds[start] = false
+  return nil
+end
+
+-- scan, and also refused when the pattern matches a second time further on in the executable. The
+-- second look ends with the executable's image, so it costs no more than the first.
 local function scanUnique(pattern, purpose)
   local address = scan(pattern, purpose)
-  local again = core.scanForAOB(pattern, address + 1)
+  local stop = imageEnd(address)
+  local again
+  if stop ~= nil then
+    again = core.scanForAOB(pattern, address + 1, stop)
+  else
+    again = core.scanForAOB(pattern, address + 1)
+  end
   if again ~= nil and again ~= 0 then
     error(string.format("%s: %s matches twice (0x%X, 0x%X)", MODULE_NAME, purpose, address, again))
   end
@@ -91,6 +125,7 @@ end
 return {
   scan = scan,
   scanUnique = scanUnique,
+  imageEnd = imageEnd,
   expectBytes = expectBytes,
   readOperand = readOperand,
   readCallTarget = readCallTarget,
