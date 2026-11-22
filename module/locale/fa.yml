@@ -1,355 +1,216 @@
-brushes_full_shape: Brushes with their full shape
-brushes_full_shape_tooltip: 'The game''s brushes count the tile under the mouse twice and leave out the tile that
-  should
-
-  be their top left corner, in the preview and when placing. With this on they have their
-
-  whole shape (in the map editor; the game''s own use of the same walk is left alone).
-
-  '
-brushes_group: Brushes
-brushes_group_descr: 'The brushes of the landscape editor.
-
-  '
-castle_all_keeps: Manor house and stronghold on every map
-castle_all_keeps_tooltip: The keeps menu offers the manor house and the stronghold on multiplayer maps too.
-castle_all_players: All eight player shields on every map
-castle_all_players_tooltip: The shields beside the minimap show all eight players on every map type, not only on
-  multiplayer maps.
-castle_barrier: Barrier in the Ruins menu
-castle_barrier_tooltip: 'Adds a Barrier button in the free spot at the bottom right of the Ruins menu: a 1x1 barrier
-
-  that can be deleted again.
-
-  '
-castle_building_counts: Building counts above the minimap
-castle_building_counts_tooltip: 'Shows above the minimap how many buildings the map has against the game''s limit
-  (every
-
-  building counts, including keeps, landscape buildings and the parts some buildings are made
-
-  of), how many player buildings all players have together, and how many the current player
-
-  has. Player buildings are the ones an enemy can be sent to destroy.
-
-  '
-castle_damaged_walls: Damaged walls and stairs
-castle_damaged_walls_tooltip: 'While the stairs, low wall, high wall or crenellated wall is chosen, a row above
-  the castle
-
-  buildings menu offers it "Damaged": the walls you place get the top of a damaged wall (they
-
-  keep their height). Choosing the wall in the menu places undamaged walls again.
-
-  '
-castle_group: Castle mode
-castle_group_descr: 'The building menu of the map editor''s castle mode.
-
-  '
-castle_hover_text: Building names further left
-castle_hover_text_tooltip: 'The name of the building under the mouse ("Player 1''s Keep") moves 100 pixels to the
-  left,
-
-  so it no longer runs into the building counts above the minimap.
-
-  '
-castle_keep_crest_tooltip: Keep crest tooltip
-castle_keep_crest_tooltip_tooltip: Hovering over a keep crest shows what it means and what a click on it does. Needs
-  Active keep crests.
-castle_keep_crests: Active keep crests
-castle_keep_crests_tooltip: Every keep shows its owner's shield above it; the player's active keep (where the lord,
-  the starting units and new peasants appear) shows it framed. Click a shield to make that keep active, or click
-  the active one to leave the player without one. A new keep no longer takes over the active keep, and when the
-  active keep is removed another keep of that player takes over. The player's main stockpile always follows the
-  active keep (the game kept the first stockpile ever placed, so with several keeps the AI found its castle spot
-  blocked and used no castle plan). Needs Several keeps.
-castle_keep_parts: Keep without campfire or stockpile
-castle_keep_parts_tooltip: 'While one of the keeps is chosen, a row above the keeps menu offers it placed in two
-  more
-
-  ways: "Keep only" (the keep and its entrance, no campfire area and no stockpile) and "No
-
-  stockpile" (keep, entrance and campfire area). Choosing a keep in the menu places the whole
-
-  keep again.
-
-  The preview and the check for room show only those parts.
-
-  '
-castle_moat_kinds: Dug, planned and permanent moat
-castle_moat_kinds_tooltip: 'While the moat is chosen in the gatehouses menu, a row above the menu offers it three
-  ways:
-
-  Dug (the editor''s usual moat), Planned (moat marked out to be dug, as in a game) and
-
-  Permanent (dug moat that nobody can fill in or delete in a game). Choosing the moat in the
-
-  menu goes back to dug moat.
-
-  '
-castle_moat_on_marsh: Moat on marsh
-castle_moat_on_marsh_tooltip: 'In the map editor moat can be placed on marsh again. The marsh stays under it, so
-  it comes
-
-  back when the moat is filled in.
-
-  '
-castle_moat_removal_keeps_ground: Removing moat keeps the ground
-castle_moat_removal_keeps_ground_tooltip: 'The editor''s "remove moat" only changes tiles with dug or planned moat:
-  it takes the moat
-
-  away (dug moat gets the normal ground height back) and leaves the ground''s texture alone.
-
-  Without this it turns every tile under the brush into plain dirt.
-
-  '
-castle_player_zero: Player 0 shield
-castle_player_zero_tooltip: A white ninth shield in the middle of the player shields chooses player 0, who can own
-  buildings and units on a map too.
-castle_ruined_cathedral: Ruined cathedral
-castle_ruined_cathedral_tooltip: 'While the cathedral is chosen, a row above the town menu offers it "Ruined": the
-  cathedral you
-
-  place gets the ruined picture the game otherwise shows only in one historical mission. In a
-
-  game it is still a whole, working cathedral that just looks ruined. Choosing the cathedral in
-
-  the menu places normal ones again. The pipette takes a ruined cathedral as ruined. Needs the
-
-  game''s own tile_churches.gm1 (older copies have no ruin in it; then cathedrals stay whole).
-
-  '
-castle_several_keeps: Several keeps per player
-castle_several_keeps_tooltip: 'Placing a keep no longer removes the player''s earlier keep (and its campfire). The
-  newest
-
-  keep is the player''s active one, the others stay as buildings.
-
-  '
-castle_several_storage: Several storage and recruitment buildings
-castle_several_storage_tooltip: 'Barracks, mercenary posts, guilds and the other buildings a player has only one
-  of are no
-
-  longer removed when another one is placed, and further stockpiles, granaries and armouries
-
-  need not touch the first one. Any number of them may also be empty (the game allows only 8
-
-  empty granaries or armouries and 32 empty stockpiles).
-
-  '
-castle_statues: Statue and shrines
-castle_statues_tooltip: 'Adds the unused 2x2 statue, 2x2 shrine and 1x1 shrine: at the end of the statue''s and
-  the
-
-  shrine''s variants (see "Building variants"), or, with those off, in a row above the menu of
-
-  good things.
-
-  '
-castle_tower_engines: Tower mangonels and ballistae anywhere
-castle_tower_engines_tooltip: 'The tower mangonel and tower ballista of the army buildings menu can be put wherever
-  a unit
-
-  could be put (the ground, walls, gates, towers, the keep), not only on the player''s own square
-
-  and round towers: on the clicked tile, one to a tile, up to 4 on a keep or large gatehouse and
-
-  8 on the large stronghold keeps. The preview is solid wherever a click places one.
-
-  '
-castle_tower_ruins: Tower ruins
-castle_tower_ruins_tooltip: 'While the Towers menu is open, a row above it offers the ruins of the five towers.
-
-  '
-castle_tunnel_and_tents: Tunnel entrance and siege tents
-castle_tunnel_and_tents_tooltip: 'In the army buildings menu: with the tunnelers'' guild chosen, a row above the
-  menu offers a
-
-  tunnel entrance; with the engineers'' guild chosen, the six siege tents.
-
-  '
-castle_variant_panels: Building variants
-castle_variant_panels_tooltip: 'While a garden, statue, shrine or cesspit is chosen, a row above the menu offers
-  each of its
-
-  variants; one chosen there stays chosen instead of turning into the next one every second.
-
-  The same for the hovel: a variant chosen above the town menu is placed every time instead of
-
-  the player''s next one. Choosing the building in the menu itself goes back to the game''s way.
-
-  The pipette takes the exact variant too.
-
-  '
-castle_wall_tools: Wall heights and free crenellations
-castle_wall_tools_tooltip: Crenellations can stand on their own. Their panel offers low, high, low damaged and high
-  damaged. A slider above the wall panel sets the height of high walls, low walls and crenellations (0-255) and
-  the steepness of stairs (0-16), each on its own; Reset beside it gives the chosen one its usual value back, and
-  leaving the map editor puts them all back.
-counts_enabled: Show map counts
-counts_enabled_tooltip: 'Point at the Animals, Vegetation or Rocks button for a tooltip with the count and the
-
-  game''s limit, for example "Trees and shrubs: 812/1999". The Animals tooltip also shows the
-
-  herds and troops, which have a limit of their own.
-
-  In the Animals menu, the deer, camel, rabbit and lion buttons show how many of each there
-
-  are; in the Vegetation menu, every tree and shrub button shows how many of that plant there
-
-  are.
-
-  A red "i" button above the key button switches all of this on and off while you work.
-
-  '
-counts_group: Map counts
-counts_group_descr: 'Shows in the landscape editor how many animals, trees and rocks the map has, and how close
-
-  it is to the game''s limits.
-
-  '
-counts_shown: Numbers shown when the editor opens
-counts_shown_tooltip: 'Off: the numbers start hidden, and the "i" button brings them up.
-
-  '
-eraser_choice: Eraser choice panel
-eraser_choice_tooltip: 'While the eraser is chosen, a panel above the menu picks what it takes: All (as before),
-
-  Animals (also crows and seagulls), Units, Buildings (with keeps, ruins and walls), Vegetation or
-
-  Rocks (also invisible rocks).
-
-  '
-eraser_group: Eraser
-eraser_group_descr: 'What the landscape editor''s eraser takes.
-
-  '
-eraser_seagulls: Eraser takes seagulls
-eraser_seagulls_tooltip: 'The eraser also takes the seagulls flying over the tiles it erases (with All or Animals).
-
-  '
-heights_group: Heights
-heights_group_descr: 'The height tools of the landscape editor.
-
-  '
-heights_invert_key: Key to invert equalize
-heights_invert_key_on: Hold to invert equalize
-heights_invert_key_on_tooltip: 'While this key is held with the equalize tool chosen, equalize roughens the ground
-  (as with
-
-  Invert ticked); let go and it smooths again.
-
-  '
-heights_invert_key_tooltip: 'The key to hold for inverting the equalize tool.
-
-  '
-heights_max_height: Max Height button
-heights_max_height_tooltip: 'Brings back the first Stronghold''s Max Height tool, right of Min Height in the Heights
-  menu:
-
-  it sets the ground under the brush to height 156. Crusader still has the tool and its button
-
-  pictures, only the button was taken out.
-
-  '
-heights_tool_options: Height tool options
-heights_tool_options_tooltip: 'While a height tool is chosen, a panel above the Heights menu offers (in rows from
-  the bottom):
-
-  - Reset ground textures (off at first): whether the height tools also turn the ground under
-
-  them back to its plain look (and the plateaus to dirt), as the game does. Off, they only
-
-  change the height.
-
-  - Break rock tiles (off at first): whether raise, lower, equalize, hill and mountain break the
-
-  rocks they touch the way the game does (the touched tiles turn invisible and walkable while the
-
-  rock stays). Off, rocks stay whole.
-
-  - Ignore water and Ignore farmland (off at first): the height tools leave sea, river, ford,
-
-  marsh and moat tiles, or scrub, thick scrub and oasis grass tiles, as they are.
-
-  - For raise, lower and equalize: Snap to range (on at first), Invert (equalize only), the
-
-  height range (8 to 156 at first; drag either end) and the strength. With Snap to range on,
-
-  tiles outside the range are brought into it, as the game does; off, they are left alone.
-
-  Invert makes equalize roughen the ground instead of smoothing it.
-
-  - Rock height changes (Whole rock at first): what the height tools do to a rock they touch.
-
-  Tile only moves just the tiles under the brush; Whole rock moves all of the rock''s tiles by the
-
-  same amount; Erase rock removes the rock, as min height always did.
-
-  The range, Snap to range, Invert and the ignore boxes go back to their defaults when you leave
-
-  the map editor.
-
-  '
-herds_animal_bin: Erase all animals button
-herds_animal_bin_tooltip: 'A red wastebin button on the right of the Animals menu that takes every animal off the
-  map,
-
-  like Alt + E. Crows and seagulls stay.
-
-  '
-herds_bird_bins: Erase all crows / seagulls buttons
-herds_bird_bins_tooltip: 'Red wastebin buttons right of the crow and the seagull button in the Animals menu: one
-  click
-
-  takes every crow (the trees stay) or every seagull off the map.
-
-  '
-herds_group: Herds
-herds_group_descr: 'The animals of the landscape editor.
-
-  '
-herds_group_warning: Herds and groups warning
-herds_group_warning_tooltip: 'When fewer than 200 herds and groups can still be made, a line at the top of the screen
-  says
-
-  how many are left, like the game''s own line for units.
-
-  '
-herds_panel: Herd panel
-herds_panel_tooltip: 'While the deer, lion, rabbit or camel is chosen, a panel above the Animals menu shows how
-
-  many animals a herd gets (a fixed part plus a random part) and which group behaviour type the herd
-
-  uses. Its check box makes herds as big as the brush: 2 x brush size - 1 animals (1 to 13),
-
-  with no random part.
-
-  '
-key_alt: Alt
-key_ctrl: Ctrl
-key_digit_0: '0'
-key_digit_1: '1'
-key_digit_2: '2'
-key_digit_3: '3'
-key_digit_4: '4'
-key_digit_5: '5'
-key_digit_6: '6'
-key_digit_7: '7'
-key_digit_8: '8'
-key_digit_9: '9'
-key_f1: F1
-key_f10: F10
-key_f11: F11
-key_f12: F12
-key_f2: F2
-key_f3: F3
-key_f4: F4
-key_f5: F5
-key_f6: F6
-key_f7: F7
-key_f8: F8
-key_f9: F9
+counts_group: شمارنده‌های نقشه
+counts_group_descr: |-
+  در ویرایشگر چشم‌انداز نشان می‌دهد چه تعداد حیوان، درخت و صخره در نقشه وجود دارد و چقدر به سقف بازی نزدیک است.
+counts_enabled: نمایش شمارنده‌های نقشه
+counts_enabled_tooltip: |-
+  نشانگر ماوس را روی دکمه‌های «حیوانات»، «پوشش گیاهی» یا «صخره‌ها» ببرید تا راهنمایی همراه با تعداد فعلی و سقف بازی ببینید، مانند «درختان و بوته‌ها: 812/1999». راهنمای حیوانات همچنین گله‌ها و گروه‌ها را نشان می‌دهد که سقف جداگانه‌ای دارند.
+  در منوی حیوانات، دکمه‌های آهو، شتر، خرگوش و شیر تعداد هرکدام را نشان می‌دهند و در منوی پوشش گیاهی، هر دکمهٔ درخت و بوته تعداد همان گیاه را نمایش می‌دهد.
+  یک دکمهٔ قرمز «i» بالای دکمهٔ کلید، همهٔ این‌ها را حین کار روشن و خاموش می‌کند.
+counts_shown: نمایش اعداد هنگام باز شدن ویرایشگر
+counts_shown_tooltip: |-
+  خاموش: اعداد در ابتدا پنهان هستند و دکمهٔ «i» آن‌ها را نمایش می‌دهد.
+trees_group: درختان و بوته‌ها
+trees_group_descr: |-
+  انتخاب‌های بیشتر هنگام قرار دادن پوشش گیاهی در ویرایشگر چشم‌انداز.
+trees_growth: اندازهٔ قلم‌مو مرحلهٔ رشد درخت را تعیین می‌کند
+trees_growth_tooltip: |-
+  درختان در مرحلهٔ رشدِ متناسب با اندازهٔ قلم‌مو قرار می‌گیرند: قلم‌موی ۱ کوچک‌ترین درختان، قلم‌موی ۴ درختان کامل (آنچه ویرایشگر همیشه قرار می‌داد)، قلم‌موی ۵ درختان کاملی که هیزم‌شکن‌ها مدتی به آن‌ها دست نمی‌زنند، و قلم‌موی ۶ و ۷ درختان خشکیده (۷ زودتر پوسیده می‌شود). بوته‌ها تغییری نمی‌کنند.
+trees_apple: دکمهٔ درخت سیب
+trees_apple_tooltip: |-
+  یک درخت سیب به منوی پوشش گیاهی اضافه می‌کند. تصویر آن images/apple.png (به‌همراه apple_hover.png و apple_selected.png) در پوشهٔ ماژول است و می‌توانید برای تغییر آن جایگزینشان کنید.
+trees_shrubs: بوته‌های بیشتر
+trees_shrubs_tooltip: |-
+  وقتی بوته‌ای که چهار رنگ دیگر دارد انتخاب شود، ردیفی بالای منوی پوشش گیاهی هر پنج رنگ آن را ارائه می‌دهد.
+trees_felled: درختان قطع‌شده
+trees_felled_tooltip: |-
+  هنگام انتخاب یک درخت، ردیفی بالای منوی پوشش گیاهی همان درخت را ابتدا ایستاده و سپس قطع‌شده با هر تعداد کندهٔ ممکن نمایش می‌دهد (از ۹ تا ۱ برای درخت کامل؛ کوچک‌ترین درختان با ۱ کنده قطع می‌شوند). روی یکی کلیک کنید تا درخت قطع‌شده بکارید؛ برای بازگشت به درختان ایستاده روی درخت ایستاده، دوباره روی قطع‌شده یا روی درخت در منو کلیک کنید.
+trees_random_mix: ترکیب‌های تصادفی در ردیف درختان
+trees_random_mix_tooltip: |-
+  دکمه‌هایی با علامت «?» به ردیف‌های بالای منوی پوشش گیاهی اضافه می‌کند:
+  - درخت تصادفی (اولین در ردیف درختان قطع‌شده): ترکیب تصادفی همهٔ مراحل رشد از کوچک‌ترین تا مرحلهٔ قلم‌مو. برای کوچک‌ترین یا درختان خشکیده ارائه نمی‌شود.
+  - درخت قطع‌شدهٔ تصادفی (آخرین در ردیف درختان قطع‌شده): درختان قطع‌شده با تعداد تصادفی کنده.
+  - بوتهٔ تصادفی (آخرین در ردیف بوته‌ها): ترکیب تصادفی پنج رنگ بوته.
+  برای توقف، دوباره کلیک کنید یا دکمهٔ دیگری را برگزینید.
+trees_obstacles: کادر انتخاب برای درختان کنار موانع
+trees_obstacles_tooltip: |-
+  یک کادر انتخاب به ردیف بالای منوی پوشش گیاهی می‌افزاید. با تیک زدن آن، درختان را می‌توان درست کنار ساختمان‌ها، صخره‌ها، دیوارها و درختان دیگر قرار داد (بوته‌ها از قبل مجازند). برای دیدن وضعیتش نشانگر را رویش ببرید.
+trees_rocks_and_water: کادر انتخاب برای پوشش گیاهی روی صخره و آب
+trees_rocks_and_water_tooltip: |-
+  کادر انتخابی در سمت راست منوی پوشش گیاهی، زیر کادر درختان کنار موانع (در ابتدا خاموش). با تیک زدن آن می‌توان درختان و بوته‌ها را روی باتلاق، رودخانه، گذرگاه آب، زمین صخره‌ای، تخته‌سنگ و شن‌ریزه نیز گذاشت.
+trees_sorted_rows: مرتب‌سازی ردیف‌های منوی پوشش گیاهی
+trees_sorted_rows_tooltip: |-
+  بوتهٔ ردیف بالا را به ردیف پایین منتقل کرده و بوته‌های پایین را مرتب می‌کند، تا ردیف بالا شامل درختان (همراه درخت سیب و کادر انتخاب) و ردیف پایین شامل همهٔ بوته‌ها باشد.
+trees_preview: پیش‌نمایش درخت
+trees_preview_tooltip: |-
+  هنگام انتخاب درخت یا بوته، درختی که قرار است کاشته شود در خانهٔ زیر ماوس با مرحلهٔ قلم‌مو (یا قطع‌شده با تعداد کندهٔ انتخابی) همان‌گونه که بازی رسمش می‌کند نشان داده می‌شود. در نمای دورنمایی‌شده نشان داده نمی‌شود.
+trees_no_stacking: جلوگیری از انباشته شدن بوته‌ها
+trees_no_stacking_tooltip: |-
+  دیگر نمی‌توان درخت یا بوته‌ای را روی خانه‌ای که از قبل گیاه دارد گذاشت. برخی بوته‌ها (بوتهٔ ردیف بالا و چهار بوتهٔ هم‌دستهٔ آن) پیش‌تر به‌شکل نامرئی روی هم انباشته می‌شدند و برای همیشه سهمیهٔ درختان را مصرف می‌کردند. پاک‌کن اکنون همهٔ بوته‌های انباشته‌شده روی یک خانه را نیز پاک می‌کند.
+textures_group: بافت‌های زمین
+textures_group_descr: |-
+  منوی بافت‌های ویرایشگر چشم‌انداز.
+textures_gravel_and_iron: شن‌ریزه و آهن در منوی بافت‌ها
+textures_gravel_and_iron_tooltip: |-
+  شن‌ریزه را به ردیف بالا و آهن را به ردیف پایین اضافه کرده و هر دو ردیف را یکنواخت پخش می‌کند. تصویر شن‌ریزه images/gravel.png (همراه gravel_hover.png و gravel_selected.png) است.
+textures_no_heights_iron: آهن فقط در منوی بافت‌ها
+textures_no_heights_iron_tooltip: |-
+  اکنون که منوی بافت‌ها دکمهٔ آهن دارد، دکمهٔ آهن را از منوی ارتفاعات حذف می‌کند.
+textures_mask: دکمهٔ ماسک
+textures_mask_tooltip: |-
+  دکمهٔ ماسک (مربع نیمه‌پر) را در گوشهٔ بالا-چپ منوی ویرایشگر چشم‌انداز اضافه می‌کند. وقتی روشن باشد، ابزارهای طبیعی (ارتفاعات، بافت‌ها، آب، درختان و بوته‌ها، صخره‌ها و قطره‌چکان) تنها خانه‌هایی را تغییر می‌دهند که بافتی یکسان با اولین خانهٔ کلیک‌شده دارند؛ با رها کردن ماوس، کلیک بعدی بافت هدف را دوباره انتخاب می‌کند.
+textures_mask_by_type: یکسان شمردن انواع آب در ماسک
+textures_mask_by_type_tooltip: |-
+  ماسک فقط خانه‌های هم‌بافت با خانهٔ کلیک‌شده را تغییر می‌دهد و هر بافت جداست (علف، بوته‌زار، بوته‌زار انبوه، سنگ، ساحل…). با روشن بودن این گزینه، حالت‌های مختلف هر نوع آب یکی حساب می‌شوند: کل دریا با لبه‌ها و عمقش، کل رودخانه با کف، موج‌ها و لبه‌های آبشار، و همهٔ گذرگاه‌های رود. دریا، رودخانه و گذرگاه همچنان جدا می‌مانند.
+water_group: آب
+water_group_descr: |-
+  منوی آب در ویرایشگر چشم‌انداز.
+water_decorations: کف و موج‌های کوچک
+water_decorations_tooltip: |-
+  دو تزئین رودخانه از ویرایشگر نخستین Stronghold را برمی‌گرداند که Crusader هنوز پشتیبانی می‌کند اما دکمه‌ای برایشان ندارد: کف (آب سفید و افشانه مانند پای آبشار، روی هر خانهٔ رودخانه زیر قلم‌مو) و موج‌های کوچک (روی تک‌خانهٔ رودخانه زیر ماوس). هر دو فقط روی رودخانه قرار می‌گیرند و در نقشه ذخیره می‌شوند.
+water_foam_on_sea: کف روی دریا نیز مجاز باشد
+water_foam_on_sea_tooltip: |-
+  کف را می‌توان روی خانه‌های دریا نیز گذاشت که در این صورت به رودخانهٔ کف‌دار تبدیل می‌شوند (با روشن بودن گزینهٔ کف).
+rocks_group: صخره‌ها
+rocks_group_descr: |-
+  منوی صخره‌های ویرایشگر چشم‌انداز.
+rocks_signpost: تابلوی راهنما در منوی صخره‌های نقشه‌های نبرد آزاد
+rocks_signpost_tooltip: |-
+  نقشه‌های نبرد آزاد همان منوی صخره‌های نقشه‌های سناریو را همراه با دکمهٔ تابلوی راهنما دریافت می‌کنند.
+rocks_random_preview: نمایش چرخش تصادفی در پیش‌نمایش
+rocks_random_preview_tooltip: |-
+  وقتی دکمهٔ چرخش تصادفی انتخاب است، بازی صخره را آن‌قدر سریع می‌چرخاند که پیش‌نمایش زیر ماوس نمی‌تواند دنبالش کند. با این گزینه، صخره هر ثانیه یک بار می‌چرخد و پیش‌نمایش دقیقاً همان صخره‌ای را نشان می‌دهد که قرار است بگذارید.
+rocks_variants: ردیف گونه‌های صخره
+rocks_variants_tooltip: |-
+  ردیفی بالای منوی صخره‌ها چهار گونهٔ اندازهٔ صخرهٔ انتخاب‌شده را در همان جهت قرارگیری نشان می‌دهد. روی یکی کلیک کنید تا فقط همان گونه را بگذارید؛ دوباره رویش یا روی هر دکمهٔ منوی صخره‌ها کلیک کنید تا به حالت چرخش خودکار بازی برگردد.
+rocks_extra_rock: صخرهٔ کوچک اضافی
+rocks_extra_rock_tooltip: |-
+  برای کوچک‌ترین صخره‌ها، ردیف گونه‌ها یک گزینهٔ پنجم نیز ارائه می‌دهد: صخرهٔ کوچکی که در بازی وجود دارد اما ویرایشگر هرگز قرار نمی‌دهد. مانند هر صخرهٔ دیگری در نقشه ذخیره می‌شود.
+rocks_invisible: کادر انتخاب صخره‌های نامرئی
+rocks_invisible_tooltip: |-
+  کادر انتخابی در سمت راست دکمه‌های منوی صخره‌ها اضافه می‌کند. با تیک زدن آن، هر صخره‌ای که بگذارید بی‌نیاز از گذاشتن ۴۰۰۰ صخره بلافاصله «صخرهٔ نامرئی» می‌شود: خانه‌ها اشغال می‌شوند (نه ساخت‌وساز ممکن است و نه عبور) ولی صخره‌ای رسم نمی‌شود و ظاهر قبلی زمین باقی می‌ماند (ترفند «2k stones»). برای صخره‌های عادی تیک را بردارید.
+rocks_erase_invisible: پاک‌کن صخره‌های نامرئی را نیز پاک کند
+rocks_erase_invisible_tooltip: |-
+  پاک‌کن چشم‌انداز (و ابزارهایی که با آن صخره پاک می‌کنند) خانه‌های صخره‌های نامرئی را هم مانند صخره‌های عادی آزاد می‌کند. بدون این گزینه، برای هر خانه نیاز به گذاشتن و پاک کردن بوتهٔ بی‌توجه به موانع بود.
+rocks_remove_lost: دکمهٔ حذف صخره‌های گمشده
+rocks_remove_lost_tooltip: |-
+  دکمهٔ «حذف صخره‌های گمشده» را در پایین-راست منوی صخره‌ها اضافه می‌کند. صخره‌ای که ابزار بالا/پایین بردن شکسته و سپس همهٔ خانه‌هایش زیر بوته‌ها رفته، بدون هیچ خانه‌ای در فهرست صخره‌های نقشه باقی می‌ماند: دیده و پاک نمی‌شود اما یکی از ۴۰۰۰ جایگاه را اشغال می‌کند. این دکمه همهٔ آن‌ها را بدون تغییر خانه‌ها از فهرست پاک می‌کند.
+heights_group: ارتفاعات
+heights_group_descr: |-
+  ابزارهای ارتفاع در ویرایشگر چشم‌انداز.
+heights_max_height: دکمهٔ بیشینهٔ ارتفاع
+heights_max_height_tooltip: |-
+  ابزار «بیشینهٔ ارتفاع» از نخستین Stronghold را در سمت راست «کمینهٔ ارتفاع» در منوی ارتفاعات برمی‌گرداند: زمین زیر قلم‌مو را به ارتفاع ۱۵۶ می‌رساند. ابزار و تصاویر دکمه‌اش هنوز در Crusader موجود بود و تنها دکمه حذف شده بود.
+heights_tool_options: گزینه‌های ابزارهای ارتفاع
+heights_tool_options_tooltip: |-
+  هنگام انتخاب ابزار ارتفاع، پنلی بالای منوی ارتفاعات (از پایین به بالا) این موارد را ارائه می‌دهد:
+  - بازنشانی بافت زمین (در ابتدا خاموش): آیا ابزارهای ارتفاع زمین زیر خود را مانند بازی به ظاهر ساده (و فلات‌ها را به خاک) برگردانند یا نه. در حالت خاموش فقط ارتفاع تغییر می‌کند.
+  - شکستن خانه‌های صخره (در ابتدا خاموش): آیا بالا بردن، پایین آوردن، هموارسازی، تپه و کوه صخره‌های لمس‌شده را مانند بازی بشکنند (خانه‌ها نامرئی و قابل عبور شوند). در حالت خاموش صخره‌ها سالم می‌مانند.
+  - نادیده گرفتن آب و نادیده گرفتن زمین حاصل‌خیز (در ابتدا خاموش): خانه‌های دریا، رودخانه، گذرگاه، باتلاق و خندق یا بوته‌زار، بوته‌زار انبوه و علف واحه دست‌نخورده می‌مانند.
+  - برای بالا بردن، پایین آوردن و هموارسازی: هم‌ترازی با بازه (در ابتدا روشن)، معکوس (فقط هموارسازی)، بازهٔ ارتفاع (در ابتدا ۸ تا ۱۵۶؛ هر دو سر قابل کشیدن) و شدت. با هم‌ترازی روشن، خانه‌های بیرون بازه مانند بازی وارد بازه می‌شوند؛ در حالت خاموش دست‌نخورده می‌مانند. معکوس باعث می‌شود هموارسازی به‌جای صاف کردن، زمین را ناهموار کند.
+  - تغییر ارتفاع صخره (در ابتدا کل صخره): واکنش به صخرهٔ لمس‌شده. «فقط خانه» تنها خانه‌های زیر قلم‌مو را جابه‌جا می‌کند؛ «کل صخره» همهٔ خانه‌های صخره را هم‌اندازه حرکت می‌دهد؛ «پاک کردن صخره» آن را حذف می‌کند (مانند کمینهٔ ارتفاع).
+  بازه، هم‌ترازی، معکوس و کادرهای نادیده گرفتن هنگام خروج از ویرایشگر نقشه به پیش‌فرض برمی‌گردند.
+heights_invert_key_on: نگه داشتن کلید برای معکوس کردن هموارسازی
+heights_invert_key_on_tooltip: |-
+  هنگام انتخاب ابزار هموارسازی، تا وقتی این کلید را نگه دارید زمین را ناهموار می‌کند (مانند تیک خوردن «معکوس») و با رها کردن دوباره هموار می‌سازد.
+heights_invert_key: کلید معکوس کردن هموارسازی
+heights_invert_key_tooltip: |-
+  کلیدی که برای معکوس کردن ابزار هموارسازی نگه داشته می‌شود.
+castle_group: حالت قلعه
+castle_group_descr: |-
+  منوی ساخت‌وساز در حالت قلعهٔ ویرایشگر نقشه.
+castle_building_counts: شمارندهٔ ساختمان‌ها بالای نقشهٔ کوچک
+castle_building_counts_tooltip: |-
+  بالای نقشهٔ کوچک تعداد کل ساختمان‌های نقشه در برابر سقف بازی (همه حساب می‌شوند، از جمله دژهای مرکزی، ساختمان‌های محیطی و اجزای ساختمان‌های چندبخشی)، مجموع ساختمان‌های همهٔ بازیکنان و ساختمان‌های بازیکن فعلی را نشان می‌دهد. ساختمان‌های بازیکن آن‌هایی هستند که دشمن می‌تواند نابود کند.
+castle_tower_ruins: ویرانه‌های برج‌ها
+castle_tower_ruins_tooltip: |-
+  وقتی منوی برج‌ها باز است، ردیفی بالای آن ویرانه‌های هر پنج برج را ارائه می‌دهد.
+castle_tunnel_and_tents: ورودی تونل و چادرهای محاصره
+castle_tunnel_and_tents_tooltip: |-
+  در منوی ساختمان‌های نظامی: با انتخاب صنف تونل‌کن‌ها، ردیفی بالای منو ورودی تونل و با انتخاب صنف مهندسان، شش چادر محاصره را ارائه می‌دهد.
+castle_statues: مجسمه و معبدها
+castle_statues_tooltip: |-
+  مجسمهٔ ۲×۲، معبد ۲×۲ و معبد ۱×۱ استفاده‌نشده را اضافه می‌کند: در انتهای گونه‌های مجسمه و معبد (بنگرید به «گونه‌های ساختمان») یا اگر خاموش باشند، در ردیفی بالای منوی امکانات مثبت.
+castle_barrier: مانع در منوی ویرانه‌ها
+castle_barrier_tooltip: |-
+  دکمهٔ مانع را در جای خالی پایین-راست منوی ویرانه‌ها می‌افزاید: یک مانع ۱×۱ که دوباره قابل حذف است.
+castle_several_keeps: چند دژ مرکزی برای هر بازیکن
+castle_several_keeps_tooltip: |-
+  گذاشتن دژ مرکزی دیگر دژ قبلی بازیکن (و آتش اردوگاهش) را حذف نمی‌کند. جدیدترین دژ، دژ فعال بازیکن است و بقیه به‌عنوان ساختمان باقی می‌مانند.
+castle_several_storage: چند ساختمان انبار و سربازگیری
+castle_several_storage_tooltip: |-
+  سربازخانه‌ها، اردوگاه‌های مزدوران، صنف‌ها و دیگر ساختمان‌هایی که هر بازیکن معمولاً فقط یکی دارد با گذاشتن نمونهٔ جدید حذف نمی‌شوند و انبارهای کالا، انبارهای غله و اسلحه‌خانه‌های بعدی نیازی به چسبیدن به اولی ندارند. هر تعداد از آن‌ها می‌تواند خالی بماند (بازی به‌طور عادی تنها ۸ انبار غله یا اسلحه‌خانهٔ خالی و ۳۲ انبار کالای خالی مجاز می‌داند).
+castle_tower_engines: منجنیق‌ها و بالیستاهای برجی در همه‌جا
+castle_tower_engines_tooltip: |-
+  منجنیق برجی و بالیستای برجی در منوی ساختمان‌های نظامی را می‌توان هرجا که واحدی بتواند بایستد (زمین، دیوارها، دروازه‌ها، برج‌ها، دژ مرکزی) گذاشت، نه فقط روی برج‌های مربعی و گرد خود بازیکن: روی خانهٔ کلیک‌شده، یکی در هر خانه، تا ۴ عدد روی دژ مرکزی یا دروازهٔ بزرگ و ۸ عدد روی دژهای بزرگ. هرجا کلیک یکی قرار دهد پیش‌نمایش توپر است.
+castle_keep_parts: دژ مرکزی بدون آتش اردوگاه یا انبار کالا
+castle_keep_parts_tooltip: |-
+  هنگام انتخاب یک دژ مرکزی، ردیفی بالای منوی دژها دو حالت دیگر ارائه می‌دهد: «فقط دژ» (دژ و ورودی، بدون محوطهٔ آتش و انبار کالا) و «بدون انبار کالا» (دژ، ورودی و محوطهٔ آتش). انتخاب دوبارهٔ دژ در منو دژ کامل را می‌گذارد.
+  پیش‌نمایش و بررسی فضا فقط همان بخش‌ها را شامل می‌شود.
+castle_hover_text: جابه‌جایی نام ساختمان‌ها به سمت چپ
+castle_hover_text_tooltip: |-
+  نام ساختمان زیر ماوس («دژ مرکزی بازیکن ۱») ۱۰۰ پیکسل به چپ می‌رود تا با شمارنده‌های ساختمان بالای نقشهٔ کوچک تداخل نکند.
+castle_damaged_walls: دیوارها و پله‌های آسیب‌دیده
+castle_damaged_walls_tooltip: |-
+  هنگام انتخاب پله، دیوار کوتاه، دیوار بلند یا کنگره، ردیفی بالای منوی ساختمان‌های قلعه حالت «آسیب‌دیده» را ارائه می‌دهد: دیوارها با حفظ ارتفاع، بالای آسیب‌دیده می‌گیرند. انتخاب دوباره در منو دیوار سالم می‌گذارد.
+castle_variant_panels: گونه‌های ساختمان
+castle_variant_panels_tooltip: |-
+  هنگام انتخاب باغچه، مجسمه، معبد یا چاه فاضلاب، ردیفی بالای منو همهٔ گونه‌های آن را نشان می‌دهد و گونهٔ انتخاب‌شده به‌جای تغییر در هر ثانیه ثابت می‌ماند. همین قابلیت برای کلبه بالای منوی شهر نیز وجود دارد. انتخاب ساختمان از خود منو به حالت بازی برمی‌گردد. قطره‌چکان هم گونهٔ دقیق را برمی‌دارد.
+castle_ruined_cathedral: کلیسای جامع ویران
+castle_ruined_cathedral_tooltip: |-
+  هنگام انتخاب کلیسای جامع، ردیفی بالای منوی شهر حالت «ویران» را ارائه می‌دهد که تصویر تخریب‌شده‌ای است که بازی فقط در یک مأموریت تاریخی نشان می‌دهد. در بازی همچنان کلیسایی کامل و فعال است که فقط ظاهر ویران دارد. انتخاب دوباره از منو کلیسای سالم می‌گذارد و قطره‌چکان حالت ویران را می‌شناسد. نیازمند فایل اصلی tile_churches.gm1 است (نسخه‌های قدیمی‌تر تصویر ویران ندارند و کلیسا سالم می‌ماند).
+castle_moat_kinds: خندق کنده‌شده، برنامه‌ریزی‌شده و دائمی
+castle_moat_kinds_tooltip: |-
+  هنگام انتخاب خندق در منوی دروازه‌ها، ردیفی بالای منو سه حالت ارائه می‌دهد: کنده‌شده (خندق معمول ویرایشگر)، برنامه‌ریزی‌شده (علامت‌گذاری‌شده برای کندن مانند داخل بازی) و دائمی (خندق کنده‌شده‌ای که هیچ‌کس در بازی نمی‌تواند پر یا حذفش کند). انتخاب از منو به خندق کنده‌شده برمی‌گردد.
+castle_moat_on_marsh: خندق روی باتلاق
+castle_moat_on_marsh_tooltip: |-
+  در ویرایشگر نقشه دوباره می‌توان خندق را روی باتلاق گذاشت. باتلاق زیر آن می‌ماند و با پر شدن خندق دوباره پدیدار می‌شود.
+castle_moat_removal_keeps_ground: حذف خندق بافت زمین را حفظ کند
+castle_moat_removal_keeps_ground_tooltip: |-
+  ابزار «حذف خندق» فقط خانه‌های دارای خندق کنده‌شده یا برنامه‌ریزی‌شده را تغییر می‌دهد: خندق را برمی‌دارد (ارتفاع عادی برمی‌گردد) و به بافت زمین دست نمی‌زند. بدون آن همهٔ خانه‌های زیر قلم‌مو به خاک ساده تبدیل می‌شدند.
+herds_group: گله‌ها
+herds_group_descr: |-
+  حیوانات در ویرایشگر چشم‌انداز.
+herds_panel: پنل گله‌ها
+herds_panel_tooltip: |-
+  هنگام انتخاب آهو، شیر، خرگوش یا شتر، پنلی بالای منوی حیوانات تعداد حیوانات هر گله (بخش ثابت به‌علاوهٔ بخش تصادفی) و نوع رفتار گروهی آن را نشان می‌دهد. کادر انتخابش اندازهٔ گله را تابع قلم‌مو می‌کند: ۲ × اندازهٔ قلم‌مو − ۱ حیوان (۱ تا ۱۳) بدون بخش تصادفی.
+brushes_group: قلم‌موها
+brushes_group_descr: |-
+  قلم‌موهای ویرایشگر چشم‌انداز.
+brushes_full_shape: قلم‌موها با شکل کامل
+brushes_full_shape_tooltip: |-
+  قلم‌موهای بازی خانهٔ زیر ماوس را دوبار می‌شمارند و خانهٔ گوشهٔ بالا-چپ شکل را در پیش‌نمایش و هنگام قرار دادن جا می‌اندازند. با این گزینه شکل کامل خود را دارند (فقط در ویرایشگر نقشه؛ کاربرد داخلی بازی تغییر نمی‌کند).
+undo_group: واگرد و از نو
+undo_group_descr: |-
+  دکمه‌های واگرد و از نو در گوشهٔ بالا-چپ ویرایشگر نقشه.
+undo_enabled: واگرد و از نو
+undo_enabled_tooltip: |-
+  دو دکمهٔ پیکانی در گوشهٔ بالا-چپ ویرایشگر نقشه: سمت چپ آخرین تغییر روی نقشه (قرار دادن، حذف، نقاشی، ارتفاعات) را برمی‌گرداند و سمت راست دوباره اعمالش می‌کند، تا ۲۰ مرحله. اگر کاری نباشد دکمه خاکستری است. هر کلیک یا هر کشیدن ممتد قلم‌مو یک مرحله است؛ کلیک‌های بی‌تغییر مرحله‌ای نمی‌سازند. بارگذاری نقشهٔ دیگر تاریخچه را از نو آغاز می‌کند.
+pipette_group: قطره‌چکان
+pipette_group_descr: |-
+  قطره‌چکانی در ستون چپ ویرایشگر چشم‌انداز، بالای اندازهٔ قلم‌مو: ارتفاع و/یا بافت یک خانه را برمی‌دارد و به خانه‌های زیر قلم‌مو می‌دهد.
+pipette_enabled: قطره‌چکان
+pipette_enabled_tooltip: |-
+  دکمهٔ قطره‌چکان را بالای اندازهٔ قلم‌مو اضافه می‌کند (اندازهٔ قلم‌مو، خط‌کش و پاک‌کن کمی پایین‌تر می‌روند).
+  با انتخابش ردیفی بالای منو ظاهر می‌شود — ارتفاعات، بافت‌ها، اشیاء، همه — و بالای آن محتوای فعلی قطره‌چکان. روی خانه‌ای کلیک کنید تا برداشته شود (یک خانه نشان می‌دهد)، سپس کلیک یا درگ کنید تا روی خانه‌های زیر قلم‌مو اعمال شود. ارتفاعات به بافت و بافت‌ها به ارتفاع دست نمی‌زنند. اشیاء ساختمان، دیوار، درخت یا صخرهٔ خانه را برمی‌دارد: ساختمان‌ها و دیوارها مانند دکمهٔ خودشان برای همان بازیکن قرار می‌گیرند (سپرش انتخاب می‌شود)، و درختان (همان نوع و مرحله یا قطع‌شده با همان کنده‌ها) و صخره‌ها (همان نوع و چرخش) مانند ابزار خودشان همراه با درگ. «همه» درخت یا صخرهٔ ۱×۱ را هم برداشته روی هر خانهٔ زیر قلم‌مو می‌گذارد. انتخاب دوبارهٔ قطره‌چکان یا یکی از حالت‌هایش آن را خالی می‌کند.
+  ارتفاع روی دریا، ساحل، باتلاق، خندق، صخره، دیوار یا ساختمان اعمال نمی‌شود و بافت روی صخره، دیوار یا ساختمان. صخره‌های پرتگاهی روی لبه‌های تند پاک شده و در لبه‌های همچنان تند دوباره ساخته می‌شوند. واگرد برای قطره‌چکان هم کار می‌کند.
+pipette_select_key_on: کلید قطره‌چکان
+pipette_select_key_on_tooltip: |-
+  کلیدی که قطره‌چکان را انتخاب (و خالی) می‌کند. فشردن دوبارهٔ آن هنگام انتخاب بودن قطره‌چکان به حالت بعدی می‌رود: ارتفاعات، بافت‌ها، اشیاء، همه.
+pipette_select_key: کلید انتخاب قطره‌چکان
+pipette_select_key_tooltip: |-
+  کلیدی که قطره‌چکان را در ویرایشگر نقشه انتخاب می‌کند. کارکرد معمول خودش را نیز حفظ می‌کند.
+pipette_read_key_on: نگه داشتن برای نمونه‌برداری از خانه
+pipette_read_key_on_tooltip: |-
+  تا وقتی این کلید را نگه دارید، قطره‌چکانِ پر دوباره از خانه نمونه می‌گیرد (نمونهٔ قبلی تا لحظهٔ کلیک می‌ماند). رها کنید تا دوباره اعمال کند.
+pipette_read_key: کلید نمونه‌برداری از خانه
+pipette_read_key_tooltip: |-
+  کلیدی که هنگام پر بودن قطره‌چکان برای نمونه‌برداری جدید نگه داشته می‌شود.
+pipette_any_tile_key_on: نگه داشتن برای اعمال روی هر خانه
+pipette_any_tile_key_on_tooltip: |-
+  آزمایشی: تا وقتی این کلید را نگه دارید، قطره‌چکان ارتفاع و بافت را به همهٔ خانه‌های زیر قلم‌مو از جمله دریا، باتلاق، صخره‌ها (باقی می‌مانند)، دیوارها و ساختمان‌ها می‌دهد (هرگز لبهٔ نقشه). محل مجاز اشیاء را تغییر نمی‌دهد.
+pipette_any_tile_key: کلید اعمال روی هر خانه
+pipette_any_tile_key_tooltip: |-
+  کلیدی که با نگه داشتنش قطره‌چکان چیزهای روی خانه را نادیده می‌گیرد.
 key_letter_a: A
 key_letter_b: B
 key_letter_c: C
@@ -376,374 +237,94 @@ key_letter_w: W
 key_letter_x: X
 key_letter_y: Y
 key_letter_z: Z
+key_digit_0: '0'
+key_digit_1: '1'
+key_digit_2: '2'
+key_digit_3: '3'
+key_digit_4: '4'
+key_digit_5: '5'
+key_digit_6: '6'
+key_digit_7: '7'
+key_digit_8: '8'
+key_digit_9: '9'
+key_f1: F1
+key_f2: F2
+key_f3: F3
+key_f4: F4
+key_f5: F5
+key_f6: F6
+key_f7: F7
+key_f8: F8
+key_f9: F9
+key_f10: F10
+key_f11: F11
+key_f12: F12
+key_ctrl: Ctrl
 key_shift: Shift
-key_space: Space
+key_alt: Alt
+key_space: فاصله (Space)
 key_tab: Tab
-map_settings_button: Map Settings button
-map_settings_button_tooltip: 'A Map Settings button on the map''s menu screen, right of the Balanced / Unbalanced
-  and
-
-  Invasion / Economy buttons. It opens the Alt + , menu.
-
-  '
-map_settings_group: Map settings
-map_settings_group_descr: 'The map''s settings: map type, size, lock and the menus that show them.
-
-  '
-map_settings_menu: Bigger Map Settings menu
-map_settings_menu_tooltip: 'The Alt + , menu gets a title, Singleplayer and Multiplayer, the four singleplayer map
-  types
-
-  (Siege, Invasion, Economic, Just Build), the four map sizes plus Custom and a Map size slider (10
-
-  to 400; the map changes size when you let go), Balanced, King of the Hill, Lock map and a Back
-
-  button.
-
-  '
-map_settings_show_locked: Show locked maps box
-map_settings_show_locked_tooltip: 'A "Show locked maps" box in the editor''s Load dialog. Ticked, locked maps are
-  listed too;
-
-  the list updates at once.
-
-  '
-menu_always_update: Always keep the menu up to date
-menu_always_update_tooltip: 'The game only redraws the menu while the mouse is over it. A change made elsewhere,
-  for
-
-  example a hotkey that picks another tool, or the counts changing as you place animals,
-
-  only shows once you move the mouse back onto the menu. With this on, the menu is redrawn
-
-  all the time in the map editor.
-
-  '
-menu_dust_clouds: Dust clouds cannot crash the game
-menu_dust_clouds_tooltip: 'A dust cloud whose movement data has been lost made the game divide by zero and crash.
-  With
-
-  this on, such a cloud stays where it is instead.
-
-  '
-menu_group: Editor menu
-menu_group_descr: 'How the editor''s menu at the bottom of the screen is drawn.
-
-  '
-pipette_any_tile_key: Key to give to any tile
-pipette_any_tile_key_on: Hold to give to any tile
-pipette_any_tile_key_on_tooltip: 'Experimental: while this key is held, the pipette gives heights and textures to
-  every tile
-
-  under the brush, also sea, marsh, rocks (which stay), walls and buildings (never the map''s
-
-  edge). It does not change where objects may be placed.
-
-  '
-pipette_any_tile_key_tooltip: 'The key to hold so that the pipette ignores what a tile has on it.
-
-  '
-pipette_enabled: Pipette
-pipette_enabled_tooltip: 'Adds the pipette button above the brush size (brush size, ruler and eraser move down a
-  little).
-
-  Choosing it shows a row above the menu - Heights, Textures, Objects, All - and above that what
-
-  the pipette holds. Click a tile to take it (the pipette shows one tile), then click or drag to
-
-  give it to the tiles under the brush. Heights leave the ground alone, textures leave the
-
-  heights alone. Objects takes the building, wall, tree or rock on a tile: buildings and walls
-
-  are then placed like their own menu button does, for the same player (that player''s shield
-
-  gets chosen), trees (same kind and stage, or felled with
-
-  the same logs) and rocks (same kind and turn) like the tree and rock tools, dragging included. All also takes
-  a tree or 1x1 rock
-
-  and puts one on every tile under the brush. Choosing the pipette or one of its kinds again
-
-  empties it.
-
-  Heights are not given to sea, beach, marsh, moat, rocks, walls or buildings; textures not to
-
-  rocks, walls or buildings. Cliff rocks (the ones the editor puts on steep edges) are cleared
-
-  and come back where an edge stays steep. Undo takes pipette strokes back like any other.
-
-  '
-pipette_group: Pipette
-pipette_group_descr: 'A pipette in the landscape editor''s left column, above the brush size: it takes the heights
-
-  and/or textures of one tile and gives them to the tiles under the brush.
-
-  '
-pipette_read_key: Key to take a tile
-pipette_read_key_on: Hold to take a tile
-pipette_read_key_on_tooltip: 'While this key is held, a pipette that holds something takes a tile again (the old
-  one stays
-
-  until you click). Let go and it gives again - if it holds anything.
-
-  '
-pipette_read_key_tooltip: 'The key to hold for taking a tile while the pipette holds something.
-
-  '
-pipette_select_key: Key for the pipette
-pipette_select_key_on: Pipette key
-pipette_select_key_on_tooltip: 'A key that chooses the pipette (and empties it). Pressed again while the pipette
-  is chosen,
-
-  it goes on to the next kind: Heights, Textures, Objects, All.
-
-  '
-pipette_select_key_tooltip: 'The key that chooses the pipette in the map editor. It still does its usual job as
-  well.
-
-  '
-rocks_erase_invisible: The eraser removes invisible rocks
-rocks_erase_invisible_tooltip: 'The landscape eraser (and the tools that remove rocks with it) frees the tiles of
-  invisible
-
-  rocks too, the way it removes normal rocks. Without this, each tile needs the shrub trick:
-
-  place the shrub that ignores obstacles on it and erase that.
-
-  '
-rocks_extra_rock: Extra small rock
-rocks_extra_rock_tooltip: 'For the smallest rocks, the variant row also offers a fifth one: a small rock the game
-  has
-
-  but the editor never places. It is saved in the map like any other rock.
-
-  '
-rocks_group: Rocks
-rocks_group_descr: 'The Rocks menu of the landscape editor.
-
-  '
-rocks_invisible: Invisible rocks check box
-rocks_invisible_tooltip: 'Adds a check box to the right of the Rocks menu''s buttons. While it is ticked, every
-  rock
-
-  you place is an "invisible rock" straight away, without placing 4000 rocks first: the
-
-  tiles are taken (nothing can be built or walk there) but no rock is drawn, so they keep
-
-  showing what was there before (the "2k stones trick"). Untick it for normal rocks.
-
-  '
-rocks_random_preview: Random rotation shows in the preview
-rocks_random_preview_tooltip: 'With the random rotation button chosen, the game turns the rock so fast that the
-  preview
-
-  under the mouse cannot follow it. With this on it turns once a second instead, and the
-
-  preview shows the rock you are about to place.
-
-  '
-rocks_remove_lost: Remove lost rocks button
-rocks_remove_lost_tooltip: 'Adds a "Remove lost rocks" button at the bottom right of the Rocks menu. A rock the
-  raise or
-
-  lower tool broke, whose tiles were then all covered with shrubs, stays in the map''s list of
-
-  rocks with no tile left: you cannot see, erase or reach it, and it uses up one of the 4000
-
-  rock slots. The button finds every such rock and takes it off the list. Tiles are not changed.
-
-  '
-rocks_signpost: Signpost in the Rocks menu of skirmish maps
-rocks_signpost_tooltip: 'Skirmish maps get the same Rocks menu as scenario maps, with the signpost button.
-
-  '
-rocks_variants: Rock variant row
-rocks_variants_tooltip: 'A row above the Rocks menu shows the four variants of the chosen rock size, turned the
-  way
-
-  they would be placed. Click one to place only that variant; click it again, or any button
-
-  of the Rocks menu, to go back to the game''s changing variants.
-
-  '
-textures_gravel_and_iron: Gravel and iron in the Textures menu
-textures_gravel_and_iron_tooltip: 'Adds Gravel to the top row and Iron to the bottom row, and spreads both rows
-  evenly. The
-
-  gravel picture is images/gravel.png (with gravel_hover.png and gravel_selected.png).
-
-  '
-textures_group: Ground textures
-textures_group_descr: 'The Textures menu of the landscape editor.
-
-  '
-textures_mask: Mask button
-textures_mask_by_type: Mask treats water variants as one
-textures_mask_by_type_tooltip: 'The mask only lets through tiles of the same texture as the one you clicked; every
-  texture stays
-
-  its own (grass, scrub, thick scrub, stones, beach ... are all different). With this on, the
-
-  variants of one water count as that water: all sea including its edges and deeper parts, all
-
-  river including foam, waves and the waterfall edges where it runs down a slope, all river
-
-  crossing. Sea, river and river crossing stay apart.
-
-  '
-textures_mask_tooltip: 'Adds a Mask button (a square, half filled) at the top left of the landscape editor''s menu.
-  While
-
-  it is on, the nature tools (heights, textures, water, trees and shrubs, rocks and the pipette) only
-
-  change tiles that have the same texture as the tile you first clicked on;
-
-  when you let go of the mouse, the next click picks the texture to paint over anew.
-
-  '
-textures_no_heights_iron: Iron only in the Textures menu
-textures_no_heights_iron_tooltip: 'Takes the iron button out of the Heights menu, now that the Textures menu has
-  one.
-
-  '
-trees_apple: Apple tree button
-trees_apple_tooltip: 'Adds an apple tree to the Vegetation menu. The picture is images/apple.png (with
-
-  apple_hover.png and apple_selected.png) in the module''s folder; replace them to change it.
-
-  '
-trees_felled: Felled trees
-trees_felled_tooltip: 'While a tree is chosen, a row above the Vegetation menu offers that tree standing (first)
-  and
-
-  felled, with every number of logs it can still hold (9 down to 1 for a fully grown tree; the
-
-  smallest trees are felled with 1 log). Click one to place felled trees; click the standing
-
-  tree, the felled one again or the tree in the menu to go back to standing trees.
-
-  '
-trees_group: Trees and shrubs
-trees_group_descr: 'More choice when placing vegetation in the landscape editor.
-
-  '
-trees_growth: Brush size sets the tree's growth stage
-trees_growth_tooltip: 'Trees are placed at the growth stage of the brush size: brush 1 places the smallest trees,
-
-  brush 4 fully grown ones (what the editor always places otherwise), brush 5 fully grown
-
-  ones the woodcutters leave alone for a while, brush 6 and 7 dead trees (7 decays sooner).
-
-  Shrubs are not affected.
-
-  '
-trees_no_stacking: No shrub stacks
-trees_no_stacking_tooltip: 'A tree or shrub can no longer be placed on a tile that already has one. Some shrubs
-  (the
-
-  shrub of the top row and the four shrubs it was sorted with) used to pile up there, invisible
-
-  but each taking a place of the tree limit for good. The eraser now also takes away every
-
-  shrub piled up on a tile, so old stacks can be cleared.
-
-  '
-trees_obstacles: Check box for trees next to obstacles
-trees_obstacles_tooltip: 'Adds a check box to the top row of the Vegetation menu. While it is ticked, trees can
-  be
-
-  placed right next to buildings, rocks, walls and other trees, which the game normally keeps
-
-  them away from (shrubs can stand there anyway). Point at it to see whether it is on.
-
-  '
-trees_preview: Tree preview
-trees_preview_tooltip: 'While a tree or shrub is chosen, the tree it would plant is shown on the tile under the
-  mouse,
-
-  at the stage the brush gives it (or felled, with the felled tree''s logs), the way the game
-
-  will draw it. Not while zoomed out.
-
-  '
-trees_random_mix: Random mixes in the tree rows
-trees_random_mix_tooltip: "Adds buttons marked \"?\" to the rows above the Vegetation menu:\n- Random tree (first\
-  \ in the felled tree row): trees of every growth stage from the smallest\n  up to the brush's, mixed at random.\
-  \ Not offered for the smallest trees or dead ones.\n- Random felled tree (last in the felled tree row): felled\
-  \ trees with a random number of\n  logs.\n- Random shrub (last in the shrub row): the five shrub colours mixed\
-  \ at random.\nClick one again, or choose another button, to stop mixing.\n"
-trees_rocks_and_water: Check box for vegetation on rocks and water
-trees_rocks_and_water_tooltip: A check box on the right of the Vegetation menu, below the one for trees next to
-  obstacles (off at first). Ticked, trees and shrubs can also be placed on marsh, river, ford, rocky, boulder and
-  gravel ground.
-trees_shrubs: More shrubs
-trees_shrubs_tooltip: 'While the shrub with four more colours is chosen, a row above the Vegetation menu offers
-
-  all five of them.
-
-  '
-trees_sorted_rows: Tidy the Vegetation menu's rows
-trees_sorted_rows_tooltip: 'Moves the shrub from the top row to the bottom row and sorts the bottom row''s shrubs,
-  so
-
-  the top row holds the trees (and the apple tree and the check box) and the bottom row all
-
-  the shrubs.
-
-  '
-trees_spread_order: Trees in spreading order
-trees_spread_order_tooltip: 'In the Vegetation menu the trees that spread on fertile ground (oasis grass, thick
-  and thin
-
-  scrub) come first, then the tree that spreads on infertile ground (dirt, stony dirt, dunes): the
-
-  third and fourth tree swap places.
-
-  '
-trees_spread_outlines: Outlines for spreading ground
-trees_spread_outlines_tooltip: 'A thin green outline round the trees that spread on fertile ground and a thin beige
-  outline
-
-  round the tree that spreads on infertile ground. The apple tree does not spread and gets none.
-
-  '
-undo_enabled: Undo and redo
-undo_enabled_tooltip: 'Two arrow buttons in the top left corner of the map editor: the left one takes back the last
-
-  thing done on the map - placing, removing, painting, heights - and the right one puts it
-
-  back, for up to 20 steps. A button is greyed out while there is nothing to take back or put
-
-  back. Every click is one step, and so is a brush stroke held down. Clicks that change
-
-  nothing on the map (with no tool chosen, for example) make no step. Loading another map
-
-  starts the history afresh.
-
-  '
-undo_group: Undo and redo
-undo_group_descr: 'Undo and redo buttons in the map editor''s top left corner.
-
-  '
-water_decorations: Foam and small waves
-water_decorations_tooltip: 'Brings back two river decorations from the first Stronghold''s editor, which Crusader
-  still
-
-  supports but has no buttons for: Foam (white water and rising spray, as below a waterfall,
-
-  on every river tile under the brush) and Small waves (on the one river tile under the
-
-  mouse). Both only go on river tiles and are saved in the map.
-
-  '
-water_foam_on_sea: Foam on the ocean too
-water_foam_on_sea_tooltip: 'Foam can also be laid on ocean tiles, which then become river with foam (with the foam
-
-  setting on).
-
-  '
-water_group: Water
-water_group_descr: 'The water menu of the landscape editor.
-
-  '
-qol: Quality of Life
+menu_group: منوی ویرایشگر
+menu_group_descr: |-
+  نحوهٔ ترسیم منوی ویرایشگر در پایین صفحه.
+menu_dust_clouds: جلوگیری از کرش بازی بر اثر ابرهای گردوغبار
+menu_dust_clouds_tooltip: |-
+  ابر گردوغباری که دادهٔ حرکتش از دست رفته بود باعث تقسیم بر صفر و کرش بازی می‌شد. با این گزینه چنین ابری سر جای خود می‌ماند.
+menu_always_update: به‌روز نگه داشتن همیشگی منو
+menu_always_update_tooltip: |-
+  بازی منو را تنها وقتی ماوس رویش است دوباره رسم می‌کند. تغییرات بیرونی مانند میانبر تغییر ابزار یا تغییر شمارنده هنگام گذاشتن حیوانات تا وقتی ماوس به منو برنگردد نمایش داده نمی‌شوند. با این گزینه منو پیوسته در ویرایشگر نقشه بازترسیم می‌شود.
+castle_all_players: هر هشت سپر بازیکن در همهٔ نقشه‌ها
+castle_all_players_tooltip: |-
+  سپرهای کنار نقشهٔ کوچک در همهٔ انواع نقشه هر هشت بازیکن را نشان می‌دهند، نه فقط در نقشه‌های چندنفره.
+castle_all_keeps: عمارت اربابی و دژ بزرگ در همهٔ نقشه‌ها
+castle_all_keeps_tooltip: |-
+  منوی دژها عمارت اربابی و دژ بزرگ را در نقشه‌های چندنفره نیز ارائه می‌دهد.
+castle_player_zero: سپر بازیکن ۰
+castle_player_zero_tooltip: |-
+  نهمین سپر سفید در میانهٔ سپرهای بازیکنان، بازیکن ۰ را انتخاب می‌کند که او هم می‌تواند مالک ساختمان‌ها و واحدها در نقشه باشد.
+castle_keep_crests: نشان‌های دژ مرکزی فعال
+castle_keep_crests_tooltip: |-
+  هر دژ مرکزی سپر مالکش را بالای خود نشان می‌دهد و دژ فعال بازیکن (جایی که لرد، نیروهای آغازین و دهقانان جدید ظاهر می‌شوند) قاب‌دار است. کلیک روی یک سپر آن دژ را فعال می‌کند و کلیک روی سپر فعال بازیکن را بدون دژ فعال می‌گذارد. دژ جدید دیگر خودکار جای فعال را نمی‌گیرد و هنگام حذف دژ فعال، دژ دیگری از همان بازیکن جایگزین می‌شود. انبار کالای اصلی همیشه دنباله‌رو دژ فعال است (بازی قبلاً اولین انبار گذاشته‌شده را نگه می‌داشت که در حالت چند دژ باعث مسدود شدن محل قلعهٔ هوش مصنوعی می‌شد). نیازمند «چند دژ مرکزی برای هر بازیکن».
+castle_keep_crest_tooltip: راهنمای نشان دژ مرکزی
+castle_keep_crest_tooltip_tooltip: |-
+  بردن ماوس روی نشان دژ مرکزی معنای آن و اثر کلیک را توضیح می‌دهد. نیازمند «نشان‌های دژ مرکزی فعال».
+castle_wall_tools: ارتفاع دیوارها و کنگره‌های آزاد
+castle_wall_tools_tooltip: |-
+  کنگره‌ها می‌توانند مستقل بایستند. پنلشان گزینه‌های کوتاه، بلند، کوتاه آسیب‌دیده و بلند آسیب‌دیده را ارائه می‌دهد. لغزنده‌ای بالای پنل دیوارها ارتفاع دیوارهای بلند، کوتاه و کنگره‌ها (۰ تا ۲۵۵) و شیب پله‌ها (۰ تا ۱۶) را جداگانه تنظیم می‌کند؛ دکمهٔ بازنشانی کنار آن مقدار معمول را برمی‌گرداند و خروج از ویرایشگر همه را بازنشانی می‌کند.
+trees_spread_order: مرتب‌سازی درختان به ترتیب زمینِ گسترش
+trees_spread_order_tooltip: |-
+  در منوی پوشش گیاهی ابتدا درختانی که در زمین حاصل‌خیز (علف واحه، بوته‌زار انبوه و تنک) گسترش می‌یابند می‌آیند و سپس درختِ زمین غیرحاصل‌خیز (خاک، خاک سنگی، تپهٔ شنی): درخت سوم و چهارم جابه‌جا می‌شوند.
+trees_spread_outlines: حاشیه برای نوع زمینِ گسترش
+trees_spread_outlines_tooltip: |-
+  یک حاشیهٔ نازک سبز دور درختان زمین حاصل‌خیز و حاشیهٔ نازک بژ دور درخت زمین غیرحاصل‌خیز می‌کشد. درخت سیب گسترش نمی‌یابد و حاشیه ندارد.
+herds_bird_bins: دکمه‌های پاک کردن همهٔ کلاغ‌ها / مرغ‌های دریایی
+herds_bird_bins_tooltip: |-
+  دکمه‌های سطل زبالهٔ قرمز در سمت راست دکمه‌های کلاغ و مرغ دریایی در منوی حیوانات: با یک کلیک همهٔ کلاغ‌ها (درختان می‌مانند) یا همهٔ مرغ‌های دریایی را از نقشه حذف می‌کنند.
+herds_animal_bin: دکمهٔ پاک کردن همهٔ حیوانات
+herds_animal_bin_tooltip: |-
+  دکمهٔ سطل زبالهٔ قرمز در سمت راست منوی حیوانات که مانند Alt + E همهٔ حیوانات را از نقشه حذف می‌کند. کلاغ‌ها و مرغ‌های دریایی می‌مانند.
+herds_group_warning: هشدار گله‌ها و گروه‌ها
+herds_group_warning_tooltip: |-
+  وقتی کمتر از ۲۰۰ گله و گروه دیگر قابل ساخت باشد، سطری در بالای صفحه تعداد باقی‌مانده را مانند سطر واحدهای بازی اعلام می‌کند.
+eraser_choice: پنل انتخاب پاک‌کن
+eraser_choice_tooltip: |-
+  هنگام انتخاب پاک‌کن، پنلی بالای منو مشخص می‌کند چه چیزی پاک شود: همه (مثل قبل)، حیوانات (همراه کلاغ‌ها و مرغ‌های دریایی)، واحدها، ساختمان‌ها (با دژها، ویرانه‌ها و دیوارها)، پوشش گیاهی یا صخره‌ها (شامل صخره‌های نامرئی).
+eraser_seagulls: پاک‌کن مرغ‌های دریایی را نیز حذف کند
+eraser_seagulls_tooltip: |-
+  پاک‌کن مرغ‌های دریایی در حال پرواز بر فراز خانه‌های پاک‌شده را هم حذف می‌کند (در حالت همه یا حیوانات).
+map_settings_show_locked: کادر «نمایش نقشه‌های قفل‌شده»
+map_settings_show_locked_tooltip: |-
+  کادر انتخاب «نمایش نقشه‌های قفل‌شده» در پنجرهٔ بارگذاری ویرایشگر. با تیک زدن آن، نقشه‌های قفل‌شده نیز بلافاصله در فهرست دیده می‌شوند.
+map_settings_button: دکمهٔ تنظیمات نقشه
+map_settings_button_tooltip: |-
+  دکمهٔ «تنظیمات نقشه» در صفحهٔ منوی نقشه، سمت راست دکمه‌های متوازن/نامتوازن و تهاجم/اقتصادی. منوی Alt + , را باز می‌کند.
+map_settings_menu: منوی گسترده‌تر تنظیمات نقشه
+map_settings_menu_tooltip: |-
+  منوی Alt + , دارای عنوان، تک‌نفره و چندنفره، چهار نوع نقشهٔ تک‌نفره (محاصره، تهاجم، اقتصادی، ساخت آزاد)، چهار اندازه به‌علاوهٔ سفارشی و لغزندهٔ اندازه (۱۰ تا ۴۰۰؛ هنگام رها کردن اعمال می‌شود)، متوازن، پادشاه تپه، قفل کردن نقشه و دکمهٔ بازگشت می‌شود.
+eraser_group: پاک‌کن
+eraser_group_descr: |-
+  آنچه پاک‌کن ویرایشگر چشم‌انداز حذف می‌کند.
+map_settings_group: تنظیمات نقشه
+map_settings_group_descr: |-
+  تنظیمات نقشه: نوع، اندازه، قفل و منوهای نمایش‌دهندهٔ آن‌ها.
+qol: بهبود تجربه بازی

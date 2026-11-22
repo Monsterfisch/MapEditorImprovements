@@ -1,355 +1,216 @@
-brushes_full_shape: Brushes with their full shape
-brushes_full_shape_tooltip: 'The game''s brushes count the tile under the mouse twice and leave out the tile that
-  should
-
-  be their top left corner, in the preview and when placing. With this on they have their
-
-  whole shape (in the map editor; the game''s own use of the same walk is left alone).
-
-  '
-brushes_group: Brushes
-brushes_group_descr: 'The brushes of the landscape editor.
-
-  '
-castle_all_keeps: Manor house and stronghold on every map
-castle_all_keeps_tooltip: The keeps menu offers the manor house and the stronghold on multiplayer maps too.
-castle_all_players: All eight player shields on every map
-castle_all_players_tooltip: The shields beside the minimap show all eight players on every map type, not only on
-  multiplayer maps.
-castle_barrier: Barrier in the Ruins menu
-castle_barrier_tooltip: 'Adds a Barrier button in the free spot at the bottom right of the Ruins menu: a 1x1 barrier
-
-  that can be deleted again.
-
-  '
-castle_building_counts: Building counts above the minimap
-castle_building_counts_tooltip: 'Shows above the minimap how many buildings the map has against the game''s limit
-  (every
-
-  building counts, including keeps, landscape buildings and the parts some buildings are made
-
-  of), how many player buildings all players have together, and how many the current player
-
-  has. Player buildings are the ones an enemy can be sent to destroy.
-
-  '
-castle_damaged_walls: Damaged walls and stairs
-castle_damaged_walls_tooltip: 'While the stairs, low wall, high wall or crenellated wall is chosen, a row above
-  the castle
-
-  buildings menu offers it "Damaged": the walls you place get the top of a damaged wall (they
-
-  keep their height). Choosing the wall in the menu places undamaged walls again.
-
-  '
-castle_group: Castle mode
-castle_group_descr: 'The building menu of the map editor''s castle mode.
-
-  '
-castle_hover_text: Building names further left
-castle_hover_text_tooltip: 'The name of the building under the mouse ("Player 1''s Keep") moves 100 pixels to the
-  left,
-
-  so it no longer runs into the building counts above the minimap.
-
-  '
-castle_keep_crest_tooltip: Keep crest tooltip
-castle_keep_crest_tooltip_tooltip: Hovering over a keep crest shows what it means and what a click on it does. Needs
-  Active keep crests.
-castle_keep_crests: Active keep crests
-castle_keep_crests_tooltip: Every keep shows its owner's shield above it; the player's active keep (where the lord,
-  the starting units and new peasants appear) shows it framed. Click a shield to make that keep active, or click
-  the active one to leave the player without one. A new keep no longer takes over the active keep, and when the
-  active keep is removed another keep of that player takes over. The player's main stockpile always follows the
-  active keep (the game kept the first stockpile ever placed, so with several keeps the AI found its castle spot
-  blocked and used no castle plan). Needs Several keeps.
-castle_keep_parts: Keep without campfire or stockpile
-castle_keep_parts_tooltip: 'While one of the keeps is chosen, a row above the keeps menu offers it placed in two
-  more
-
-  ways: "Keep only" (the keep and its entrance, no campfire area and no stockpile) and "No
-
-  stockpile" (keep, entrance and campfire area). Choosing a keep in the menu places the whole
-
-  keep again.
-
-  The preview and the check for room show only those parts.
-
-  '
-castle_moat_kinds: Dug, planned and permanent moat
-castle_moat_kinds_tooltip: 'While the moat is chosen in the gatehouses menu, a row above the menu offers it three
-  ways:
-
-  Dug (the editor''s usual moat), Planned (moat marked out to be dug, as in a game) and
-
-  Permanent (dug moat that nobody can fill in or delete in a game). Choosing the moat in the
-
-  menu goes back to dug moat.
-
-  '
-castle_moat_on_marsh: Moat on marsh
-castle_moat_on_marsh_tooltip: 'In the map editor moat can be placed on marsh again. The marsh stays under it, so
-  it comes
-
-  back when the moat is filled in.
-
-  '
-castle_moat_removal_keeps_ground: Removing moat keeps the ground
-castle_moat_removal_keeps_ground_tooltip: 'The editor''s "remove moat" only changes tiles with dug or planned moat:
-  it takes the moat
-
-  away (dug moat gets the normal ground height back) and leaves the ground''s texture alone.
-
-  Without this it turns every tile under the brush into plain dirt.
-
-  '
-castle_player_zero: Player 0 shield
-castle_player_zero_tooltip: A white ninth shield in the middle of the player shields chooses player 0, who can own
-  buildings and units on a map too.
-castle_ruined_cathedral: Ruined cathedral
-castle_ruined_cathedral_tooltip: 'While the cathedral is chosen, a row above the town menu offers it "Ruined": the
-  cathedral you
-
-  place gets the ruined picture the game otherwise shows only in one historical mission. In a
-
-  game it is still a whole, working cathedral that just looks ruined. Choosing the cathedral in
-
-  the menu places normal ones again. The pipette takes a ruined cathedral as ruined. Needs the
-
-  game''s own tile_churches.gm1 (older copies have no ruin in it; then cathedrals stay whole).
-
-  '
-castle_several_keeps: Several keeps per player
-castle_several_keeps_tooltip: 'Placing a keep no longer removes the player''s earlier keep (and its campfire). The
-  newest
-
-  keep is the player''s active one, the others stay as buildings.
-
-  '
-castle_several_storage: Several storage and recruitment buildings
-castle_several_storage_tooltip: 'Barracks, mercenary posts, guilds and the other buildings a player has only one
-  of are no
-
-  longer removed when another one is placed, and further stockpiles, granaries and armouries
-
-  need not touch the first one. Any number of them may also be empty (the game allows only 8
-
-  empty granaries or armouries and 32 empty stockpiles).
-
-  '
-castle_statues: Statue and shrines
-castle_statues_tooltip: 'Adds the unused 2x2 statue, 2x2 shrine and 1x1 shrine: at the end of the statue''s and
-  the
-
-  shrine''s variants (see "Building variants"), or, with those off, in a row above the menu of
-
-  good things.
-
-  '
-castle_tower_engines: Tower mangonels and ballistae anywhere
-castle_tower_engines_tooltip: 'The tower mangonel and tower ballista of the army buildings menu can be put wherever
-  a unit
-
-  could be put (the ground, walls, gates, towers, the keep), not only on the player''s own square
-
-  and round towers: on the clicked tile, one to a tile, up to 4 on a keep or large gatehouse and
-
-  8 on the large stronghold keeps. The preview is solid wherever a click places one.
-
-  '
-castle_tower_ruins: Tower ruins
-castle_tower_ruins_tooltip: 'While the Towers menu is open, a row above it offers the ruins of the five towers.
-
-  '
-castle_tunnel_and_tents: Tunnel entrance and siege tents
-castle_tunnel_and_tents_tooltip: 'In the army buildings menu: with the tunnelers'' guild chosen, a row above the
-  menu offers a
-
-  tunnel entrance; with the engineers'' guild chosen, the six siege tents.
-
-  '
-castle_variant_panels: Building variants
-castle_variant_panels_tooltip: 'While a garden, statue, shrine or cesspit is chosen, a row above the menu offers
-  each of its
-
-  variants; one chosen there stays chosen instead of turning into the next one every second.
-
-  The same for the hovel: a variant chosen above the town menu is placed every time instead of
-
-  the player''s next one. Choosing the building in the menu itself goes back to the game''s way.
-
-  The pipette takes the exact variant too.
-
-  '
-castle_wall_tools: Wall heights and free crenellations
-castle_wall_tools_tooltip: Crenellations can stand on their own. Their panel offers low, high, low damaged and high
-  damaged. A slider above the wall panel sets the height of high walls, low walls and crenellations (0-255) and
-  the steepness of stairs (0-16), each on its own; Reset beside it gives the chosen one its usual value back, and
-  leaving the map editor puts them all back.
-counts_enabled: Show map counts
-counts_enabled_tooltip: 'Point at the Animals, Vegetation or Rocks button for a tooltip with the count and the
-
-  game''s limit, for example "Trees and shrubs: 812/1999". The Animals tooltip also shows the
-
-  herds and troops, which have a limit of their own.
-
-  In the Animals menu, the deer, camel, rabbit and lion buttons show how many of each there
-
-  are; in the Vegetation menu, every tree and shrub button shows how many of that plant there
-
-  are.
-
-  A red "i" button above the key button switches all of this on and off while you work.
-
-  '
-counts_group: Map counts
-counts_group_descr: 'Shows in the landscape editor how many animals, trees and rocks the map has, and how close
-
-  it is to the game''s limits.
-
-  '
-counts_shown: Numbers shown when the editor opens
-counts_shown_tooltip: 'Off: the numbers start hidden, and the "i" button brings them up.
-
-  '
-eraser_choice: Eraser choice panel
-eraser_choice_tooltip: 'While the eraser is chosen, a panel above the menu picks what it takes: All (as before),
-
-  Animals (also crows and seagulls), Units, Buildings (with keeps, ruins and walls), Vegetation or
-
-  Rocks (also invisible rocks).
-
-  '
-eraser_group: Eraser
-eraser_group_descr: 'What the landscape editor''s eraser takes.
-
-  '
-eraser_seagulls: Eraser takes seagulls
-eraser_seagulls_tooltip: 'The eraser also takes the seagulls flying over the tiles it erases (with All or Animals).
-
-  '
-heights_group: Heights
-heights_group_descr: 'The height tools of the landscape editor.
-
-  '
-heights_invert_key: Key to invert equalize
-heights_invert_key_on: Hold to invert equalize
-heights_invert_key_on_tooltip: 'While this key is held with the equalize tool chosen, equalize roughens the ground
-  (as with
-
-  Invert ticked); let go and it smooths again.
-
-  '
-heights_invert_key_tooltip: 'The key to hold for inverting the equalize tool.
-
-  '
-heights_max_height: Max Height button
-heights_max_height_tooltip: 'Brings back the first Stronghold''s Max Height tool, right of Min Height in the Heights
-  menu:
-
-  it sets the ground under the brush to height 156. Crusader still has the tool and its button
-
-  pictures, only the button was taken out.
-
-  '
-heights_tool_options: Height tool options
-heights_tool_options_tooltip: 'While a height tool is chosen, a panel above the Heights menu offers (in rows from
-  the bottom):
-
-  - Reset ground textures (off at first): whether the height tools also turn the ground under
-
-  them back to its plain look (and the plateaus to dirt), as the game does. Off, they only
-
-  change the height.
-
-  - Break rock tiles (off at first): whether raise, lower, equalize, hill and mountain break the
-
-  rocks they touch the way the game does (the touched tiles turn invisible and walkable while the
-
-  rock stays). Off, rocks stay whole.
-
-  - Ignore water and Ignore farmland (off at first): the height tools leave sea, river, ford,
-
-  marsh and moat tiles, or scrub, thick scrub and oasis grass tiles, as they are.
-
-  - For raise, lower and equalize: Snap to range (on at first), Invert (equalize only), the
-
-  height range (8 to 156 at first; drag either end) and the strength. With Snap to range on,
-
-  tiles outside the range are brought into it, as the game does; off, they are left alone.
-
-  Invert makes equalize roughen the ground instead of smoothing it.
-
-  - Rock height changes (Whole rock at first): what the height tools do to a rock they touch.
-
-  Tile only moves just the tiles under the brush; Whole rock moves all of the rock''s tiles by the
-
-  same amount; Erase rock removes the rock, as min height always did.
-
-  The range, Snap to range, Invert and the ignore boxes go back to their defaults when you leave
-
-  the map editor.
-
-  '
-herds_animal_bin: Erase all animals button
-herds_animal_bin_tooltip: 'A red wastebin button on the right of the Animals menu that takes every animal off the
-  map,
-
-  like Alt + E. Crows and seagulls stay.
-
-  '
-herds_bird_bins: Erase all crows / seagulls buttons
-herds_bird_bins_tooltip: 'Red wastebin buttons right of the crow and the seagull button in the Animals menu: one
-  click
-
-  takes every crow (the trees stay) or every seagull off the map.
-
-  '
-herds_group: Herds
-herds_group_descr: 'The animals of the landscape editor.
-
-  '
-herds_group_warning: Herds and groups warning
-herds_group_warning_tooltip: 'When fewer than 200 herds and groups can still be made, a line at the top of the screen
-  says
-
-  how many are left, like the game''s own line for units.
-
-  '
-herds_panel: Herd panel
-herds_panel_tooltip: 'While the deer, lion, rabbit or camel is chosen, a panel above the Animals menu shows how
-
-  many animals a herd gets (a fixed part plus a random part) and which group behaviour type the herd
-
-  uses. Its check box makes herds as big as the brush: 2 x brush size - 1 animals (1 to 13),
-
-  with no random part.
-
-  '
-key_alt: Alt
-key_ctrl: Ctrl
-key_digit_0: '0'
-key_digit_1: '1'
-key_digit_2: '2'
-key_digit_3: '3'
-key_digit_4: '4'
-key_digit_5: '5'
-key_digit_6: '6'
-key_digit_7: '7'
-key_digit_8: '8'
-key_digit_9: '9'
-key_f1: F1
-key_f10: F10
-key_f11: F11
-key_f12: F12
-key_f2: F2
-key_f3: F3
-key_f4: F4
-key_f5: F5
-key_f6: F6
-key_f7: F7
-key_f8: F8
-key_f9: F9
+counts_group: Térképszámlálók
+counts_group_descr: |-
+  Megmutatja a tájszerkesztőben, hány állat, fa és szikla található a térképen, és mennyire közel vannak a játék korlátaihoz.
+counts_enabled: Térképszámlálók megjelenítése
+counts_enabled_tooltip: |-
+  Vidd az egeret az Állatok, Növényzet vagy Sziklák gombra, hogy tipp mutassa a darabszámot és a játék korlátját, például „Fák és bokrok: 812/1999”. Az Állatok tippje a csordákat és csoportokat is mutatja, amelyeknek saját korlátjuk van.
+  Az Állatok menüben a szarvas, teve, nyúl és oroszlán gombokon látható a darabszámuk; a Növényzet menüben minden fa- és bokorgombon szerepel az adott növény száma.
+  A kulcs gomb feletti piros „i” gomb munka közben is ki- és bekapcsolja ezt.
+counts_shown: Számok megjelenítése a szerkesztő megnyitásakor
+counts_shown_tooltip: |-
+  Ki: a számok alapból rejtve indulnak, és az „i” gombbal jeleníthetők meg.
+trees_group: Fák és bokrok
+trees_group_descr: |-
+  Több választási lehetőség növényzet elhelyezésekor a tájszerkesztőben.
+trees_growth: Az ecsetméret állítja a fa növekedési fokozatát
+trees_growth_tooltip: |-
+  A fák az ecsetméretnek megfelelő növekedési fokozatban kerülnek le: az 1-es ecset a legkisebb fákat helyezi le, a 4-es a kifejletteket (amit a szerkesztő egyébként mindig lerak), az 5-ös olyan kifejlett fákat, amelyeket a favágók egy ideig békén hagynak, a 6-os és 7-es pedig elszáradt fákat (a 7-es hamarabb elkorhad). A bokrokra nincs hatással.
+trees_apple: Almafa gomb
+trees_apple_tooltip: |-
+  Almafát ad a Növényzet menühöz. A képe az images/apple.png (valamint apple_hover.png és apple_selected.png) a modul mappájában; cseréld le őket, ha módosítani szeretnéd.
+trees_shrubs: Több bokor
+trees_shrubs_tooltip: |-
+  Amikor a négy további színnel rendelkező bokor van kiválasztva, a Növényzet menü feletti sor mind az öt színt felkínálja.
+trees_felled: Kidöntött fák
+trees_felled_tooltip: |-
+  Fa kiválasztásakor a Növényzet menü feletti sor felkínálja a fát állva (elsőként) és kidöntve, minden lehetséges rönkszámmal (kifejlett fánál 9-től 1-ig; a legkisebb fák 1 rönkkel dőlnek ki). Kattints egyre kidöntött fák lerakásához; kattints az álló fára, újra a kidöntöttre vagy a menübeli fára az álló fákhoz való visszatéréshez.
+trees_random_mix: Véletlen keverékek a fasorokban
+trees_random_mix_tooltip: |-
+  „?” jelű gombokat ad a Növényzet menü feletti sorokhoz:
+  - Véletlen fa (első a kidöntött fák sorában): a legkisebbtől az ecset méretéig minden növekedési fokozat véletlenszerűen keverve. A legkisebb és az elszáradt fáknál nem elérhető.
+  - Véletlen kidöntött fa (utolsó a kidöntött fák sorában): kidöntött fák véletlen rönkszámmal.
+  - Véletlen bokor (utolsó a bokrok sorában): az öt bokorszín véletlenszerű keveréke.
+  Kattints újra, vagy válassz másik gombot a keverés leállításához.
+trees_obstacles: Jelölőnégyzet akadályok melletti fákhoz
+trees_obstacles_tooltip: |-
+  Jelölőnégyzetet ad a Növényzet menü felső sorához. Bepipálva a fák közvetlenül épületek, sziklák, falak és más fák mellé is helyezhetők, amitől a játék egyébként távol tartja őket (bokrok eleve állhatnak ott). Mutass rá az állapot megtekintéséhez.
+trees_rocks_and_water: Jelölőnégyzet sziklákra és vízre kerülő növényzethez
+trees_rocks_and_water_tooltip: |-
+  Jelölőnégyzet a Növényzet menü jobb oldalán, az akadályok melletti fáké alatt (kezdetben kikapcsolva). Bepipálva fák és bokrok mocsárra, folyóra, gázlóra, sziklás talajra, sziklatömbökre és kavicsra is helyezhetők.
+trees_sorted_rows: A Növényzet menü sorainak rendezése
+trees_sorted_rows_tooltip: |-
+  Átteszi a felső sorból a bokrot az alsó sorba, és rendezi az alsó sor bokrait, így felül a fák (az almafával és a jelölőnégyzettel), alul pedig az összes bokor szerepel.
+trees_preview: Fa-előnézet
+trees_preview_tooltip: |-
+  Fa vagy bokor kiválasztásakor az egér alatti mezőn megjelenik a lehelyezendő fa az ecset szerinti fokozatban (vagy kidöntve a megfelelő rönkszámmal), pontosan úgy, ahogy a játék kirajzolja. Kicsinyített nézetben nem látszik.
+trees_no_stacking: Ne halmozódjanak a bokrok
+trees_no_stacking_tooltip: |-
+  Többé nem helyezhető fa vagy bokor olyan mezőre, amelyen már van egy. Egyes bokrok (a felső sor bokra és a mellé rendezett négy másik) korábban láthatatlanul egymásra halmozódtak, végleg elfoglalva a fakapacitást. A radír mostantól egy mező összes egymásra halmozott bokrát törli, így a régi halmok is megtisztíthatók.
+textures_group: Talajtextúrák
+textures_group_descr: |-
+  A tájszerkesztő Textúrák menüje.
+textures_gravel_and_iron: Kavics és vas a Textúrák menüben
+textures_gravel_and_iron_tooltip: |-
+  Kaviccsal bővíti a felső sort és vassal az alsót, egyenletesen elosztva mindkét sort. A kavics képe az images/gravel.png (valamint gravel_hover.png és gravel_selected.png).
+textures_no_heights_iron: Vas csak a Textúrák menüben
+textures_no_heights_iron_tooltip: |-
+  Eltávolítja a vas gombot a Magasságok menüből, mivel a Textúrák menüben már van.
+textures_mask: Maszk gomb
+textures_mask_tooltip: |-
+  Maszk gombot (félig kitöltött négyzet) ad a tájszerkesztő menüjének bal felső sarkába. Bekapcsolva a természeti eszközök (magasságok, textúrák, víz, fák és bokrok, sziklák és pipetta) csak azokat a mezőket módosítják, amelyek textúrája megegyezik az először kattintott mezőével; az egérgomb elengedése után a következő kattintás új céltextúrát választ.
+textures_mask_by_type: A maszk egynek tekinti a vízvariánsokat
+textures_mask_by_type_tooltip: |-
+  A maszk csak az azonos textúrájú mezőket engedi át (fű, bozót, sűrű bozót, kövek, part… mind különálló). Bekapcsolva egy víztípus variánsai egynek számítanak: a teljes tenger szélekkel és mély részekkel együtt, a teljes folyó habbal, hullámokkal és vízesésszélekkel, illetve az összes gázló. A tenger, a folyó és a gázló külön marad.
+water_group: Víz
+water_group_descr: |-
+  A tájszerkesztő Víz menüje.
+water_decorations: Hab és kis hullámok
+water_decorations_tooltip: |-
+  Visszahoz két folyódíszt az első Stronghold szerkesztőjéből, amelyet a Crusader még támogat, de gombjai nincsenek hozzá: Hab (fehér tajték és permet, mint vízesés alatt, az ecset alatti minden folyómezőre) és Kis hullámok (az egér alatti egyetlen folyómezőre). Mindkettő csak folyóra tehető és a térképpel mentődik.
+water_foam_on_sea: Hab a tengerre is
+water_foam_on_sea_tooltip: |-
+  A hab tengermezőkre is helyezhető, amelyek ekkor habos folyóvá alakulnak (ha a hab opció be van kapcsolva).
+rocks_group: Sziklák
+rocks_group_descr: |-
+  A tájszerkesztő Sziklák menüje.
+rocks_signpost: Útjelző tábla a csetepaté térképek Sziklák menüjében
+rocks_signpost_tooltip: |-
+  A csetepaté térképek ugyanazt a Sziklák menüt kapják, mint a küldetéstérképek, az útjelző tábla gombbal együtt.
+rocks_random_preview: Véletlen forgatás az előnézetben
+rocks_random_preview_tooltip: |-
+  Véletlen forgatásnál a játék túl gyorsan forgatja a sziklát ahhoz, hogy az előnézet kövesse. Bekapcsolva másodpercenként egyszer fordul, így az előnézet pontosan a lehelyezendő sziklát mutatja.
+rocks_variants: Sziklavariánsok sora
+rocks_variants_tooltip: |-
+  A Sziklák menü feletti sor a választott sziklaméret négy variánsát mutatja a lehelyezési tájolásban. Kattints egyre, hogy csak azt rakja le; újabb kattintás rá vagy bármely Sziklák menügombra visszaállítja a váltakozást.
+rocks_extra_rock: Extra kis szikla
+rocks_extra_rock_tooltip: |-
+  A legkisebb szikláknál a variánssor egy ötödiket is kínál: egy kis sziklát, amely benne van a játékban, de a szerkesztő sosem helyezi le. Úgy mentődik, mint bármely másik szikla.
+rocks_invisible: Láthatatlan sziklák jelölőnégyzet
+rocks_invisible_tooltip: |-
+  Jelölőnégyzetet ad a Sziklák menü gombjaitól jobbra. Bepipálva minden lerakott szikla rögtön „láthatatlan szikla” lesz, anélkül hogy előbb 4000 sziklát kellene lerakni: a mezők foglaltak (nem építhető és nem járható), de nem rajzolódik ki szikla, így a korábbi felszín marad látható (a „2k kő trükk”). Vedd ki a pipát a rendes sziklákhoz.
+rocks_erase_invisible: A radír törli a láthatatlan sziklákat
+rocks_erase_invisible_tooltip: |-
+  A tájradír (és a vele sziklát törlő eszközök) a láthatatlan sziklák mezőit is felszabadítja, akárcsak a rendes sziklákét. Enélkül minden mezőnél az akadályt figyelmen kívül hagyó bokor lerakása és törlése kellene.
+rocks_remove_lost: Elveszett sziklák eltávolítása gomb
+rocks_remove_lost_tooltip: |-
+  „Elveszett sziklák eltávolítása” gombot ad a Sziklák menü jobb alsó sarkába. Az emelés/süllyesztés által megtört szikla, amelynek minden mezőjét később bokrok fedték el, mező nélkül marad a térkép sziklalistájában: nem látható és nem törölhető, de foglal egyet a 4000 helyből. A gomb minden ilyen bejegyzést eltávolít a listából a mezők megváltoztatása nélkül.
+heights_group: Magasságok
+heights_group_descr: |-
+  A tájszerkesztő magasságeszközei.
+heights_max_height: Maximális magasság gomb
+heights_max_height_tooltip: |-
+  Visszahozza az első Stronghold Maximális magasság eszközét a Minimális magasságtól jobbra: az ecset alatti talajt 156-os magasságra emeli. A Crusaderben az eszköz és a gombképek megmaradtak, csak a gomb hiányzott.
+heights_tool_options: Magasságeszköz-beállítások
+heights_tool_options_tooltip: |-
+  Magasságeszköz kiválasztásakor a Magasságok menü feletti panel (alulról felfelé) felkínálja:
+  - Talajtextúrák visszaállítása (kezdetben ki): visszaállítsák-e az eszközök a talajt alapszínére (a fennsíkokat földre), mint a játékban. Kikapcsolva csak a magasságot módosítják.
+  - Sziklamezők törése (kezdetben ki): megtörjék-e az emelés, süllyesztés, kiegyenlítés, domb és hegy eszközök az érintett sziklákat, mint a játékban (az érintett mezők láthatatlanná és járhatóvá válnak, miközben a szikla megmarad). Kikapcsolva a sziklák épek maradnak.
+  - Víz mellőzése és Termőföld mellőzése (kezdetben ki): érintetlenül hagyja a tenger, folyó, gázló, mocsár és várárok, illetve a bozót, sűrű bozót és oázisfű mezőket.
+  - Emeléshez, süllyesztéshez és kiegyenlítéshez: Tartományhoz igazítás (kezdetben be), Megfordítás (csak kiegyenlítés), magasságtartomány (kezdetben 8–156; mindkét vége húzható) és erősség. Tartományhoz igazítással a tartományon kívüli mezők behúzódnak bele; kikapcsolva érintetlenek maradnak. A Megfordítás simítás helyett érdesíti a talajt.
+  - Sziklamagasság változása (kezdetben Egész szikla): mit tegyenek az eszközök egy érintett sziklával. Csak mező csak az ecset alatti mezőket mozgatja; Egész szikla a szikla minden mezőjét együtt; Szikla törlése eltávolítja a sziklát, mint a minimális magasság.
+  A tartomány, az igazítás, a megfordítás és a mellőzés dobozok a szerkesztőből kilépve visszaállnak alapértelmezettre.
+heights_invert_key_on: Tartsd lenyomva a kiegyenlítés megfordításához
+heights_invert_key_on_tooltip: |-
+  Ha ezt a billentyűt lenyomva tartod a kiegyenlítés eszköznél, a talajt érdesíti (mintha a Megfordítás be lenne pipálva); elengedve ismét simít.
+heights_invert_key: Billentyű a kiegyenlítés megfordításához
+heights_invert_key_tooltip: |-
+  A kiegyenlítés eszköz megfordításához lenyomva tartandó billentyű.
+castle_group: Vármód
+castle_group_descr: |-
+  A térképszerkesztő vármódjának építési menüje.
+castle_building_counts: Épületszámlálók a minitérkép felett
+castle_building_counts_tooltip: |-
+  Megmutatja a minitérkép felett a térkép összes épületét a játék korlátjához képest (minden beleszámít, beleértve a vártornyokat, tájépületeket és épületrészeket), az összes játékos épületeinek számát és az aktuális játékosét. Játékosépület minden olyan épület, amelyet ellenség lerombolhat.
+castle_tower_ruins: Toronyromok
+castle_tower_ruins_tooltip: |-
+  A Tornyok menü megnyitásakor a felette lévő sor felkínálja az öt torony romjait.
+castle_tunnel_and_tents: Alagútbejárat és ostromsátrak
+castle_tunnel_and_tents_tooltip: |-
+  A katonai épületek menüjében: az alagútásók céhének kiválasztásakor egy alagútbejárat, a mérnökök céhénél pedig a hat ostromsátor jelenik meg a menü feletti sorban.
+castle_statues: Szobor és szentélyek
+castle_statues_tooltip: |-
+  Hozzáadja a fel nem használt 2×2-es szobrot, 2×2-es szentélyt és 1×1-es szentélyt: a szobor és szentély variánsainak végére (lásd „Épületvariánsok”), vagy ha azok ki vannak kapcsolva, a jó dolgok menüje feletti sorba.
+castle_barrier: Korlát a Romok menüben
+castle_barrier_tooltip: |-
+  Korlát gombot ad a Romok menü jobb alsó szabad helyére: egy később törölhető 1×1-es akadályt.
+castle_several_keeps: Több vártorony játékosonként
+castle_several_keeps_tooltip: |-
+  Új vártorony lerakása többé nem törli a játékos korábbi vártornyát (és tábortüzét). A legújabb lesz a játékos aktív vártornya, a többi épületként megmarad.
+castle_several_storage: Több raktár- és toborzóépület
+castle_several_storage_tooltip: |-
+  A kaszárnyák, zsoldostáborok, céhek és egyéb, rendesen egyedüli épületek nem törlődnek újabb lerakásakor, a további raktáraknak, magtáraknak és fegyvertáraknak pedig nem kell érintkezniük az elsővel. Bármennyi maradhat üresen is (a játék amúgy csak 8 üres magtárat/fegyvertárat és 32 üres raktárat enged).
+castle_tower_engines: Torony-kővetőgépek és balliszták bárhová
+castle_tower_engines_tooltip: |-
+  A katonai menü torony-kővetőgépe és toronyballisztája bárhová lerakható, ahol egység állhat (talaj, falak, kapuk, tornyok, vártorony), nem csak a játékos saját szögletes és kerek tornyaira: a kattintott mezőre, mezőnként egy, legfeljebb 4 vártoronyra vagy nagy kapuházra és 8 a nagy erőd-vártornyokra. Az előnézet minden érvényes helyen tömör.
+castle_keep_parts: Vártorony tábortűz vagy raktár nélkül
+castle_keep_parts_tooltip: |-
+  Vártorony kiválasztásakor a felette lévő sor két további módot kínál: „Csak vártorony” (vártorony és bejárat, tábortűz és raktár nélkül) és „Raktár nélkül” (vártorony, bejárat és tábortűzhely). A menüből választva ismét a teljes vártorony kerül le.
+  Az előnézet és a helyellenőrzés csak ezeket a részeket vizsgálja.
+castle_hover_text: Épületnevek balrább
+castle_hover_text_tooltip: |-
+  Az egér alatti épület neve („1. játékos vártornya”) 100 pixellel balrább kerül, így nem ütközik a minitérkép feletti épületszámlálókkal.
+castle_damaged_walls: Sérült falak és lépcsők
+castle_damaged_walls_tooltip: |-
+  Lépcső, alacsony fal, magas fal vagy pártázat kiválasztásakor a várépületek menüje feletti sor felkínálja a „Sérült” változatot: a lerakott falak sérült fal tetejét kapják megőrzött magassággal. A menüből választva ismét ép falak kerülnek le.
+castle_variant_panels: Épületvariánsok
+castle_variant_panels_tooltip: |-
+  Kert, szobor, szentély vagy pöcegödör kiválasztásakor a menü feletti sor megjeleníti minden variánsát; az ott választott változat rögzítve marad a másodpercenkénti váltás helyett. Ugyanez működik a kunyhónál a városmenü felett. A menüből választva visszatér az eredeti működés. A pipetta is a pontos variánst veszi fel.
+castle_ruined_cathedral: Romos katedrális
+castle_ruined_cathedral_tooltip: |-
+  Katedrális kiválasztásakor a városmenü feletti sor felkínálja „Romos” változatban: a lerakott katedrális azt a romos képet kapja, amelyet a játék amúgy csak egy történelmi küldetésben mutat. A játékban teljesen működő katedrális marad, csak romosnak látszik. A menüből választva ismét ép katedrális kerül le. A pipetta romosként veszi fel. Az eredeti tile_churches.gm1 szükséges hozzá (régebbi verziókban nincs rom, így a katedrális ép marad).
+castle_moat_kinds: Kiásott, tervezett és állandó várárok
+castle_moat_kinds_tooltip: |-
+  Várárok kiválasztásakor a kapuházak menüje feletti sor három típust kínál: Kiásott (a szerkesztő szokásos árka), Tervezett (kiásásra kijelölt árok, mint játék közben) és Állandó (kiásott árok, amelyet játékban senki nem temethet be és nem törölhet). A menüből választva visszaáll a kiásott árok.
+castle_moat_on_marsh: Várárok mocsárra
+castle_moat_on_marsh_tooltip: |-
+  A térképszerkesztőben ismét helyezhető várárok mocsárra. A mocsár alatta marad, így az árok betemetésekor visszatér.
+castle_moat_removal_keeps_ground: Az árok eltávolítása megőrzi a talajt
+castle_moat_removal_keeps_ground_tooltip: |-
+  A szerkesztő „várárok eltávolítása” eszköze csak a kiásott vagy tervezett várárkos mezőket módosítja: eltávolítja az árkot (visszaadva a rendes talajmagasságot) és békén hagyja a talajtextúrát. Enélkül az ecset alatti minden mező sima földdé válik.
+herds_group: Csordák
+herds_group_descr: |-
+  A tájszerkesztő állatai.
+herds_panel: Csordapanel
+herds_panel_tooltip: |-
+  Szarvas, oroszlán, nyúl vagy teve kiválasztásakor az Állatok menü feletti panel mutatja, hány állatból áll egy csorda (fix + véletlen rész) és milyen csoportos viselkedést használ. A jelölőnégyzettel a csordaméret az ecsethez igazodik: 2 × ecsetméret − 1 állat (1-től 13-ig), véletlen rész nélkül.
+brushes_group: Ecsetek
+brushes_group_descr: |-
+  A tájszerkesztő ecsetei.
+brushes_full_shape: Teljes alakú ecsetek
+brushes_full_shape_tooltip: |-
+  A játék ecsetei kétszer számolják az egér alatti mezőt, és kihagyják a bal felső sarokmezőt az előnézetben és a lerakáskor is. Bekapcsolva teljes alakjuk lesz (csak a térképszerkesztőben; a játék belső használata változatlan).
+undo_group: Visszavonás és újra
+undo_group_descr: |-
+  Visszavonás és újra gombok a térképszerkesztő bal felső sarkában.
+undo_enabled: Visszavonás és újra
+undo_enabled_tooltip: |-
+  Két nyílgomb a térképszerkesztő bal felső sarkában: a bal visszavonja a térkép utolsó módosítását (elhelyezés, törlés, festés, magasságok), a jobb visszaállítja, legfeljebb 20 lépésig. A gomb elszürkül, ha nincs mit visszavonni vagy újra végrehajtani. Minden kattintás egy lépés, akárcsak egy lenyomva tartott ecsetvonás. A térképet nem módosító kattintások nem hoznak létre lépést. Másik térkép betöltése újraindítja az előzményeket.
+pipette_group: Pipetta
+pipette_group_descr: |-
+  Pipetta a tájszerkesztő bal oszlopában, az ecsetméret felett: felveszi egy mező magasságát és/vagy textúráját, és átadja az ecset alatti mezőknek.
+pipette_enabled: Pipetta
+pipette_enabled_tooltip: |-
+  Pipetta gombot ad az ecsetméret fölé (az ecsetméret, a vonalzó és a radír kissé lejjebb kerül).
+  Kiválasztásakor egy sor jelenik meg a menü felett — Magasságok, Textúrák, Objektumok, Mind — és felette a pipetta tartalma. Kattints egy mezőre a felvételhez (a pipetta egyetlen mezőt mutat), majd kattints vagy húzd az ecsetet az átadáshoz. A Magasságok békén hagyja a textúrát, a Textúrák a magasságot. Az Objektumok felveszi a mező épületét, falát, fáját vagy szikláját: az épületek és falak ugyanúgy rakhatók le az eredeti játékosnak (annak címere kiválasztódik), a fák (azonos fajta és fokozat vagy kidöntött rönkszám) és sziklák (azonos fajta és forgatás) pedig saját eszközeik módján, húzással is. A Mind egy fát vagy 1×1-es sziklát is felvesz és minden ecset alatti mezőre letesz belőle. A pipetta vagy valamelyik módjának újbóli kiválasztása kiüríti azt.
+  Magasság nem adható tengerre, partra, mocsárra, várárokra, sziklákra, falakra és épületekre; textúra nem adható sziklákra, falakra és épületekre. A meredek peremeken lévő szirtkövek törlődnek és visszajönnek, ahol a perem meredek marad. A visszavonás a pipettára is működik.
+pipette_select_key_on: Pipettabillentyű
+pipette_select_key_on_tooltip: |-
+  Billentyű, amely kiválasztja (és kiüríti) a pipettát. Ha a pipetta már aktív, újabb lenyomásra a következő módra lép: Magasságok, Textúrák, Objektumok, Mind.
+pipette_select_key: Billentyű a pipettához
+pipette_select_key_tooltip: |-
+  A pipettát kiválasztó billentyű a térképszerkesztőben. Szokásos funkcióját is megtartja.
+pipette_read_key_on: Tartsd lenyomva mező felvételéhez
+pipette_read_key_on_tooltip: |-
+  Lenyomva tartva a már feltöltött pipetta újra felvesz egy mezőt (a régi a kattintásig megmarad). Elengedve ismét fest, ha van benne valami.
+pipette_read_key: Billentyű mező felvételéhez
+pipette_read_key_tooltip: |-
+  Mező felvételéhez lenyomva tartandó billentyű, amikor a pipettában már van tartalom.
+pipette_any_tile_key_on: Tartsd lenyomva bármely mezőre festéshez
+pipette_any_tile_key_on_tooltip: |-
+  Kísérleti: lenyomva tartva a pipetta az ecset alatti minden mezőre átadja a magasságot és a textúrát, tengerre, mocsárra, sziklákra (amelyek megmaradnak), falakra és épületekre is (sosem a térkép szélére). Nem változtatja meg, hová helyezhetők objektumok.
+pipette_any_tile_key: Billentyű bármely mezőre festéshez
+pipette_any_tile_key_tooltip: |-
+  Billentyű, amellyel a pipetta figyelmen kívül hagyja a mezőn lévő elemeket.
 key_letter_a: A
 key_letter_b: B
 key_letter_c: C
@@ -376,374 +237,94 @@ key_letter_w: W
 key_letter_x: X
 key_letter_y: Y
 key_letter_z: Z
+key_digit_0: '0'
+key_digit_1: '1'
+key_digit_2: '2'
+key_digit_3: '3'
+key_digit_4: '4'
+key_digit_5: '5'
+key_digit_6: '6'
+key_digit_7: '7'
+key_digit_8: '8'
+key_digit_9: '9'
+key_f1: F1
+key_f2: F2
+key_f3: F3
+key_f4: F4
+key_f5: F5
+key_f6: F6
+key_f7: F7
+key_f8: F8
+key_f9: F9
+key_f10: F10
+key_f11: F11
+key_f12: F12
+key_ctrl: Ctrl
 key_shift: Shift
-key_space: Space
+key_alt: Alt
+key_space: Szóköz
 key_tab: Tab
-map_settings_button: Map Settings button
-map_settings_button_tooltip: 'A Map Settings button on the map''s menu screen, right of the Balanced / Unbalanced
-  and
-
-  Invasion / Economy buttons. It opens the Alt + , menu.
-
-  '
-map_settings_group: Map settings
-map_settings_group_descr: 'The map''s settings: map type, size, lock and the menus that show them.
-
-  '
-map_settings_menu: Bigger Map Settings menu
-map_settings_menu_tooltip: 'The Alt + , menu gets a title, Singleplayer and Multiplayer, the four singleplayer map
-  types
-
-  (Siege, Invasion, Economic, Just Build), the four map sizes plus Custom and a Map size slider (10
-
-  to 400; the map changes size when you let go), Balanced, King of the Hill, Lock map and a Back
-
-  button.
-
-  '
-map_settings_show_locked: Show locked maps box
-map_settings_show_locked_tooltip: 'A "Show locked maps" box in the editor''s Load dialog. Ticked, locked maps are
-  listed too;
-
-  the list updates at once.
-
-  '
-menu_always_update: Always keep the menu up to date
-menu_always_update_tooltip: 'The game only redraws the menu while the mouse is over it. A change made elsewhere,
-  for
-
-  example a hotkey that picks another tool, or the counts changing as you place animals,
-
-  only shows once you move the mouse back onto the menu. With this on, the menu is redrawn
-
-  all the time in the map editor.
-
-  '
-menu_dust_clouds: Dust clouds cannot crash the game
-menu_dust_clouds_tooltip: 'A dust cloud whose movement data has been lost made the game divide by zero and crash.
-  With
-
-  this on, such a cloud stays where it is instead.
-
-  '
-menu_group: Editor menu
-menu_group_descr: 'How the editor''s menu at the bottom of the screen is drawn.
-
-  '
-pipette_any_tile_key: Key to give to any tile
-pipette_any_tile_key_on: Hold to give to any tile
-pipette_any_tile_key_on_tooltip: 'Experimental: while this key is held, the pipette gives heights and textures to
-  every tile
-
-  under the brush, also sea, marsh, rocks (which stay), walls and buildings (never the map''s
-
-  edge). It does not change where objects may be placed.
-
-  '
-pipette_any_tile_key_tooltip: 'The key to hold so that the pipette ignores what a tile has on it.
-
-  '
-pipette_enabled: Pipette
-pipette_enabled_tooltip: 'Adds the pipette button above the brush size (brush size, ruler and eraser move down a
-  little).
-
-  Choosing it shows a row above the menu - Heights, Textures, Objects, All - and above that what
-
-  the pipette holds. Click a tile to take it (the pipette shows one tile), then click or drag to
-
-  give it to the tiles under the brush. Heights leave the ground alone, textures leave the
-
-  heights alone. Objects takes the building, wall, tree or rock on a tile: buildings and walls
-
-  are then placed like their own menu button does, for the same player (that player''s shield
-
-  gets chosen), trees (same kind and stage, or felled with
-
-  the same logs) and rocks (same kind and turn) like the tree and rock tools, dragging included. All also takes
-  a tree or 1x1 rock
-
-  and puts one on every tile under the brush. Choosing the pipette or one of its kinds again
-
-  empties it.
-
-  Heights are not given to sea, beach, marsh, moat, rocks, walls or buildings; textures not to
-
-  rocks, walls or buildings. Cliff rocks (the ones the editor puts on steep edges) are cleared
-
-  and come back where an edge stays steep. Undo takes pipette strokes back like any other.
-
-  '
-pipette_group: Pipette
-pipette_group_descr: 'A pipette in the landscape editor''s left column, above the brush size: it takes the heights
-
-  and/or textures of one tile and gives them to the tiles under the brush.
-
-  '
-pipette_read_key: Key to take a tile
-pipette_read_key_on: Hold to take a tile
-pipette_read_key_on_tooltip: 'While this key is held, a pipette that holds something takes a tile again (the old
-  one stays
-
-  until you click). Let go and it gives again - if it holds anything.
-
-  '
-pipette_read_key_tooltip: 'The key to hold for taking a tile while the pipette holds something.
-
-  '
-pipette_select_key: Key for the pipette
-pipette_select_key_on: Pipette key
-pipette_select_key_on_tooltip: 'A key that chooses the pipette (and empties it). Pressed again while the pipette
-  is chosen,
-
-  it goes on to the next kind: Heights, Textures, Objects, All.
-
-  '
-pipette_select_key_tooltip: 'The key that chooses the pipette in the map editor. It still does its usual job as
-  well.
-
-  '
-rocks_erase_invisible: The eraser removes invisible rocks
-rocks_erase_invisible_tooltip: 'The landscape eraser (and the tools that remove rocks with it) frees the tiles of
-  invisible
-
-  rocks too, the way it removes normal rocks. Without this, each tile needs the shrub trick:
-
-  place the shrub that ignores obstacles on it and erase that.
-
-  '
-rocks_extra_rock: Extra small rock
-rocks_extra_rock_tooltip: 'For the smallest rocks, the variant row also offers a fifth one: a small rock the game
-  has
-
-  but the editor never places. It is saved in the map like any other rock.
-
-  '
-rocks_group: Rocks
-rocks_group_descr: 'The Rocks menu of the landscape editor.
-
-  '
-rocks_invisible: Invisible rocks check box
-rocks_invisible_tooltip: 'Adds a check box to the right of the Rocks menu''s buttons. While it is ticked, every
-  rock
-
-  you place is an "invisible rock" straight away, without placing 4000 rocks first: the
-
-  tiles are taken (nothing can be built or walk there) but no rock is drawn, so they keep
-
-  showing what was there before (the "2k stones trick"). Untick it for normal rocks.
-
-  '
-rocks_random_preview: Random rotation shows in the preview
-rocks_random_preview_tooltip: 'With the random rotation button chosen, the game turns the rock so fast that the
-  preview
-
-  under the mouse cannot follow it. With this on it turns once a second instead, and the
-
-  preview shows the rock you are about to place.
-
-  '
-rocks_remove_lost: Remove lost rocks button
-rocks_remove_lost_tooltip: 'Adds a "Remove lost rocks" button at the bottom right of the Rocks menu. A rock the
-  raise or
-
-  lower tool broke, whose tiles were then all covered with shrubs, stays in the map''s list of
-
-  rocks with no tile left: you cannot see, erase or reach it, and it uses up one of the 4000
-
-  rock slots. The button finds every such rock and takes it off the list. Tiles are not changed.
-
-  '
-rocks_signpost: Signpost in the Rocks menu of skirmish maps
-rocks_signpost_tooltip: 'Skirmish maps get the same Rocks menu as scenario maps, with the signpost button.
-
-  '
-rocks_variants: Rock variant row
-rocks_variants_tooltip: 'A row above the Rocks menu shows the four variants of the chosen rock size, turned the
-  way
-
-  they would be placed. Click one to place only that variant; click it again, or any button
-
-  of the Rocks menu, to go back to the game''s changing variants.
-
-  '
-textures_gravel_and_iron: Gravel and iron in the Textures menu
-textures_gravel_and_iron_tooltip: 'Adds Gravel to the top row and Iron to the bottom row, and spreads both rows
-  evenly. The
-
-  gravel picture is images/gravel.png (with gravel_hover.png and gravel_selected.png).
-
-  '
-textures_group: Ground textures
-textures_group_descr: 'The Textures menu of the landscape editor.
-
-  '
-textures_mask: Mask button
-textures_mask_by_type: Mask treats water variants as one
-textures_mask_by_type_tooltip: 'The mask only lets through tiles of the same texture as the one you clicked; every
-  texture stays
-
-  its own (grass, scrub, thick scrub, stones, beach ... are all different). With this on, the
-
-  variants of one water count as that water: all sea including its edges and deeper parts, all
-
-  river including foam, waves and the waterfall edges where it runs down a slope, all river
-
-  crossing. Sea, river and river crossing stay apart.
-
-  '
-textures_mask_tooltip: 'Adds a Mask button (a square, half filled) at the top left of the landscape editor''s menu.
-  While
-
-  it is on, the nature tools (heights, textures, water, trees and shrubs, rocks and the pipette) only
-
-  change tiles that have the same texture as the tile you first clicked on;
-
-  when you let go of the mouse, the next click picks the texture to paint over anew.
-
-  '
-textures_no_heights_iron: Iron only in the Textures menu
-textures_no_heights_iron_tooltip: 'Takes the iron button out of the Heights menu, now that the Textures menu has
-  one.
-
-  '
-trees_apple: Apple tree button
-trees_apple_tooltip: 'Adds an apple tree to the Vegetation menu. The picture is images/apple.png (with
-
-  apple_hover.png and apple_selected.png) in the module''s folder; replace them to change it.
-
-  '
-trees_felled: Felled trees
-trees_felled_tooltip: 'While a tree is chosen, a row above the Vegetation menu offers that tree standing (first)
-  and
-
-  felled, with every number of logs it can still hold (9 down to 1 for a fully grown tree; the
-
-  smallest trees are felled with 1 log). Click one to place felled trees; click the standing
-
-  tree, the felled one again or the tree in the menu to go back to standing trees.
-
-  '
-trees_group: Trees and shrubs
-trees_group_descr: 'More choice when placing vegetation in the landscape editor.
-
-  '
-trees_growth: Brush size sets the tree's growth stage
-trees_growth_tooltip: 'Trees are placed at the growth stage of the brush size: brush 1 places the smallest trees,
-
-  brush 4 fully grown ones (what the editor always places otherwise), brush 5 fully grown
-
-  ones the woodcutters leave alone for a while, brush 6 and 7 dead trees (7 decays sooner).
-
-  Shrubs are not affected.
-
-  '
-trees_no_stacking: No shrub stacks
-trees_no_stacking_tooltip: 'A tree or shrub can no longer be placed on a tile that already has one. Some shrubs
-  (the
-
-  shrub of the top row and the four shrubs it was sorted with) used to pile up there, invisible
-
-  but each taking a place of the tree limit for good. The eraser now also takes away every
-
-  shrub piled up on a tile, so old stacks can be cleared.
-
-  '
-trees_obstacles: Check box for trees next to obstacles
-trees_obstacles_tooltip: 'Adds a check box to the top row of the Vegetation menu. While it is ticked, trees can
-  be
-
-  placed right next to buildings, rocks, walls and other trees, which the game normally keeps
-
-  them away from (shrubs can stand there anyway). Point at it to see whether it is on.
-
-  '
-trees_preview: Tree preview
-trees_preview_tooltip: 'While a tree or shrub is chosen, the tree it would plant is shown on the tile under the
-  mouse,
-
-  at the stage the brush gives it (or felled, with the felled tree''s logs), the way the game
-
-  will draw it. Not while zoomed out.
-
-  '
-trees_random_mix: Random mixes in the tree rows
-trees_random_mix_tooltip: "Adds buttons marked \"?\" to the rows above the Vegetation menu:\n- Random tree (first\
-  \ in the felled tree row): trees of every growth stage from the smallest\n  up to the brush's, mixed at random.\
-  \ Not offered for the smallest trees or dead ones.\n- Random felled tree (last in the felled tree row): felled\
-  \ trees with a random number of\n  logs.\n- Random shrub (last in the shrub row): the five shrub colours mixed\
-  \ at random.\nClick one again, or choose another button, to stop mixing.\n"
-trees_rocks_and_water: Check box for vegetation on rocks and water
-trees_rocks_and_water_tooltip: A check box on the right of the Vegetation menu, below the one for trees next to
-  obstacles (off at first). Ticked, trees and shrubs can also be placed on marsh, river, ford, rocky, boulder and
-  gravel ground.
-trees_shrubs: More shrubs
-trees_shrubs_tooltip: 'While the shrub with four more colours is chosen, a row above the Vegetation menu offers
-
-  all five of them.
-
-  '
-trees_sorted_rows: Tidy the Vegetation menu's rows
-trees_sorted_rows_tooltip: 'Moves the shrub from the top row to the bottom row and sorts the bottom row''s shrubs,
-  so
-
-  the top row holds the trees (and the apple tree and the check box) and the bottom row all
-
-  the shrubs.
-
-  '
-trees_spread_order: Trees in spreading order
-trees_spread_order_tooltip: 'In the Vegetation menu the trees that spread on fertile ground (oasis grass, thick
-  and thin
-
-  scrub) come first, then the tree that spreads on infertile ground (dirt, stony dirt, dunes): the
-
-  third and fourth tree swap places.
-
-  '
-trees_spread_outlines: Outlines for spreading ground
-trees_spread_outlines_tooltip: 'A thin green outline round the trees that spread on fertile ground and a thin beige
-  outline
-
-  round the tree that spreads on infertile ground. The apple tree does not spread and gets none.
-
-  '
-undo_enabled: Undo and redo
-undo_enabled_tooltip: 'Two arrow buttons in the top left corner of the map editor: the left one takes back the last
-
-  thing done on the map - placing, removing, painting, heights - and the right one puts it
-
-  back, for up to 20 steps. A button is greyed out while there is nothing to take back or put
-
-  back. Every click is one step, and so is a brush stroke held down. Clicks that change
-
-  nothing on the map (with no tool chosen, for example) make no step. Loading another map
-
-  starts the history afresh.
-
-  '
-undo_group: Undo and redo
-undo_group_descr: 'Undo and redo buttons in the map editor''s top left corner.
-
-  '
-water_decorations: Foam and small waves
-water_decorations_tooltip: 'Brings back two river decorations from the first Stronghold''s editor, which Crusader
-  still
-
-  supports but has no buttons for: Foam (white water and rising spray, as below a waterfall,
-
-  on every river tile under the brush) and Small waves (on the one river tile under the
-
-  mouse). Both only go on river tiles and are saved in the map.
-
-  '
-water_foam_on_sea: Foam on the ocean too
-water_foam_on_sea_tooltip: 'Foam can also be laid on ocean tiles, which then become river with foam (with the foam
-
-  setting on).
-
-  '
-water_group: Water
-water_group_descr: 'The water menu of the landscape editor.
-
-  '
-qol: Quality of Life
+menu_group: Szerkesztőmenü
+menu_group_descr: |-
+  Hogyan rajzolódik ki a képernyő alján lévő szerkesztőmenü.
+menu_dust_clouds: A porfelhők nem omlaszthatják össze a játékot
+menu_dust_clouds_tooltip: |-
+  Az elveszett mozgásadatú porfelhők nullával való osztást és összeomlást okoztak. Bekapcsolva az ilyen porfelhő egyszerűen egy helyben marad.
+menu_always_update: A menü mindig maradjon friss
+menu_always_update_tooltip: |-
+  A játék csak akkor rajzolja újra a menüt, ha az egér felette van. A máshol történt változások — például gyorsbillentyűvel váltott eszköz vagy állatok lerakásakor változó számlálók — csak akkor frissülnek, ha visszaviszed rá az egeret. Bekapcsolva a menü folyamatosan újrarajzolódik a térképszerkesztőben.
+castle_all_players: Mind a nyolc játékoscímer minden térképen
+castle_all_players_tooltip: |-
+  A minitérkép melletti címerek minden térképtípuson mind a nyolc játékost mutatják, nem csak többjátékos térképeken.
+castle_all_keeps: Udvarház és erődítmény minden térképen
+castle_all_keeps_tooltip: |-
+  A vártornyok menüje többjátékos térképeken is felkínálja az udvarházat és az erődítményt.
+castle_player_zero: 0. játékos címere
+castle_player_zero_tooltip: |-
+  Egy fehér kilencedik címer a játékoscímerek közepén a 0. játékost választja ki, aki szintén birtokolhat épületeket és egységeket a térképen.
+castle_keep_crests: Aktív vártorony-címerek
+castle_keep_crests_tooltip: |-
+  Minden vártorony felett látható a tulajdonosa címere; a játékos aktív vártornyán (ahol a lord, a kezdőegységek és az új parasztok megjelennek) kerettel. Kattints egy címerre a vártorony aktiválásához, vagy az aktívra, hogy ne legyen aktív vártornya a játékosnak. Az új vártorony nem veszi át automatikusan az aktív szerepet, és ha az aktívat törlik, a játékos egy másik vártornya veszi át. A fő raktár mindig követi az aktív vártornyot (különben a játék az elsőként lerakott raktárat őrizte meg, így több vártoronynál az MI blokkolva találta a várhelyét és nem épített terv szerint). A „Több vártorony játékosonként” opciót igényli.
+castle_keep_crest_tooltip: Vártorony-címer tippje
+castle_keep_crest_tooltip_tooltip: |-
+  Vártorony címerére mutatva megjeleníti a jelentését és a kattintás hatását. Az „Aktív vártorony-címerek” opciót igényli.
+castle_wall_tools: Falmagasságok és szabad pártázatok
+castle_wall_tools_tooltip: |-
+  A pártázatok önállóan is megállnak. Paneljük alacsony, magas, sérült alacsony és sérült magas változatot kínál. A falpanel feletti csúszka külön állítja a magas falak, alacsony falak és pártázatok magasságát (0–255) és a lépcsők meredekségét (0–16); a melletti Visszaállítás visszaadja a kiválasztott alapértékét, a szerkesztőből kilépve pedig mind visszaáll.
+trees_spread_order: Fák terjedési sorrendben
+trees_spread_order_tooltip: |-
+  A Növényzet menüben előbb a termékeny talajon terjedő fák (oázisfű, sűrű és ritka bozót), majd a terméketlen talajon terjedő fa (föld, köves föld, dűnék) következik: a harmadik és negyedik fa helyet cserél.
+trees_spread_outlines: Keretek a terjedési talajhoz
+trees_spread_outlines_tooltip: |-
+  Vékony zöld keret a termékeny talajon terjedő fák körül, és vékony bézs keret a terméketlen talajon terjedő fa körül. Az almafa nem terjed, ezért nincs kerete.
+herds_bird_bins: Összes varjú / sirály törlése gombok
+herds_bird_bins_tooltip: |-
+  Piros kuka gombok a varjú és a sirály gombjától jobbra az Állatok menüben: egy kattintással eltávolítanak minden varjút (a fák maradnak) vagy minden sirályt a térképről.
+herds_animal_bin: Összes állat törlése gomb
+herds_animal_bin_tooltip: |-
+  Piros kuka gomb az Állatok menü jobb oldalán, amely az Alt + E-hez hasonlóan minden állatot töröl a térképről. A varjak és sirályok maradnak.
+herds_group_warning: Csordák és csoportok figyelmeztetés
+herds_group_warning_tooltip: |-
+  Ha 200-nál kevesebb csorda és csoport hozható még létre, a képernyő tetején egy sor jelzi a maradék számot, akárcsak a játék egységsora.
+eraser_choice: Radír választópanel
+eraser_choice_tooltip: |-
+  A radír kiválasztásakor a menü feletti panel meghatározza, mit töröljön: Mind (mint eddig), Állatok (varjak és sirályok is), Egységek, Épületek (vártornyokkal, romokkal és falakkal), Növényzet vagy Sziklák (láthatatlan sziklák is).
+eraser_seagulls: A radír törli a sirályokat
+eraser_seagulls_tooltip: |-
+  A radír a radírozott mezők felett repülő sirályokat is eltávolítja (Mind vagy Állatok módban).
+map_settings_show_locked: „Zárolt térképek mutatása” négyzet
+map_settings_show_locked_tooltip: |-
+  „Zárolt térképek mutatása” jelölőnégyzet a szerkesztő Betöltés ablakában. Bepipálva a zárolt térképek is megjelennek; a lista azonnal frissül.
+map_settings_button: Térképbeállítások gomb
+map_settings_button_tooltip: |-
+  Térképbeállítások gomb a térkép menüképernyőjén, a Kiegyensúlyozott / Kiegyensúlyozatlan és Invázió / Gazdasági gomboktól jobbra. Az Alt + , menüt nyitja meg.
+map_settings_menu: Nagyobb Térképbeállítások menü
+map_settings_menu_tooltip: |-
+  Az Alt + , menü címet, Egyjátékos és Többjátékos választást, a négy egyjátékos térképtípust (Ostrom, Invázió, Gazdasági, Szabad építés), a négy térképméretet plusz Egyénit és egy Térképméret csúszkát (10-től 400-ig; elengedéskor alkalmazódik), Kiegyensúlyozott, Domb királya, Térkép zárolása és Vissza gombot kap.
+eraser_group: Radír
+eraser_group_descr: |-
+  Mit töröljön a tájszerkesztő radírja.
+map_settings_group: Térképbeállítások
+map_settings_group_descr: |-
+  A térkép beállításai: térképtípus, méret, zárolás és az ezeket mutató menük.
+qol: Kényelmi funkciók

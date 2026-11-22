@@ -1,355 +1,216 @@
-brushes_full_shape: Brushes with their full shape
-brushes_full_shape_tooltip: 'The game''s brushes count the tile under the mouse twice and leave out the tile that
-  should
-
-  be their top left corner, in the preview and when placing. With this on they have their
-
-  whole shape (in the map editor; the game''s own use of the same walk is left alone).
-
-  '
-brushes_group: Brushes
-brushes_group_descr: 'The brushes of the landscape editor.
-
-  '
-castle_all_keeps: Manor house and stronghold on every map
-castle_all_keeps_tooltip: The keeps menu offers the manor house and the stronghold on multiplayer maps too.
-castle_all_players: All eight player shields on every map
-castle_all_players_tooltip: The shields beside the minimap show all eight players on every map type, not only on
-  multiplayer maps.
-castle_barrier: Barrier in the Ruins menu
-castle_barrier_tooltip: 'Adds a Barrier button in the free spot at the bottom right of the Ruins menu: a 1x1 barrier
-
-  that can be deleted again.
-
-  '
-castle_building_counts: Building counts above the minimap
-castle_building_counts_tooltip: 'Shows above the minimap how many buildings the map has against the game''s limit
-  (every
-
-  building counts, including keeps, landscape buildings and the parts some buildings are made
-
-  of), how many player buildings all players have together, and how many the current player
-
-  has. Player buildings are the ones an enemy can be sent to destroy.
-
-  '
-castle_damaged_walls: Damaged walls and stairs
-castle_damaged_walls_tooltip: 'While the stairs, low wall, high wall or crenellated wall is chosen, a row above
-  the castle
-
-  buildings menu offers it "Damaged": the walls you place get the top of a damaged wall (they
-
-  keep their height). Choosing the wall in the menu places undamaged walls again.
-
-  '
-castle_group: Castle mode
-castle_group_descr: 'The building menu of the map editor''s castle mode.
-
-  '
-castle_hover_text: Building names further left
-castle_hover_text_tooltip: 'The name of the building under the mouse ("Player 1''s Keep") moves 100 pixels to the
-  left,
-
-  so it no longer runs into the building counts above the minimap.
-
-  '
-castle_keep_crest_tooltip: Keep crest tooltip
-castle_keep_crest_tooltip_tooltip: Hovering over a keep crest shows what it means and what a click on it does. Needs
-  Active keep crests.
-castle_keep_crests: Active keep crests
-castle_keep_crests_tooltip: Every keep shows its owner's shield above it; the player's active keep (where the lord,
-  the starting units and new peasants appear) shows it framed. Click a shield to make that keep active, or click
-  the active one to leave the player without one. A new keep no longer takes over the active keep, and when the
-  active keep is removed another keep of that player takes over. The player's main stockpile always follows the
-  active keep (the game kept the first stockpile ever placed, so with several keeps the AI found its castle spot
-  blocked and used no castle plan). Needs Several keeps.
-castle_keep_parts: Keep without campfire or stockpile
-castle_keep_parts_tooltip: 'While one of the keeps is chosen, a row above the keeps menu offers it placed in two
-  more
-
-  ways: "Keep only" (the keep and its entrance, no campfire area and no stockpile) and "No
-
-  stockpile" (keep, entrance and campfire area). Choosing a keep in the menu places the whole
-
-  keep again.
-
-  The preview and the check for room show only those parts.
-
-  '
-castle_moat_kinds: Dug, planned and permanent moat
-castle_moat_kinds_tooltip: 'While the moat is chosen in the gatehouses menu, a row above the menu offers it three
-  ways:
-
-  Dug (the editor''s usual moat), Planned (moat marked out to be dug, as in a game) and
-
-  Permanent (dug moat that nobody can fill in or delete in a game). Choosing the moat in the
-
-  menu goes back to dug moat.
-
-  '
-castle_moat_on_marsh: Moat on marsh
-castle_moat_on_marsh_tooltip: 'In the map editor moat can be placed on marsh again. The marsh stays under it, so
-  it comes
-
-  back when the moat is filled in.
-
-  '
-castle_moat_removal_keeps_ground: Removing moat keeps the ground
-castle_moat_removal_keeps_ground_tooltip: 'The editor''s "remove moat" only changes tiles with dug or planned moat:
-  it takes the moat
-
-  away (dug moat gets the normal ground height back) and leaves the ground''s texture alone.
-
-  Without this it turns every tile under the brush into plain dirt.
-
-  '
-castle_player_zero: Player 0 shield
-castle_player_zero_tooltip: A white ninth shield in the middle of the player shields chooses player 0, who can own
-  buildings and units on a map too.
-castle_ruined_cathedral: Ruined cathedral
-castle_ruined_cathedral_tooltip: 'While the cathedral is chosen, a row above the town menu offers it "Ruined": the
-  cathedral you
-
-  place gets the ruined picture the game otherwise shows only in one historical mission. In a
-
-  game it is still a whole, working cathedral that just looks ruined. Choosing the cathedral in
-
-  the menu places normal ones again. The pipette takes a ruined cathedral as ruined. Needs the
-
-  game''s own tile_churches.gm1 (older copies have no ruin in it; then cathedrals stay whole).
-
-  '
-castle_several_keeps: Several keeps per player
-castle_several_keeps_tooltip: 'Placing a keep no longer removes the player''s earlier keep (and its campfire). The
-  newest
-
-  keep is the player''s active one, the others stay as buildings.
-
-  '
-castle_several_storage: Several storage and recruitment buildings
-castle_several_storage_tooltip: 'Barracks, mercenary posts, guilds and the other buildings a player has only one
-  of are no
-
-  longer removed when another one is placed, and further stockpiles, granaries and armouries
-
-  need not touch the first one. Any number of them may also be empty (the game allows only 8
-
-  empty granaries or armouries and 32 empty stockpiles).
-
-  '
-castle_statues: Statue and shrines
-castle_statues_tooltip: 'Adds the unused 2x2 statue, 2x2 shrine and 1x1 shrine: at the end of the statue''s and
-  the
-
-  shrine''s variants (see "Building variants"), or, with those off, in a row above the menu of
-
-  good things.
-
-  '
-castle_tower_engines: Tower mangonels and ballistae anywhere
-castle_tower_engines_tooltip: 'The tower mangonel and tower ballista of the army buildings menu can be put wherever
-  a unit
-
-  could be put (the ground, walls, gates, towers, the keep), not only on the player''s own square
-
-  and round towers: on the clicked tile, one to a tile, up to 4 on a keep or large gatehouse and
-
-  8 on the large stronghold keeps. The preview is solid wherever a click places one.
-
-  '
-castle_tower_ruins: Tower ruins
-castle_tower_ruins_tooltip: 'While the Towers menu is open, a row above it offers the ruins of the five towers.
-
-  '
-castle_tunnel_and_tents: Tunnel entrance and siege tents
-castle_tunnel_and_tents_tooltip: 'In the army buildings menu: with the tunnelers'' guild chosen, a row above the
-  menu offers a
-
-  tunnel entrance; with the engineers'' guild chosen, the six siege tents.
-
-  '
-castle_variant_panels: Building variants
-castle_variant_panels_tooltip: 'While a garden, statue, shrine or cesspit is chosen, a row above the menu offers
-  each of its
-
-  variants; one chosen there stays chosen instead of turning into the next one every second.
-
-  The same for the hovel: a variant chosen above the town menu is placed every time instead of
-
-  the player''s next one. Choosing the building in the menu itself goes back to the game''s way.
-
-  The pipette takes the exact variant too.
-
-  '
-castle_wall_tools: Wall heights and free crenellations
-castle_wall_tools_tooltip: Crenellations can stand on their own. Their panel offers low, high, low damaged and high
-  damaged. A slider above the wall panel sets the height of high walls, low walls and crenellations (0-255) and
-  the steepness of stairs (0-16), each on its own; Reset beside it gives the chosen one its usual value back, and
-  leaving the map editor puts them all back.
-counts_enabled: Show map counts
-counts_enabled_tooltip: 'Point at the Animals, Vegetation or Rocks button for a tooltip with the count and the
-
-  game''s limit, for example "Trees and shrubs: 812/1999". The Animals tooltip also shows the
-
-  herds and troops, which have a limit of their own.
-
-  In the Animals menu, the deer, camel, rabbit and lion buttons show how many of each there
-
-  are; in the Vegetation menu, every tree and shrub button shows how many of that plant there
-
-  are.
-
-  A red "i" button above the key button switches all of this on and off while you work.
-
-  '
-counts_group: Map counts
-counts_group_descr: 'Shows in the landscape editor how many animals, trees and rocks the map has, and how close
-
-  it is to the game''s limits.
-
-  '
-counts_shown: Numbers shown when the editor opens
-counts_shown_tooltip: 'Off: the numbers start hidden, and the "i" button brings them up.
-
-  '
-eraser_choice: Eraser choice panel
-eraser_choice_tooltip: 'While the eraser is chosen, a panel above the menu picks what it takes: All (as before),
-
-  Animals (also crows and seagulls), Units, Buildings (with keeps, ruins and walls), Vegetation or
-
-  Rocks (also invisible rocks).
-
-  '
-eraser_group: Eraser
-eraser_group_descr: 'What the landscape editor''s eraser takes.
-
-  '
-eraser_seagulls: Eraser takes seagulls
-eraser_seagulls_tooltip: 'The eraser also takes the seagulls flying over the tiles it erases (with All or Animals).
-
-  '
-heights_group: Heights
-heights_group_descr: 'The height tools of the landscape editor.
-
-  '
-heights_invert_key: Key to invert equalize
-heights_invert_key_on: Hold to invert equalize
-heights_invert_key_on_tooltip: 'While this key is held with the equalize tool chosen, equalize roughens the ground
-  (as with
-
-  Invert ticked); let go and it smooths again.
-
-  '
-heights_invert_key_tooltip: 'The key to hold for inverting the equalize tool.
-
-  '
-heights_max_height: Max Height button
-heights_max_height_tooltip: 'Brings back the first Stronghold''s Max Height tool, right of Min Height in the Heights
-  menu:
-
-  it sets the ground under the brush to height 156. Crusader still has the tool and its button
-
-  pictures, only the button was taken out.
-
-  '
-heights_tool_options: Height tool options
-heights_tool_options_tooltip: 'While a height tool is chosen, a panel above the Heights menu offers (in rows from
-  the bottom):
-
-  - Reset ground textures (off at first): whether the height tools also turn the ground under
-
-  them back to its plain look (and the plateaus to dirt), as the game does. Off, they only
-
-  change the height.
-
-  - Break rock tiles (off at first): whether raise, lower, equalize, hill and mountain break the
-
-  rocks they touch the way the game does (the touched tiles turn invisible and walkable while the
-
-  rock stays). Off, rocks stay whole.
-
-  - Ignore water and Ignore farmland (off at first): the height tools leave sea, river, ford,
-
-  marsh and moat tiles, or scrub, thick scrub and oasis grass tiles, as they are.
-
-  - For raise, lower and equalize: Snap to range (on at first), Invert (equalize only), the
-
-  height range (8 to 156 at first; drag either end) and the strength. With Snap to range on,
-
-  tiles outside the range are brought into it, as the game does; off, they are left alone.
-
-  Invert makes equalize roughen the ground instead of smoothing it.
-
-  - Rock height changes (Whole rock at first): what the height tools do to a rock they touch.
-
-  Tile only moves just the tiles under the brush; Whole rock moves all of the rock''s tiles by the
-
-  same amount; Erase rock removes the rock, as min height always did.
-
-  The range, Snap to range, Invert and the ignore boxes go back to their defaults when you leave
-
-  the map editor.
-
-  '
-herds_animal_bin: Erase all animals button
-herds_animal_bin_tooltip: 'A red wastebin button on the right of the Animals menu that takes every animal off the
-  map,
-
-  like Alt + E. Crows and seagulls stay.
-
-  '
-herds_bird_bins: Erase all crows / seagulls buttons
-herds_bird_bins_tooltip: 'Red wastebin buttons right of the crow and the seagull button in the Animals menu: one
-  click
-
-  takes every crow (the trees stay) or every seagull off the map.
-
-  '
-herds_group: Herds
-herds_group_descr: 'The animals of the landscape editor.
-
-  '
-herds_group_warning: Herds and groups warning
-herds_group_warning_tooltip: 'When fewer than 200 herds and groups can still be made, a line at the top of the screen
-  says
-
-  how many are left, like the game''s own line for units.
-
-  '
-herds_panel: Herd panel
-herds_panel_tooltip: 'While the deer, lion, rabbit or camel is chosen, a panel above the Animals menu shows how
-
-  many animals a herd gets (a fixed part plus a random part) and which group behaviour type the herd
-
-  uses. Its check box makes herds as big as the brush: 2 x brush size - 1 animals (1 to 13),
-
-  with no random part.
-
-  '
-key_alt: Alt
-key_ctrl: Ctrl
-key_digit_0: '0'
-key_digit_1: '1'
-key_digit_2: '2'
-key_digit_3: '3'
-key_digit_4: '4'
-key_digit_5: '5'
-key_digit_6: '6'
-key_digit_7: '7'
-key_digit_8: '8'
-key_digit_9: '9'
-key_f1: F1
-key_f10: F10
-key_f11: F11
-key_f12: F12
-key_f2: F2
-key_f3: F3
-key_f4: F4
-key_f5: F5
-key_f6: F6
-key_f7: F7
-key_f8: F8
-key_f9: F9
+counts_group: Compteurs de la carte
+counts_group_descr: |-
+  Affiche dans l'éditeur de paysage le nombre d'animaux, d'arbres et de rochers présents sur la carte ainsi que la marge par rapport aux limites du jeu.
+counts_enabled: Afficher les compteurs de la carte
+counts_enabled_tooltip: |-
+  Survolez les boutons Animaux, Végétation ou Rochers pour afficher une infobulle indiquant le total et la limite du jeu, par exemple « Arbres et buissons : 812/1999 ». L'infobulle Animaux indique également les troupeaux et groupes, qui ont leur propre limite.
+  Dans le menu Animaux, les boutons cerf, chameau, lapin et lion affichent leur nombre ; dans le menu Végétation, chaque bouton d'arbre et de buisson affiche le nombre de plantes de ce type.
+  Un bouton « i » rouge au-dessus du bouton clé permet d'activer ou de masquer tout cela en cours d'édition.
+counts_shown: Afficher les compteurs à l'ouverture de l'éditeur
+counts_shown_tooltip: |-
+  Désactivé : les compteurs sont masqués au départ et le bouton « i » permet de les afficher.
+trees_group: Arbres et buissons
+trees_group_descr: |-
+  Plus de choix lors du placement de la végétation dans l'éditeur de paysage.
+trees_growth: La taille du pinceau définit le stade de croissance de l'arbre
+trees_growth_tooltip: |-
+  Les arbres sont placés au stade de croissance correspondant à la taille du pinceau : pinceau 1 pour les plus petits, pinceau 4 pour les arbres adultes (ce que l'éditeur place toujours par défaut), pinceau 5 pour des arbres adultes que les bûcherons laissent tranquilles un moment, pinceaux 6 et 7 pour des arbres morts (7 disparaît plus vite). Les buissons ne sont pas concernés.
+trees_apple: Bouton Pommier
+trees_apple_tooltip: |-
+  Ajoute un pommier au menu Végétation. L'image utilisée est images/apple.png (avec apple_hover.png et apple_selected.png) dans le dossier du module ; remplacez-les pour la modifier.
+trees_shrubs: Plus de buissons
+trees_shrubs_tooltip: |-
+  Lorsque le buisson aux quatre autres couleurs est sélectionné, une rangée au-dessus du menu Végétation propose les cinq couleurs.
+trees_felled: Arbres abattus
+trees_felled_tooltip: |-
+  Lorsqu'un arbre est sélectionné, une rangée au-dessus du menu Végétation le propose debout (en premier) puis abattu avec chaque nombre de rondins possible (de 9 à 1 pour un arbre adulte ; les plus petits tombent avec 1 rondin). Cliquez sur l'un d'eux pour placer des arbres abattus ; cliquez sur l'arbre debout, de nouveau sur l'arbre abattu ou sur l'arbre dans le menu pour revenir aux arbres debout.
+trees_random_mix: Mélanges aléatoires dans les rangées d'arbres
+trees_random_mix_tooltip: |-
+  Ajoute des boutons marqués « ? » aux rangées au-dessus du menu Végétation :
+  - Arbre aléatoire (premier de la rangée des arbres abattus) : mélange aléatoire de tous les stades de croissance, du plus petit jusqu'à la taille du pinceau. Non proposé pour les plus petits arbres ou les arbres morts.
+  - Arbre abattu aléatoire (dernier de la rangée des arbres abattus) : arbres abattus avec un nombre aléatoire de rondins.
+  - Buisson aléatoire (dernier de la rangée des buissons) : mélange aléatoire des cinq couleurs de buissons.
+  Cliquez de nouveau ou choisissez un autre bouton pour arrêter le mélange.
+trees_obstacles: Case à cocher pour les arbres près des obstacles
+trees_obstacles_tooltip: |-
+  Ajoute une case à cocher dans la rangée supérieure du menu Végétation. Lorsqu'elle est cochée, les arbres peuvent être placés juste à côté des bâtiments, rochers, murs et autres arbres, ce que le jeu empêche normalement (les buissons y sont déjà autorisés). Survolez-la pour voir si elle est active.
+trees_rocks_and_water: Case à cocher pour la végétation sur rochers et eau
+trees_rocks_and_water_tooltip: |-
+  Case à cocher à droite du menu Végétation, sous celle des arbres près des obstacles (décochée au départ). Cochée, les arbres et buissons peuvent aussi être placés sur les marais, rivières, gués, sols rocheux, blocs et graviers.
+trees_sorted_rows: Ranger les rangées du menu Végétation
+trees_sorted_rows_tooltip: |-
+  Déplace le buisson de la rangée du haut vers celle du bas et trie les buissons du bas, afin que la rangée du haut regroupe les arbres (avec le pommier et la case à cocher) et celle du bas tous les buissons.
+trees_preview: Aperçu d'arbre
+trees_preview_tooltip: |-
+  Lorsqu'un arbre ou un buisson est sélectionné, l'arbre qui serait planté s'affiche sur la case sous la souris, au stade du pinceau (ou abattu avec ses rondins), tel que le jeu le dessinera. Désactivé en vue dézoomée.
+trees_no_stacking: Empêcher l'empilement des buissons
+trees_no_stacking_tooltip: |-
+  Il n'est plus possible de placer un arbre ou un buisson sur une case qui en contient déjà un. Certains buissons (celui de la rangée supérieure et les quatre regroupés avec lui) pouvaient s'empiler de façon invisible tout en consommant définitivement la limite d'arbres. La gomme supprime désormais aussi tous les buissons empilés sur une case, permettant de nettoyer les anciens empilements.
+textures_group: Textures de terrain
+textures_group_descr: |-
+  Le menu Textures de l'éditeur de paysage.
+textures_gravel_and_iron: Gravier et fer dans le menu Textures
+textures_gravel_and_iron_tooltip: |-
+  Ajoute le Gravier à la rangée supérieure et le Fer à la rangée inférieure, et répartit les deux rangées uniformément. L'image du gravier est images/gravel.png (avec gravel_hover.png et gravel_selected.png).
+textures_no_heights_iron: Fer uniquement dans le menu Textures
+textures_no_heights_iron_tooltip: |-
+  Retire le bouton Fer du menu Reliefs, maintenant que le menu Textures en possède un.
+textures_mask: Bouton Masque
+textures_mask_tooltip: |-
+  Ajoute un bouton Masque (un carré à moitié rempli) en haut à gauche du menu de l'éditeur de paysage. Lorsqu'il est actif, les outils naturels (reliefs, textures, eau, arbres et buissons, rochers et pipette) ne modifient que les cases ayant la même texture que la première case cliquée ; une fois le bouton de souris relâché, le clic suivant choisit une nouvelle texture cible.
+textures_mask_by_type: Le masque regroupe les variantes d'eau
+textures_mask_by_type_tooltip: |-
+  Le masque ne laisse passer que les cases de même texture que celle cliquée ; chaque texture reste distincte (herbe, broussailles, broussailles épaisses, pierres, plage…). Avec cette option, les variantes d'un même type d'eau comptent comme une seule eau : toute la mer avec ses bords et zones profondes, toute la rivière avec écume, vagues et rebords de cascade, et tous les gués. Mer, rivière et gué restent séparés.
+water_group: Eau
+water_group_descr: |-
+  Le menu Eau de l'éditeur de paysage.
+water_decorations: Écume et petites vagues
+water_decorations_tooltip: |-
+  Restaure deux décorations de rivière de l'éditeur du premier Stronghold, toujours gérées par Crusader mais sans bouton : Écume (eau vive et embruns, comme au pied d'une cascade, sur chaque case de rivière sous le pinceau) et Petites vagues (sur la case de rivière sous la souris). Les deux ne s'appliquent qu'aux rivières et sont enregistrées dans la carte.
+water_foam_on_sea: Écume aussi sur l'océan
+water_foam_on_sea_tooltip: |-
+  L'écume peut aussi être posée sur des cases d'océan, qui deviennent alors de la rivière avec écume (si l'option d'écume est active).
+rocks_group: Rochers
+rocks_group_descr: |-
+  Le menu Rochers de l'éditeur de paysage.
+rocks_signpost: Panneau indicateur dans le menu Rochers des cartes d'escarmouche
+rocks_signpost_tooltip: |-
+  Les cartes d'escarmouche reçoivent le même menu Rochers que les cartes de scénario, avec le bouton panneau indicateur.
+rocks_random_preview: Rotation aléatoire visible dans l'aperçu
+rocks_random_preview_tooltip: |-
+  Lorsque la rotation aléatoire est choisie, le jeu fait tourner le rocher si vite que l'aperçu sous la souris ne peut pas suivre. Avec cette option, il tourne une fois par seconde et l'aperçu montre exactement le rocher sur le point d'être posé.
+rocks_variants: Rangée de variantes de rochers
+rocks_variants_tooltip: |-
+  Une rangée au-dessus du menu Rochers affiche les quatre variantes de la taille de rocher choisie, orientées telles qu'elles seront posées. Cliquez sur l'une d'elles pour ne placer que cette variante ; cliquez de nouveau dessus ou sur un bouton du menu Rochers pour revenir à l'alternance normale du jeu.
+rocks_extra_rock: Petit rocher supplémentaire
+rocks_extra_rock_tooltip: |-
+  Pour les plus petits rochers, la rangée de variantes en propose un cinquième : un petit rocher présent dans le jeu mais que l'éditeur ne place jamais. Il est sauvegardé dans la carte comme n'importe quel autre rocher.
+rocks_invisible: Case à cocher pour les rochers invisibles
+rocks_invisible_tooltip: |-
+  Ajoute une case à cocher à droite des boutons du menu Rochers. Cochée, chaque rocher placé est immédiatement un « rocher invisible » sans avoir à poser 4000 rochers d'abord : les cases sont occupées (impossible d'y bâtir ou d'y marcher) mais aucun rocher n'est dessiné, laissant visible ce qui s'y trouvait (l'astuce des « 2k pierres »). Décochez pour poser des rochers normaux.
+rocks_erase_invisible: La gomme efface les rochers invisibles
+rocks_erase_invisible_tooltip: |-
+  La gomme du paysage (et les outils qui retirent les rochers avec elle) libère aussi les cases de rochers invisibles, comme pour les rochers normaux. Sans cela, il faut recourir à l'astuce du buisson sur chaque case : poser le buisson qui ignore les obstacles puis l'effacer.
+rocks_remove_lost: Bouton Supprimer les rochers perdus
+rocks_remove_lost_tooltip: |-
+  Ajoute un bouton « Supprimer les rochers perdus » en bas à droite du menu Rochers. Un rocher brisé par l'outil élever/abaisser dont toutes les cases ont ensuite été recouvertes de buissons reste dans la liste des rochers de la carte sans aucune case : impossible de le voir, de l'effacer ou de l'atteindre, mais il occupe l'un des 4000 emplacements. Ce bouton retire tous ces rochers de la liste sans modifier les cases.
+heights_group: Reliefs
+heights_group_descr: |-
+  Les outils de relief de l'éditeur de paysage.
+heights_max_height: Bouton Hauteur maximale
+heights_max_height_tooltip: |-
+  Restaure l'outil Hauteur maximale du premier Stronghold, à droite de Hauteur minimale dans le menu Reliefs : il met le terrain sous le pinceau à la hauteur 156. Crusader possède toujours l'outil et ses icônes, seul le bouton avait été retiré.
+heights_tool_options: Options des outils de relief
+heights_tool_options_tooltip: |-
+  Lorsqu'un outil de relief est sélectionné, un panneau au-dessus du menu Reliefs propose (de bas en haut) :
+  - Réinitialiser les textures du sol (désactivé au départ) : indique si les outils de relief remettent aussi le sol à sa texture de base (et les plateaux en terre) comme le fait le jeu. Désactivé, ils ne modifient que la hauteur.
+  - Briser les cases de rochers (désactivé au départ) : indique si élever, abaisser, égaliser, colline et montagne brisent les rochers touchés comme dans le jeu (les cases touchées deviennent invisibles et franchissables tandis que le rocher reste). Désactivé, les rochers restent intacts.
+  - Ignorer l'eau et Ignorer les terres fertiles (désactivés au départ) : les outils de relief laissent intacts mer, rivière, gué, marais et douves, ou broussailles, broussailles épaisses et herbe d'oasis.
+  - Pour élever, abaisser et égaliser : Ajuster à la plage (activé au départ), Inverser (égaliser uniquement), la plage de hauteur (8 à 156 au départ ; faites glisser chaque extrémité) et la force. Avec Ajuster à la plage activé, les cases hors plage y sont ramenées comme dans le jeu ; désactivé, elles restent intactes. Inverser fait qu'égaliser rend le terrain plus accidenté au lieu de le lisser.
+  - Changement de hauteur des rochers (Rocher entier au départ) : comportement sur un rocher touché. Case seule ne déplace que les cases sous le pinceau ; Rocher entier déplace toutes les cases du rocher d'un bloc ; Effacer le rocher le supprime, comme le faisait Hauteur minimale.
+  La plage, Ajuster à la plage, Inverser et les cases d'exclusion reviennent par défaut en quittant l'éditeur de cartes.
+heights_invert_key_on: Maintenir pour inverser l'égalisation
+heights_invert_key_on_tooltip: |-
+  Tant que cette touche est maintenue avec l'outil égaliser sélectionné, celui-ci rend le sol accidenté (comme avec Inverser coché) ; relâchez-la pour lisser de nouveau.
+heights_invert_key: Touche pour inverser l'égalisation
+heights_invert_key_tooltip: |-
+  La touche à maintenir pour inverser l'outil égaliser.
+castle_group: Mode château
+castle_group_descr: |-
+  Le menu de construction du mode château dans l'éditeur de cartes.
+castle_building_counts: Compteurs de bâtiments au-dessus de la minicarte
+castle_building_counts_tooltip: |-
+  Affiche au-dessus de la minicarte le nombre de bâtiments sur la carte par rapport à la limite du jeu (tout compte, y compris donjons, bâtiments de décor et sous-éléments), le total des bâtiments de joueurs et ceux du joueur sélectionné. Les bâtiments de joueurs sont ceux qu'un ennemi peut recevoir l'ordre de détruire.
+castle_tower_ruins: Ruines de tours
+castle_tower_ruins_tooltip: |-
+  Lorsque le menu Tours est ouvert, une rangée au-dessus propose les ruines des cinq tours.
+castle_tunnel_and_tents: Entrée de tunnel et tentes de siège
+castle_tunnel_and_tents_tooltip: |-
+  Dans le menu des bâtiments militaires : avec la guilde des tunneliers sélectionnée, une rangée au-dessus propose une entrée de tunnel ; avec la guilde des ingénieurs sélectionnée, les six tentes de siège.
+castle_statues: Statue et sanctuaires
+castle_statues_tooltip: |-
+  Ajoute la statue 2×2, le sanctuaire 2×2 et le sanctuaire 1×1 inutilisés : à la fin des variantes de la statue et du sanctuaire (voir « Variantes de bâtiments ») ou, si elles sont désactivées, dans une rangée au-dessus du menu des bons éléments.
+castle_barrier: Barrière dans le menu Ruines
+castle_barrier_tooltip: |-
+  Ajoute un bouton Barrière dans l'emplacement libre en bas à droite du menu Ruines : une barrière 1×1 pouvant être supprimée ensuite.
+castle_several_keeps: Plusieurs donjons par joueur
+castle_several_keeps_tooltip: |-
+  Placer un donjon ne supprime plus l'ancien donjon du joueur (ni son feu de camp). Le donjon le plus récent est le donjon actif du joueur ; les autres restent comme bâtiments.
+castle_several_storage: Plusieurs bâtiments de stockage et de recrutement
+castle_several_storage_tooltip: |-
+  Casernes, camps de mercenaires, guildes et autres bâtiments normalement uniques par joueur ne sont plus supprimés lors d'un nouveau placement, et les réserves, greniers et armureries supplémentaires n'ont plus besoin de toucher le premier. Un nombre illimité d'entre eux peuvent aussi rester vides (le jeu n'autorise sinon que 8 greniers ou armureries vides et 32 réserves vides).
+castle_tower_engines: Mangonneaux et balistes de tour partout
+castle_tower_engines_tooltip: |-
+  Le mangonneau de tour et la baliste de tour du menu militaire peuvent être placés partout où une unité peut se tenir (sol, murs, portes, tours, donjon), et plus seulement sur les tours carrées et rondes du joueur : sur la case cliquée, un par case, jusqu'à 4 sur un donjon ou une grande porte et 8 sur les grands donjons de forteresse. L'aperçu est plein partout où le placement est possible.
+castle_keep_parts: Donjon sans feu de camp ni réserve
+castle_keep_parts_tooltip: |-
+  Lorsqu'un donjon est sélectionné, une rangée au-dessus du menu des donjons propose deux variantes supplémentaires : « Donjon seul » (donjon et entrée, sans feu de camp ni réserve) et « Sans réserve » (donjon, entrée et aire du feu de camp). Sélectionner un donjon dans le menu replace le donjon complet.
+  L'aperçu et la vérification d'espace ne portent que sur ces éléments.
+castle_hover_text: Noms de bâtiments plus à gauche
+castle_hover_text_tooltip: |-
+  Le nom du bâtiment sous la souris (« Donjon du joueur 1 ») est décalé de 100 pixels vers la gauche afin de ne plus chevaucher les compteurs de bâtiments au-dessus de la minicarte.
+castle_damaged_walls: Murs et escaliers endommagés
+castle_damaged_walls_tooltip: |-
+  Lorsque les escaliers, le mur bas, le mur haut ou les créneaux sont choisis, une rangée au-dessus du menu des bâtiments de château les propose en version « Endommagé » : les murs posés prennent l'aspect crénelé endommagé tout en gardant leur hauteur. Resélectionner le mur dans le menu replace des murs intacts.
+castle_variant_panels: Variantes de bâtiments
+castle_variant_panels_tooltip: |-
+  Lorsqu'un jardin, une statue, un sanctuaire ou une fosse d'aisances est choisi, une rangée au-dessus du menu présente toutes ses variantes ; celle qui y est sélectionnée reste fixe au lieu de défiler chaque seconde. Même chose pour la masure au-dessus du menu Ville. Resélectionner le bâtiment dans le menu revient au fonctionnement du jeu. La pipette reprend également la variante exacte.
+castle_ruined_cathedral: Cathédrale en ruine
+castle_ruined_cathedral_tooltip: |-
+  Lorsque la cathédrale est choisie, une rangée au-dessus du menu Ville la propose en « Ruine » : la cathédrale posée utilise le visuel détruit que le jeu n'affiche sinon que dans une mission historique. En partie, elle reste une cathédrale fonctionnelle d'apparence ruinée. Resélectionner la cathédrale dans le menu replace des cathédrales intactes. La pipette reprend aussi son état en ruine. Nécessite le fichier tile_churches.gm1 d'origine du jeu (les copies plus anciennes ne contiennent pas la ruine et posent une cathédrale intacte).
+castle_moat_kinds: Douves creusées, prévues et permanentes
+castle_moat_kinds_tooltip: |-
+  Lorsque les douves sont sélectionnées dans le menu des portes, une rangée au-dessus propose trois modes : Creusées (mode habituel de l'éditeur), Prévues (douves tracées à creuser, comme en partie) et Permanentes (douves creusées que personne ne peut combler ni effacer en partie). Resélectionner les douves dans le menu revient aux douves creusées.
+castle_moat_on_marsh: Douves sur marais
+castle_moat_on_marsh_tooltip: |-
+  Dans l'éditeur de cartes, les douves peuvent de nouveau être placées sur des marais. Le marais reste dessous et réapparaît si les douves sont comblées.
+castle_moat_removal_keeps_ground: Retirer les douves conserve le sol
+castle_moat_removal_keeps_ground_tooltip: |-
+  L'outil « Supprimer les douves » ne modifie plus que les cases contenant des douves creusées ou prévues : il les retire (en rendant leur hauteur normale aux douves creusées) sans toucher à la texture du sol. Sans cela, toute case sous le pinceau redevient de la terre nue.
+herds_group: Troupeaux
+herds_group_descr: |-
+  Les animaux de l'éditeur de paysage.
+herds_panel: Panneau des troupeaux
+herds_panel_tooltip: |-
+  Lorsque le cerf, le lion, le lapin ou le chameau est sélectionné, un panneau au-dessus du menu Animaux affiche la taille d'un troupeau (part fixe plus part aléatoire) et son type de comportement de groupe. Sa case à cocher adapte la taille du troupeau au pinceau : 2 × taille du pinceau − 1 animaux (de 1 à 13), sans part aléatoire.
+brushes_group: Pinceaux
+brushes_group_descr: |-
+  Les pinceaux de l'éditeur de paysage.
+brushes_full_shape: Pinceaux à forme complète
+brushes_full_shape_tooltip: |-
+  Les pinceaux du jeu comptent deux fois la case sous la souris et oublient la case du coin supérieur gauche, dans l'aperçu comme au placement. Avec cette option, ils retrouvent leur forme complète (dans l'éditeur de cartes ; l'usage interne du jeu reste intact).
+undo_group: Annuler et rétablir
+undo_group_descr: |-
+  Boutons Annuler et Rétablir en haut à gauche de l'éditeur de cartes.
+undo_enabled: Annuler et rétablir
+undo_enabled_tooltip: |-
+  Deux flèches en haut à gauche de l'éditeur de cartes : celle de gauche annule la dernière modification (placement, suppression, peinture, reliefs) et celle de droite la rétablit, jusqu'à 20 étapes. Un bouton est grisé s'il n'y a rien à annuler ou rétablir. Chaque clic compte pour une étape, de même qu'un trait de pinceau maintenu. Les clics sans effet sur la carte ne créent pas d'étape. Charger une autre carte repart d'un historique vide.
+pipette_group: Pipette
+pipette_group_descr: |-
+  Une pipette dans la colonne gauche de l'éditeur de paysage, au-dessus de la taille du pinceau : prélève hauteurs et/ou textures d'une case pour les appliquer aux cases sous le pinceau.
+pipette_enabled: Pipette
+pipette_enabled_tooltip: |-
+  Ajoute le bouton pipette au-dessus de la taille du pinceau (taille du pinceau, règle et gomme descendent légèrement).
+  Lorsqu'elle est choisie, une rangée apparaît au-dessus du menu — Reliefs, Textures, Objets, Tout — avec au-dessus ce que contient la pipette. Cliquez sur une case pour prélever (la pipette affiche une seule case), puis cliquez ou glissez pour appliquer aux cases sous le pinceau. Reliefs laisse le sol intact, Textures laisse les hauteurs intactes. Objets prélève le bâtiment, mur, arbre ou rocher d'une case : bâtiments et murs se placent alors comme depuis leur propre menu pour le même joueur (son écusson est sélectionné), arbres (même type et stade, ou abattu avec le même nombre de rondins) et rochers (même type et rotation) comme avec leurs outils respectifs, glisser compris. Tout prélève aussi un arbre ou un rocher 1×1 pour en placer un sur chaque case sous le pinceau. Resélectionner la pipette ou l'un de ses modes la vide.
+  Les hauteurs ne sont pas appliquées à mer, plage, marais, douves, rochers, murs ou bâtiments ; les textures non plus aux rochers, murs ou bâtiments. Les rochers de falaise sur pentes raides sont effacés puis recréés là où la pente reste raide. Annuler fonctionne aussi pour la pipette.
+pipette_select_key_on: Touche de la pipette
+pipette_select_key_on_tooltip: |-
+  Une touche qui sélectionne la pipette (et la vide). Pressée de nouveau quand la pipette est active, elle passe au mode suivant : Reliefs, Textures, Objets, Tout.
+pipette_select_key: Touche pour la pipette
+pipette_select_key_tooltip: |-
+  La touche qui sélectionne la pipette dans l'éditeur de cartes. Elle conserve aussi son rôle habituel.
+pipette_read_key_on: Maintenir pour prélever une case
+pipette_read_key_on_tooltip: |-
+  Tant que cette touche est maintenue, une pipette déjà remplie prélève de nouveau une case (l'ancienne reste en mémoire jusqu'au clic). Relâchez pour appliquer de nouveau, si elle contient quelque chose.
+pipette_read_key: Touche pour prélever une case
+pipette_read_key_tooltip: |-
+  La touche à maintenir pour prélever une case alors que la pipette est déjà remplie.
+pipette_any_tile_key_on: Maintenir pour appliquer à n'importe quelle case
+pipette_any_tile_key_on_tooltip: |-
+  Expérimental : tant que cette touche est maintenue, la pipette applique hauteurs et textures à toutes les cases sous le pinceau, y compris mer, marais, rochers (qui restent), murs et bâtiments (jamais le bord de la carte). Ne change pas les règles de placement des objets.
+pipette_any_tile_key: Touche pour appliquer à toute case
+pipette_any_tile_key_tooltip: |-
+  La touche à maintenir pour que la pipette ignore ce qui se trouve sur une case.
 key_letter_a: A
 key_letter_b: B
 key_letter_c: C
@@ -376,374 +237,94 @@ key_letter_w: W
 key_letter_x: X
 key_letter_y: Y
 key_letter_z: Z
-key_shift: Shift
-key_space: Space
+key_digit_0: '0'
+key_digit_1: '1'
+key_digit_2: '2'
+key_digit_3: '3'
+key_digit_4: '4'
+key_digit_5: '5'
+key_digit_6: '6'
+key_digit_7: '7'
+key_digit_8: '8'
+key_digit_9: '9'
+key_f1: F1
+key_f2: F2
+key_f3: F3
+key_f4: F4
+key_f5: F5
+key_f6: F6
+key_f7: F7
+key_f8: F8
+key_f9: F9
+key_f10: F10
+key_f11: F11
+key_f12: F12
+key_ctrl: Ctrl
+key_shift: Maj
+key_alt: Alt
+key_space: Espace
 key_tab: Tab
-map_settings_button: Map Settings button
-map_settings_button_tooltip: 'A Map Settings button on the map''s menu screen, right of the Balanced / Unbalanced
-  and
-
-  Invasion / Economy buttons. It opens the Alt + , menu.
-
-  '
-map_settings_group: Map settings
-map_settings_group_descr: 'The map''s settings: map type, size, lock and the menus that show them.
-
-  '
-map_settings_menu: Bigger Map Settings menu
-map_settings_menu_tooltip: 'The Alt + , menu gets a title, Singleplayer and Multiplayer, the four singleplayer map
-  types
-
-  (Siege, Invasion, Economic, Just Build), the four map sizes plus Custom and a Map size slider (10
-
-  to 400; the map changes size when you let go), Balanced, King of the Hill, Lock map and a Back
-
-  button.
-
-  '
-map_settings_show_locked: Show locked maps box
-map_settings_show_locked_tooltip: 'A "Show locked maps" box in the editor''s Load dialog. Ticked, locked maps are
-  listed too;
-
-  the list updates at once.
-
-  '
-menu_always_update: Always keep the menu up to date
-menu_always_update_tooltip: 'The game only redraws the menu while the mouse is over it. A change made elsewhere,
-  for
-
-  example a hotkey that picks another tool, or the counts changing as you place animals,
-
-  only shows once you move the mouse back onto the menu. With this on, the menu is redrawn
-
-  all the time in the map editor.
-
-  '
-menu_dust_clouds: Dust clouds cannot crash the game
-menu_dust_clouds_tooltip: 'A dust cloud whose movement data has been lost made the game divide by zero and crash.
-  With
-
-  this on, such a cloud stays where it is instead.
-
-  '
-menu_group: Editor menu
-menu_group_descr: 'How the editor''s menu at the bottom of the screen is drawn.
-
-  '
-pipette_any_tile_key: Key to give to any tile
-pipette_any_tile_key_on: Hold to give to any tile
-pipette_any_tile_key_on_tooltip: 'Experimental: while this key is held, the pipette gives heights and textures to
-  every tile
-
-  under the brush, also sea, marsh, rocks (which stay), walls and buildings (never the map''s
-
-  edge). It does not change where objects may be placed.
-
-  '
-pipette_any_tile_key_tooltip: 'The key to hold so that the pipette ignores what a tile has on it.
-
-  '
-pipette_enabled: Pipette
-pipette_enabled_tooltip: 'Adds the pipette button above the brush size (brush size, ruler and eraser move down a
-  little).
-
-  Choosing it shows a row above the menu - Heights, Textures, Objects, All - and above that what
-
-  the pipette holds. Click a tile to take it (the pipette shows one tile), then click or drag to
-
-  give it to the tiles under the brush. Heights leave the ground alone, textures leave the
-
-  heights alone. Objects takes the building, wall, tree or rock on a tile: buildings and walls
-
-  are then placed like their own menu button does, for the same player (that player''s shield
-
-  gets chosen), trees (same kind and stage, or felled with
-
-  the same logs) and rocks (same kind and turn) like the tree and rock tools, dragging included. All also takes
-  a tree or 1x1 rock
-
-  and puts one on every tile under the brush. Choosing the pipette or one of its kinds again
-
-  empties it.
-
-  Heights are not given to sea, beach, marsh, moat, rocks, walls or buildings; textures not to
-
-  rocks, walls or buildings. Cliff rocks (the ones the editor puts on steep edges) are cleared
-
-  and come back where an edge stays steep. Undo takes pipette strokes back like any other.
-
-  '
-pipette_group: Pipette
-pipette_group_descr: 'A pipette in the landscape editor''s left column, above the brush size: it takes the heights
-
-  and/or textures of one tile and gives them to the tiles under the brush.
-
-  '
-pipette_read_key: Key to take a tile
-pipette_read_key_on: Hold to take a tile
-pipette_read_key_on_tooltip: 'While this key is held, a pipette that holds something takes a tile again (the old
-  one stays
-
-  until you click). Let go and it gives again - if it holds anything.
-
-  '
-pipette_read_key_tooltip: 'The key to hold for taking a tile while the pipette holds something.
-
-  '
-pipette_select_key: Key for the pipette
-pipette_select_key_on: Pipette key
-pipette_select_key_on_tooltip: 'A key that chooses the pipette (and empties it). Pressed again while the pipette
-  is chosen,
-
-  it goes on to the next kind: Heights, Textures, Objects, All.
-
-  '
-pipette_select_key_tooltip: 'The key that chooses the pipette in the map editor. It still does its usual job as
-  well.
-
-  '
-rocks_erase_invisible: The eraser removes invisible rocks
-rocks_erase_invisible_tooltip: 'The landscape eraser (and the tools that remove rocks with it) frees the tiles of
-  invisible
-
-  rocks too, the way it removes normal rocks. Without this, each tile needs the shrub trick:
-
-  place the shrub that ignores obstacles on it and erase that.
-
-  '
-rocks_extra_rock: Extra small rock
-rocks_extra_rock_tooltip: 'For the smallest rocks, the variant row also offers a fifth one: a small rock the game
-  has
-
-  but the editor never places. It is saved in the map like any other rock.
-
-  '
-rocks_group: Rocks
-rocks_group_descr: 'The Rocks menu of the landscape editor.
-
-  '
-rocks_invisible: Invisible rocks check box
-rocks_invisible_tooltip: 'Adds a check box to the right of the Rocks menu''s buttons. While it is ticked, every
-  rock
-
-  you place is an "invisible rock" straight away, without placing 4000 rocks first: the
-
-  tiles are taken (nothing can be built or walk there) but no rock is drawn, so they keep
-
-  showing what was there before (the "2k stones trick"). Untick it for normal rocks.
-
-  '
-rocks_random_preview: Random rotation shows in the preview
-rocks_random_preview_tooltip: 'With the random rotation button chosen, the game turns the rock so fast that the
-  preview
-
-  under the mouse cannot follow it. With this on it turns once a second instead, and the
-
-  preview shows the rock you are about to place.
-
-  '
-rocks_remove_lost: Remove lost rocks button
-rocks_remove_lost_tooltip: 'Adds a "Remove lost rocks" button at the bottom right of the Rocks menu. A rock the
-  raise or
-
-  lower tool broke, whose tiles were then all covered with shrubs, stays in the map''s list of
-
-  rocks with no tile left: you cannot see, erase or reach it, and it uses up one of the 4000
-
-  rock slots. The button finds every such rock and takes it off the list. Tiles are not changed.
-
-  '
-rocks_signpost: Signpost in the Rocks menu of skirmish maps
-rocks_signpost_tooltip: 'Skirmish maps get the same Rocks menu as scenario maps, with the signpost button.
-
-  '
-rocks_variants: Rock variant row
-rocks_variants_tooltip: 'A row above the Rocks menu shows the four variants of the chosen rock size, turned the
-  way
-
-  they would be placed. Click one to place only that variant; click it again, or any button
-
-  of the Rocks menu, to go back to the game''s changing variants.
-
-  '
-textures_gravel_and_iron: Gravel and iron in the Textures menu
-textures_gravel_and_iron_tooltip: 'Adds Gravel to the top row and Iron to the bottom row, and spreads both rows
-  evenly. The
-
-  gravel picture is images/gravel.png (with gravel_hover.png and gravel_selected.png).
-
-  '
-textures_group: Ground textures
-textures_group_descr: 'The Textures menu of the landscape editor.
-
-  '
-textures_mask: Mask button
-textures_mask_by_type: Mask treats water variants as one
-textures_mask_by_type_tooltip: 'The mask only lets through tiles of the same texture as the one you clicked; every
-  texture stays
-
-  its own (grass, scrub, thick scrub, stones, beach ... are all different). With this on, the
-
-  variants of one water count as that water: all sea including its edges and deeper parts, all
-
-  river including foam, waves and the waterfall edges where it runs down a slope, all river
-
-  crossing. Sea, river and river crossing stay apart.
-
-  '
-textures_mask_tooltip: 'Adds a Mask button (a square, half filled) at the top left of the landscape editor''s menu.
-  While
-
-  it is on, the nature tools (heights, textures, water, trees and shrubs, rocks and the pipette) only
-
-  change tiles that have the same texture as the tile you first clicked on;
-
-  when you let go of the mouse, the next click picks the texture to paint over anew.
-
-  '
-textures_no_heights_iron: Iron only in the Textures menu
-textures_no_heights_iron_tooltip: 'Takes the iron button out of the Heights menu, now that the Textures menu has
-  one.
-
-  '
-trees_apple: Apple tree button
-trees_apple_tooltip: 'Adds an apple tree to the Vegetation menu. The picture is images/apple.png (with
-
-  apple_hover.png and apple_selected.png) in the module''s folder; replace them to change it.
-
-  '
-trees_felled: Felled trees
-trees_felled_tooltip: 'While a tree is chosen, a row above the Vegetation menu offers that tree standing (first)
-  and
-
-  felled, with every number of logs it can still hold (9 down to 1 for a fully grown tree; the
-
-  smallest trees are felled with 1 log). Click one to place felled trees; click the standing
-
-  tree, the felled one again or the tree in the menu to go back to standing trees.
-
-  '
-trees_group: Trees and shrubs
-trees_group_descr: 'More choice when placing vegetation in the landscape editor.
-
-  '
-trees_growth: Brush size sets the tree's growth stage
-trees_growth_tooltip: 'Trees are placed at the growth stage of the brush size: brush 1 places the smallest trees,
-
-  brush 4 fully grown ones (what the editor always places otherwise), brush 5 fully grown
-
-  ones the woodcutters leave alone for a while, brush 6 and 7 dead trees (7 decays sooner).
-
-  Shrubs are not affected.
-
-  '
-trees_no_stacking: No shrub stacks
-trees_no_stacking_tooltip: 'A tree or shrub can no longer be placed on a tile that already has one. Some shrubs
-  (the
-
-  shrub of the top row and the four shrubs it was sorted with) used to pile up there, invisible
-
-  but each taking a place of the tree limit for good. The eraser now also takes away every
-
-  shrub piled up on a tile, so old stacks can be cleared.
-
-  '
-trees_obstacles: Check box for trees next to obstacles
-trees_obstacles_tooltip: 'Adds a check box to the top row of the Vegetation menu. While it is ticked, trees can
-  be
-
-  placed right next to buildings, rocks, walls and other trees, which the game normally keeps
-
-  them away from (shrubs can stand there anyway). Point at it to see whether it is on.
-
-  '
-trees_preview: Tree preview
-trees_preview_tooltip: 'While a tree or shrub is chosen, the tree it would plant is shown on the tile under the
-  mouse,
-
-  at the stage the brush gives it (or felled, with the felled tree''s logs), the way the game
-
-  will draw it. Not while zoomed out.
-
-  '
-trees_random_mix: Random mixes in the tree rows
-trees_random_mix_tooltip: "Adds buttons marked \"?\" to the rows above the Vegetation menu:\n- Random tree (first\
-  \ in the felled tree row): trees of every growth stage from the smallest\n  up to the brush's, mixed at random.\
-  \ Not offered for the smallest trees or dead ones.\n- Random felled tree (last in the felled tree row): felled\
-  \ trees with a random number of\n  logs.\n- Random shrub (last in the shrub row): the five shrub colours mixed\
-  \ at random.\nClick one again, or choose another button, to stop mixing.\n"
-trees_rocks_and_water: Check box for vegetation on rocks and water
-trees_rocks_and_water_tooltip: A check box on the right of the Vegetation menu, below the one for trees next to
-  obstacles (off at first). Ticked, trees and shrubs can also be placed on marsh, river, ford, rocky, boulder and
-  gravel ground.
-trees_shrubs: More shrubs
-trees_shrubs_tooltip: 'While the shrub with four more colours is chosen, a row above the Vegetation menu offers
-
-  all five of them.
-
-  '
-trees_sorted_rows: Tidy the Vegetation menu's rows
-trees_sorted_rows_tooltip: 'Moves the shrub from the top row to the bottom row and sorts the bottom row''s shrubs,
-  so
-
-  the top row holds the trees (and the apple tree and the check box) and the bottom row all
-
-  the shrubs.
-
-  '
-trees_spread_order: Trees in spreading order
-trees_spread_order_tooltip: 'In the Vegetation menu the trees that spread on fertile ground (oasis grass, thick
-  and thin
-
-  scrub) come first, then the tree that spreads on infertile ground (dirt, stony dirt, dunes): the
-
-  third and fourth tree swap places.
-
-  '
-trees_spread_outlines: Outlines for spreading ground
-trees_spread_outlines_tooltip: 'A thin green outline round the trees that spread on fertile ground and a thin beige
-  outline
-
-  round the tree that spreads on infertile ground. The apple tree does not spread and gets none.
-
-  '
-undo_enabled: Undo and redo
-undo_enabled_tooltip: 'Two arrow buttons in the top left corner of the map editor: the left one takes back the last
-
-  thing done on the map - placing, removing, painting, heights - and the right one puts it
-
-  back, for up to 20 steps. A button is greyed out while there is nothing to take back or put
-
-  back. Every click is one step, and so is a brush stroke held down. Clicks that change
-
-  nothing on the map (with no tool chosen, for example) make no step. Loading another map
-
-  starts the history afresh.
-
-  '
-undo_group: Undo and redo
-undo_group_descr: 'Undo and redo buttons in the map editor''s top left corner.
-
-  '
-water_decorations: Foam and small waves
-water_decorations_tooltip: 'Brings back two river decorations from the first Stronghold''s editor, which Crusader
-  still
-
-  supports but has no buttons for: Foam (white water and rising spray, as below a waterfall,
-
-  on every river tile under the brush) and Small waves (on the one river tile under the
-
-  mouse). Both only go on river tiles and are saved in the map.
-
-  '
-water_foam_on_sea: Foam on the ocean too
-water_foam_on_sea_tooltip: 'Foam can also be laid on ocean tiles, which then become river with foam (with the foam
-
-  setting on).
-
-  '
-water_group: Water
-water_group_descr: 'The water menu of the landscape editor.
-
-  '
-qol: Quality of Life
+menu_group: Menu de l'éditeur
+menu_group_descr: |-
+  Manière dont le menu de l'éditeur en bas de l'écran est dessiné.
+menu_dust_clouds: Les nuages de poussière ne font plus planter le jeu
+menu_dust_clouds_tooltip: |-
+  Un nuage de poussière ayant perdu ses données de mouvement provoquait une division par zéro et un plantage du jeu. Avec cette option, un tel nuage reste simplement immobile.
+menu_always_update: Toujours garder le menu à jour
+menu_always_update_tooltip: |-
+  Le jeu ne redessine le menu que lorsque la souris le survole. Un changement survenu ailleurs, comme un raccourci choisissant un autre outil ou des compteurs mis à jour en posant des animaux, n'apparaît qu'en ramenant la souris sur le menu. Avec cette option, le menu est redessiné en continu dans l'éditeur de cartes.
+castle_all_players: Les huit écussons de joueurs sur toutes les cartes
+castle_all_players_tooltip: |-
+  Les écussons à côté de la minicarte affichent les huit joueurs sur tout type de carte, et plus seulement en multijoueur.
+castle_all_keeps: Manoir et forteresse sur toutes les cartes
+castle_all_keeps_tooltip: |-
+  Le menu des donjons propose aussi le manoir et la forteresse sur les cartes multijoueur.
+castle_player_zero: Écusson du joueur 0
+castle_player_zero_tooltip: |-
+  Un neuvième écusson blanc au centre des écussons de joueurs sélectionne le joueur 0, qui peut lui aussi posséder bâtiments et unités sur une carte.
+castle_keep_crests: Écussons de donjon actif
+castle_keep_crests_tooltip: |-
+  Chaque donjon affiche l'écusson de son propriétaire au-dessus de lui ; le donjon actif du joueur (où apparaissent le seigneur, les unités de départ et les nouveaux paysans) est encadré. Cliquez sur un écusson pour activer ce donjon, ou sur l'écusson actif pour laisser le joueur sans donjon actif. Un nouveau donjon ne remplace plus automatiquement l'actif, et si l'actif est supprimé, un autre donjon du joueur prend le relais. La réserve principale suit toujours le donjon actif (sinon le jeu gardait la première réserve posée, bloquant l'emplacement de l'IA avec plusieurs donjons). Nécessite « Plusieurs donjons par joueur ».
+castle_keep_crest_tooltip: Infobulle des écussons de donjon
+castle_keep_crest_tooltip_tooltip: |-
+  Survoler un écusson de donjon indique sa signification et l'effet d'un clic. Nécessite « Écussons de donjon actif ».
+castle_wall_tools: Hauteurs de murs et créneaux libres
+castle_wall_tools_tooltip: |-
+  Les créneaux peuvent tenir seuls. Leur panneau propose Bas, Haut, Bas endommagé et Haut endommagé. Un curseur au-dessus du panneau des murs règle séparément la hauteur des murs hauts, murs bas et créneaux (0 à 255) ainsi que la pente des escaliers (0 à 16) ; Réinitialiser à côté rend la valeur habituelle au type choisi, et quitter l'éditeur les réinitialise tous.
+trees_spread_order: Arbres classés par sol de propagation
+trees_spread_order_tooltip: |-
+  Dans le menu Végétation, les arbres qui se propagent sur sol fertile (herbe d'oasis, broussailles épaisses et fines) apparaissent d'abord, suivis de l'arbre qui se propage sur sol aride (terre, terre pierreuse, dunes) : les troisième et quatrième arbres échangent leurs places.
+trees_spread_outlines: Contours pour les sols de propagation
+trees_spread_outlines_tooltip: |-
+  Un fin contour vert entoure les arbres se propageant sur sol fertile, et un fin contour beige l'arbre des sols arides. Le pommier ne se propage pas et n'a pas de contour.
+herds_bird_bins: Boutons Effacer tous les corbeaux / mouettes
+herds_bird_bins_tooltip: |-
+  Boutons corbeille rouges à droite des boutons corbeau et mouette dans le menu Animaux : un clic retire de la carte tous les corbeaux (les arbres restent) ou toutes les mouettes.
+herds_animal_bin: Bouton Effacer tous les animaux
+herds_animal_bin_tooltip: |-
+  Un bouton corbeille rouge à droite du menu Animaux qui retire tous les animaux de la carte, comme Alt + E. Les corbeaux et les mouettes restent.
+herds_group_warning: Avertissement troupeaux et groupes
+herds_group_warning_tooltip: |-
+  Lorsqu'il reste moins de 200 troupeaux et groupes disponibles, une ligne en haut de l'écran indique combien il en reste, comme la ligne du jeu pour les unités.
+eraser_choice: Panneau de choix de la gomme
+eraser_choice_tooltip: |-
+  Lorsque la gomme est choisie, un panneau au-dessus du menu choisit ce qu'elle efface : Tout (comme avant), Animaux (corbeaux et mouettes inclus), Unités, Bâtiments (donjons, ruines et murs inclus), Végétation ou Rochers (rochers invisibles inclus).
+eraser_seagulls: La gomme efface les mouettes
+eraser_seagulls_tooltip: |-
+  La gomme efface également les mouettes survolant les cases gommées (en mode Tout ou Animaux).
+map_settings_show_locked: Case « Afficher les cartes verrouillées »
+map_settings_show_locked_tooltip: |-
+  Ajoute une case « Afficher les cartes verrouillées » dans la fenêtre Charger de l'éditeur. Cochée, les cartes verrouillées apparaissent dans la liste immédiatement.
+map_settings_button: Bouton Paramètres de la carte
+map_settings_button_tooltip: |-
+  Ajoute un bouton Paramètres de la carte sur l'écran de menu de la carte, à droite des boutons Équilibrée / Déséquilibrée et Invasion / Économie. Ouvre le menu Alt + ,.
+map_settings_menu: Menu Paramètres de la carte étendu
+map_settings_menu_tooltip: |-
+  Le menu Alt + , reçoit un titre, Solo et Multijoueur, les quatre types de cartes solo (Siège, Invasion, Économique, Construction libre), les quatre tailles plus Personnalisée et un curseur de taille de carte (10 à 400 ; appliqué au relâchement), Équilibrée, Roi de la colline, Verrouiller la carte et un bouton Retour.
+eraser_group: Gomme
+eraser_group_descr: |-
+  Ce que la gomme de l'éditeur de paysage supprime.
+map_settings_group: Paramètres de la carte
+map_settings_group_descr: |-
+  Les paramètres de la carte : type, taille, verrouillage et menus associés.
+qol: Qualité de vie
