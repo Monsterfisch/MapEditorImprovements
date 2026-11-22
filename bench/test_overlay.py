@@ -216,9 +216,14 @@ def main():
         h = Host(NEW, exe_path, rt(SMALL))
         h.m.write_log = []
         n = h.frame()
-        print('  %-4s off costs %d instructions, writes %d' % (
-            'ok' if n == OFF_COST and not h.m.write_log else 'FAIL', n, len(h.m.write_log)))
-        failures += not (n == OFF_COST and not h.m.write_log)
+        # The only write: the return address of the shared site's call into the grid's routine,
+        # in the four bytes below the stack pointer.
+        writes = list(h.m.write_log)
+        clean = writes == [(STACK_TOP - 4, 4)]
+        print('  %-4s off costs %d instructions, writes %s' % (
+            'ok' if n == OFF_COST and clean else 'FAIL', n,
+            'only the return address' if clean else repr(writes)))
+        failures += not (n == OFF_COST and clean)
 
         print('  -- Custom Hotkeys with module actions')
         p = Pair(exe_path, rt(SMALL), hotkeys=True)
