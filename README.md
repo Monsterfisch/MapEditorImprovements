@@ -222,6 +222,7 @@ What the module does, in plain English, is in `module/locale/description-en.md`.
   menu (MapEditorProperties) and the Load dialog get one item each by copying whatever table the
   constructor pushes now (autosave extends the Load dialog first); locked maps stay in the list
   when mapNames_filterMapsIfMapLock's `cmp [lock], 0 / jne` is answered "keep".
+* **Panels above the menu never overlap.** Every floating panel (the picture rows of both menus, the herd and height panels, the wall height slider) is placed by `module/editor/lane.lua`: at the lowest free spot over the menu, clear of the menu's own items above its top (measured like the module measures buttons), of the game's description line and the row above it, and of the building counts. When nothing along that line is wide enough, the panel moves up. `cd bench && python test_layout.py` checks every panel kind on both executables' menus at screen widths from 1024 to 2560.
 * **The map drawing's patch site.** After `renderMap`'s one call and the floater pass come two
   loads (`mov eax,[..]`, `mov ecx,[..]`). `module/editor/frame.lua` puts one jump in their place
   that calls the resource grid's routine and then the editor's own frame work (tree preview,
