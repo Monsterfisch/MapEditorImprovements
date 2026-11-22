@@ -521,10 +521,15 @@ function C.pipette(G, O, data, added, guarded, places, button)
     end
   end
   local storedLine                                 -- (below) the line drawn above the panel
+  -- The line now in `text` and its width: written and measured again only when it changes.
+  local written, writtenWidth = nil, 0
   local function lineWidth()
     local line = storedLine()
-    writeCString(text, line:sub(1, 250))
-    return textWidth(G.textManager, text, math.min(#line, 250), TOOLTIP_FONT)
+    if line ~= written or writtenWidth <= 0 then
+      writeCString(text, line:sub(1, 250))
+      written, writtenWidth = line, textWidth(G.textManager, text, math.min(#line, 250), TOOLTIP_FONT)
+    end
+    return writtenWidth
   end
   local paint = makePanel(G, { counts = false }, data, panel, function()
     local list = {}
@@ -565,9 +570,7 @@ function C.pipette(G, O, data, added, guarded, places, button)
     paint()
     local first = panel.items[1]
     if rd16(first + ITEM_HIDDEN) ~= 0 then return end
-    local line = storedLine()
-    writeCString(text, line:sub(1, 250))
-    local width = textWidth(G.textManager, text, math.min(#line, 250), TOOLTIP_FONT)
+    local width = lineWidth()                      -- also leaves the line in `text`
     -- Centred over the panel, in the room the panel keeps above itself (rectAbove).
     local panelLeft, panelRight = rd32(first + ITEM_X), rd32(first + ITEM_X)
     for _, address in ipairs(panel.items) do

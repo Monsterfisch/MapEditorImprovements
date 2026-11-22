@@ -23,7 +23,7 @@ local RENDER_IMAGE = layout.RENDER_IMAGE
 local PLACED_BY_CONTROL = layout.PLACED_BY_CONTROL
 local IMAGE_INDEX_MASK, IMAGE_SIZE, PICTURE_SIZE = layout.IMAGE_INDEX_MASK, layout.IMAGE_SIZE, layout.PICTURE_SIZE
 local MENU_ITEM_SIZE = layout.MENU_ITEM_SIZE
-local MENU_X = layout.MENU_X
+local MENU_X, MENU_SCROLL = layout.MENU_X, layout.MENU_SCROLL
 local PANEL_BOTTOM, PANEL_GAP, PANEL_MARGIN = layout.PANEL_BOTTOM, layout.PANEL_GAP, layout.PANEL_MARGIN
 local TOOLTIP_LINE = layout.TOOLTIP_LINE
 
@@ -98,11 +98,13 @@ end
 ---------------------------------------------------------------------------------------
 
 ---The items of a menu table by block (0: those shown with every tab, else the tab's id), in the
----order the menu has them. Called once the module's copy of the table is complete.
----@return table<number, number[]> addresses by block
+---order the menu has them, and for each item its block and its place in the table. Called once
+---the module's copy of the table is complete.
+---@return table<number, number[]> addresses by block, table<number, number> block by address,
+---  table<number, number> place by address
 function M.blocks(itemTable)
   local rd32 = core.readInteger
-  local blocks, block, i = { [0] = {} }, 0, 0
+  local blocks, blockOf, order, block, i = { [0] = {} }, {}, {}, 0, 0
   while true do
     local address = itemTable + i * MENU_ITEM_SIZE
     local itemType = rd32(address + ITEM_TYPE)
@@ -112,10 +114,11 @@ function M.blocks(itemTable)
       blocks[block] = blocks[block] or {}
     else
       table.insert(blocks[block], address)
+      blockOf[address], order[address] = block, i
     end
     i = i + 1
   end
-  return blocks
+  return blocks, blockOf, order
 end
 
 ---A button's picture size (its image table entry's gm picture), nil while the gm is not loaded.
@@ -143,6 +146,13 @@ function M.measure(G, address)
   return width, height
 end
 
+---Whether an item that could not be measured may still get a size: a picture item with a picture
+---(not image 0, which has none: the build menu has one such item) whose gm is not loaded yet.
+local function pending(address)
+  local rd32 = core.readInteger
+  return rd32(address + ITEM_RENDER_TYPE) == RENDER_IMAGE and (rd32(address + ITEM_IMAGE) & IMAGE_INDEX_MASK) ~= 0
+end
+
 ---What a floating panel of this menu must keep clear of while `tab` is shown, apart from the
 ---module's fixed boxes (M.extras): the menu's items above its top (not the module's floating ones)
 ---and the description line with the row above it. Also whether every item could be measured (its
@@ -164,7 +174,7 @@ function M.keepOuts(data, tab, measure)
     local width, height = measure(address)
     if width ~= nil then
       list[#list + 1] = { x = x, y = y, w = width, h = height }
-    elseif rd32(address + ITEM_RENDER_TYPE) == RENDER_IMAGE then
+    elseif pending(address) then
       complete = false
     end
   end
@@ -213,7 +223,7 @@ function M.menuSpan(data, measure)
         local width = measure(address)
         if width ~= nil then
           take(x, width)
-        elseif rd32(address + ITEM_RENDER_TYPE) == RENDER_IMAGE then
+        elseif pending(address) then
           complete = false
         end
       end
@@ -238,17 +248,29 @@ end
 ---The spot for a floating box of this menu: centred over the menu, as low as it can sit at its
 ---preferred bottom (PANEL_BOTTOM unless given) without covering anything in the band, within the
 ---menu's width when it fits there. `owner` is what places it (a panel): its `items` are the
----floating ones it moves, and its box stays clear of the other owners' boxes while theirs show
----(the pipette panel and a Vegetation panel can be up at once).
+---floating ones it moves. Its box also stays clear of the boxes of the owners the menu draws
+---before it in the same frame (the pipette panel, in the block every tab shows, before a
+---Vegetation panel; a wall panel before its slider): those shown, of the block every tab shows or
+---of the tab shown. An owner the menu draws later keeps clear of this one instead, so neither
+---depends on the other's last frame, and a panel left up on another tab does not count.
 ---@param extra table[]|nil more rects to keep clear of (the panel a slider stands on)
 ---@return number left, number top
 function M.spot(G, data, owner, width, height, bottom, extra)
   local rd32 = core.readInteger
   if not owner.laneRegistered then
-    for _, address in ipairs(owner.items) do data.floating[address] = true end
+    -- Where the menu draws it: the block and the place of its first item in the table.
+    owner.laneOrder = math.huge
+    for _, address in ipairs(owner.items) do
+      data.floating[address] = true
+      local place = data.laneOrder ~= nil and data.laneOrder[address] or nil
+      if place ~= nil and place < owner.laneOrder then
+        owner.laneOrder, owner.laneBlock = place, data.laneBlockOf[address]
+      end
+    end
     owner.laneRegistered = true
   end
-  local menuX = rd32(G.menu + MENU_X)
+  -- Menu coordinates to the screen: the menu's x less its scroll, as the menu draws its items.
+  local menuX = rd32(G.menu + MENU_X) - rd32(G.menu + MENU_SCROLL)
   local screen = rd32(G.screenWidth)
   local function measure(address) return M.measure(G, address) end
   -- The menu's items stay put once it is laid out: read them once per tab, then reuse them a while.
@@ -267,7 +289,10 @@ function M.spot(G, data, owner, width, height, bottom, extra)
   for _, rect in ipairs(extra or {}) do keepOut[#keepOut + 1] = rect end
   data.lanePlaced = data.lanePlaced or {}
   for other, placed in pairs(data.lanePlaced) do
-    if other ~= owner and anyShown(other.items) then keepOut[#keepOut + 1] = placed end
+    if other.laneOrder < owner.laneOrder and (other.laneBlock == 0 or other.laneBlock == tab)
+        and anyShown(other.items) then
+      keepOut[#keepOut + 1] = placed
+    end
   end
   local left, top = M.place(width, height, {
     left = PANEL_MARGIN - menuX, right = screen - PANEL_MARGIN - menuX, centre = screen / 2 - menuX,
@@ -280,7 +305,7 @@ end
 ---Set up a menu's lane once its item table is complete: its items by block and its description
 ---line, given, or else the item the game's description renderer draws.
 function M.prepare(data, itemTable, description, descriptionRender, descriptionShift)
-  data.laneBlocks = M.blocks(itemTable)
+  data.laneBlocks, data.laneBlockOf, data.laneOrder = M.blocks(itemTable)
   data.descriptionShift = descriptionShift or 0
   data.description = description
   if description == nil then
