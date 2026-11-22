@@ -180,7 +180,7 @@ minden blokkban azokat a mezőket, amelyeket egy MI-vasbánya elfoglalna.
 - Alapértelmezés szerint csak sík nézetben (Szóköz) látható, ahol a vonalak pontosan a talajra
   esnek, a V nézetben pedig rejtve marad.
 - **Rács engedélyezése játék közben** segítségével egy próbajátékban is ellenőrizheted a
-  vonalakat.
+  vonalakat (Custom Hotkeys mellett ott rendeld hozzá a játékbeli gyorsbillentyűjét).
 - A rács, a határok és a vasbánya alaprajzának színe módosítható.
 - Semmi nem mentődik a térképbe.
 

@@ -342,7 +342,8 @@ cover.
   settings, or the shortcut can be changed in Custom Hotkeys.
 - By default it only shows in the flattened view (space bar), where the lines lie exactly on the
   ground, and it is hidden in the V view.
-- **Allow the overlay during games** lets you check the lines in a test game.
+- **Allow the overlay during games** lets you check the lines in a test game (with Custom
+  Hotkeys, bind its in-game shortcut there).
 - The colours of the grid, the boundaries and the mine footprint can be changed.
 - Nothing is saved into the map.
 

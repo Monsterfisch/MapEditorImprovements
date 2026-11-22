@@ -179,7 +179,8 @@ würde.
   lässt sich in den Einstellungen wählen, oder das Kürzel kann in Custom Hotkeys geändert werden.
 - Standardmäßig erscheint es nur in der flachen Ansicht (Leertaste), in der die Linien exakt auf
   dem Boden liegen, und bleibt in der V-Ansicht ausgeblendet.
-- **Raster auch im Spiel erlauben** lässt dich die Linien in einem Testspiel prüfen.
+- **Raster auch im Spiel erlauben** lässt dich die Linien in einem Testspiel prüfen (mit Custom
+  Hotkeys das Kürzel für das Spiel dort belegen).
 - Die Farben des Rasters, der Grenzen und der Grundfläche der Eisenmine lassen sich ändern.
 - Es wird nichts in der Karte gespeichert.
 

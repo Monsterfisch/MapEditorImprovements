@@ -179,7 +179,8 @@ l'IA.
   peut être choisie dans les paramètres, ou le raccourci peut être modifié dans Custom Hotkeys.
 - Par défaut, elle ne s'affiche qu'en vue aplatie (barre d'espace), où les lignes reposent
   exactement sur le sol, et elle est masquée dans la vue V.
-- **Autoriser la grille en partie** vous permet de vérifier les lignes lors d'une partie de test.
+- **Autoriser la grille en partie** vous permet de vérifier les lignes lors d'une partie de test
+  (avec Custom Hotkeys, attribuez-y son raccourci en partie).
 - Les couleurs de la grille, des limites et de l'emprise de la mine peuvent être modifiées.
 - Rien n'est enregistré dans la carte.
 

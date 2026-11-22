@@ -172,7 +172,7 @@ y en cada bloque las casillas que cubriría una mina de hierro de la IA.
 - Por defecto solo se muestra en la vista plana (barra espaciadora), donde las líneas quedan
   exactamente sobre el suelo, y se oculta en la vista de la tecla V.
 - **Permitir la cuadrícula durante partidas** te permite comprobar las líneas en una partida de
-  prueba.
+  prueba (con Custom Hotkeys, asigna allí su atajo en partida).
 - Se pueden cambiar los colores de la cuadrícula, los límites y la superficie de la mina.
 - No se guarda nada en el mapa.
 

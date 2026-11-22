@@ -178,7 +178,8 @@ yapay zekâ demir madeninin kaplayacağı kareleri de çizer.
   seçilebilir ya da kısayol Custom Hotkeys içinde değiştirilebilir.
 - Varsayılan olarak yalnızca çizgilerin zemine tam oturduğu düzleştirilmiş görünümde (Boşluk
   tuşu) gösterilir ve V görünümünde gizlenir.
-- **Oyun sırasında ızgaraya izin ver**, bir deneme oyununda çizgileri kontrol etmenizi sağlar.
+- **Oyun sırasında ızgaraya izin ver**, bir deneme oyununda çizgileri kontrol etmenizi sağlar
+  (Custom Hotkeys ile oyun içi kısayolunu oradan atayın).
 - Izgaranın, sınırların ve maden alanının renkleri değiştirilebilir.
 - Haritaya hiçbir şey kaydedilmez.
 

@@ -3,7 +3,8 @@
 --
 -- The frame routine is called from the map drawing's patch site (editor/frame.lua) and only
 -- calls into lua when there is something new to work out. Switched off, it costs one compare a
--- frame. Switched on, it checks the map editor, flattened view and V view itself, and then compares the few values the picture depends on (map rotation, zoom level,
+-- frame. Switched on, it checks the map editor, flattened view and V view itself, and then
+-- compares the few values the picture depends on (map rotation, zoom level,
 -- camera, rendered area, pixel format) with the ones it last drew for. Only when one of them has
 -- changed does it call lua, which clips every line to the new view and writes what is left into
 -- a short list. Every other frame the assembly replays that list.
