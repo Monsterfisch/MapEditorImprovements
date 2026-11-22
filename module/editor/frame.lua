@@ -102,7 +102,7 @@ function M.install(self)
   }))
   for name in pairs(routines) do running[name] = true end
   routines = {}
-  log(INFO, string.format("%s: map drawing at 0x%X (%d bytes)%s", MODULE_NAME, at, size,
+  log(INFO, string.format("map drawing at 0x%X (%d bytes)%s", at, size,
     grid and ", with the resource grid" or ""))
   return true
 end

@@ -63,8 +63,8 @@ local function sectionEnd(inside)
     base = base - 0x10000
   end
   missed[start] = true
-  log(WARNING, string.format("%s: no executable header found below 0x%X; pattern checks scan to the "
-    .. "framework's default end", MODULE_NAME, inside))
+  log(WARNING, string.format("no executable header found below 0x%X; pattern checks scan to the "
+    .. "framework's default end", inside))
   return nil
 end
 

@@ -26,8 +26,6 @@
 --     Zoom's own pattern on the same function reads, so the two modules can be enabled in either
 --     order.
 
-local layout = require("editor.layout")
-local MODULE_NAME = layout.MODULE_NAME
 local memory = require("editor.memory")
 local frame = require("editor.frame")
 local B = require("editor.grid_draw")
@@ -208,8 +206,8 @@ local function resolveChoice(name, table_, defaultName, what)
   local value = table_[name]
   if value == nil then
     if name ~= nil then
-      log(WARNING, string.format("%s: resource grid: unknown %s '%s', using '%s'.",
-        MODULE_NAME, what, tostring(name), defaultName))
+      log(WARNING, string.format("resource grid: unknown %s '%s', using '%s'.",
+        what, tostring(name), defaultName))
     end
     value = table_[defaultName]
   end
@@ -237,13 +235,13 @@ function M.enable(self, config)
   if config.enabled == false then return false end
 
   if modules ~= nil and modules["resource-grid-overlay"] ~= nil then
-    log(WARNING, MODULE_NAME .. ": resource grid: Resource Grid Overlay is active and draws it; "
+    log(WARNING, "resource grid: Resource Grid Overlay is active and draws it; "
       .. "this module leaves the grid to it. Turn that module off to use the grid here.")
     return false
   end
   local S = frame.resolve()
   if not S.firstLoadFree then
-    log(WARNING, MODULE_NAME .. ": resource grid: another module has changed the map drawing's "
+    log(WARNING, "resource grid: another module has changed the map drawing's "
       .. "first load; the grid is disabled.")
     return false
   end
@@ -292,7 +290,7 @@ function M.enable(self, config)
 
   if surfaceSite == nil or gameModeSite == nil or orientationSite == nil
       or (hotkeys == nil and dispatchSite == nil) then
-    log(WARNING, MODULE_NAME .. ": resource grid: disabled, the game code it needs was not found.")
+    log(WARNING, "resource grid: disabled, the game code it needs was not found.")
     return false
   end
 
@@ -343,7 +341,7 @@ function M.enable(self, config)
   local viewFlag = viewModeSite ~= nil
     and readAddress(viewModeSite + OFFSET_COMMAND_OBJECT) + VIEW_FLAG_IN_COMMAND_OBJECT or nil
   if flattenedOnly and flattenA == nil then
-    log(WARNING, MODULE_NAME .. ": resource grid: the flattened view flags were not found, "
+    log(WARNING, "resource grid: the flattened view flags were not found, "
       .. "so the overlay shows in every view.")
   end
 
@@ -379,7 +377,7 @@ function M.enable(self, config)
       writeInteger(control + B.MARKER_BLOCK + 4, 0)
       if not rebuildFailed then
         rebuildFailed = true
-        log(WARNING, MODULE_NAME .. ": resource grid: could not work out the overlay: " .. tostring(err))
+        log(WARNING, "resource grid: could not work out the overlay: " .. tostring(err))
       end
     end
     -- Marked valid either way: a failure is not retried until the view changes.
@@ -447,12 +445,12 @@ function M.enable(self, config)
           })
         end)
         if not gameOk then
-          log(WARNING, MODULE_NAME .. ": resource grid: Custom Hotkeys refused the game action ("
+          log(WARNING, "resource grid: Custom Hotkeys refused the game action ("
             .. tostring(gameProblem) .. "); the grid toggles in the map editor only")
         end
       end
     else
-      log(WARNING, MODULE_NAME .. ": resource grid: Custom Hotkeys refused the toggle ("
+      log(WARNING, "resource grid: Custom Hotkeys refused the toggle ("
         .. tostring(problem) .. "); Alt + key instead")
     end
   end
@@ -468,7 +466,7 @@ function M.enable(self, config)
     end, dispatchSite + OFFSET_SYS_KEY_JUMP, SIZE_SYS_KEY_JUMP)
     input = string.format("Alt + key 0x%02X", hotkey)
   elseif input == nil then
-    log(WARNING, MODULE_NAME .. ": resource grid: no way to toggle it; it stays hidden")
+    log(WARNING, "resource grid: no way to toggle it; it stays hidden")
     input = "no toggle"
   end
 
@@ -489,13 +487,13 @@ function M.enable(self, config)
       return registers
     end, screenChangeSite + OFFSET_SCREEN_STORED, SIZE_SCREEN_STORED)
   else
-    log(WARNING, MODULE_NAME .. ": resource grid: no screen change site, so it stays on when you leave the map")
+    log(WARNING, "resource grid: no screen change site, so it stays on when you leave the map")
   end
 
   -- Last, once every other part is in: a failure above leaves no grid routine behind.
   frame.add("grid", routine)
-  log(INFO, string.format("%s: resource grid: %s, %d lines, rotation boundaries %s, %s.",
-    MODULE_NAME, input, #state.lines[V.DEFAULT_ORIENTATION][1], withRotation and "on" or "off",
+  log(INFO, string.format("resource grid: %s, %d lines, rotation boundaries %s, %s.",
+    input, #state.lines[V.DEFAULT_ORIENTATION][1], withRotation and "on" or "off",
     editorOnly and "map editor only" or "on every map"))
   return true
 end

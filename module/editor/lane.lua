@@ -314,7 +314,7 @@ function M.prepare(data, itemTable, description, descriptionRender, descriptionS
     end
   end
   if data.description == nil then
-    log(WARNING, layout.MODULE_NAME .. ": the description line of a menu was not found; panels may cover it")
+    log(WARNING, "the description line of a menu was not found; panels may cover it")
   end
 end
 
