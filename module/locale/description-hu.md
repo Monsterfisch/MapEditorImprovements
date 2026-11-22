@@ -168,8 +168,6 @@ A játék csak akkor rajzolja újra a szerkesztőmenüt, ha az egér felette van
 
 ## Nyersanyagrács
 
-Korábban a Monsterfish által készített különálló Resource Grid Overlay modul.
-
 A térképre rajzolja azt a rácsot, amelyet az MI használ, amikor helyet keres kőfejtői,
 vasbányái, olajkútjai és favágói számára: 5 × 5 mezős blokkokat. Egyetlen blokkon belül lévő
 kőlelőhely többet ér az MI számára, mint ugyanez a lelőhely négy blokkra szétosztva. Kirajzolja
@@ -177,21 +175,14 @@ azt a négy vonalat is, ahol az MI várelrendezése a vártorony helyzete alapj�
 minden blokkban azokat a mezőket, amelyeket egy MI-vasbánya elfoglalna.
 
 - **Alt + G** megjeleníti vagy elrejti a térképszerkesztőben. A beállításokban másik Alt +
-  billentyű kombináció is választható. Olyan Custom Hotkeys verzióval, amely engedi a
-  moduloknak saját gyorsbillentyűk hozzáadását, a gyorsbillentyű ott szerepel a Map Editor
-  Improvements alatt és módosítható; a játékokhoz tartozó második gyorsbillentyű is megjelenik,
-  kezdetben billentyű nélkül.
+  billentyű kombináció is választható, vagy a gyorsbillentyű a Custom Hotkeys modulban is
+  módosítható.
 - Alapértelmezés szerint csak sík nézetben (Szóköz) látható, ahol a vonalak pontosan a talajra
   esnek, a V nézetben pedig rejtve marad.
 - **Rács engedélyezése játék közben** segítségével egy próbajátékban is ellenőrizheted a
   vonalakat.
 - A rács, a határok és a vasbánya alaprajzának színe módosítható.
-- A térkép elhagyása elrejti, így a szerkesztő minden megnyitásakor rejtve indul.
 - Semmi nem mentődik a térképbe.
-
-A régi Resource Grid Overlay modulban megadott beállítások nem kerülnek átvételre. Ha
-módosítottad őket, állítsd be újra ennek a modulnak a „Nyersanyagrács” csoportjában. Ha a
-Resource Grid Overlay még be van kapcsolva, ez a modul átengedi neki a rácsot; kapcsold ki.
 
 ## Jó tudni
 

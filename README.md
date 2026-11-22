@@ -8,7 +8,9 @@ growth stages, apple trees, more shrubs, felled trees, random mixes, gravel and 
 variants, herd sizes. And it draws the grid the AI reads when it looks for places for its
 resource buildings - 5 x 5 blocks of tiles - over the terrain, with the four lines where a keep's
 rotation changes and the tiles an iron mine would cover in each block; **Alt + G** switches it on
-and off. That resource grid was the separate Resource Grid Overlay module until 1.0.65.
+and off. That resource grid was the separate Resource Grid Overlay module until 1.0.65; its
+settings are not taken over, and while Resource Grid Overlay is turned on this module leaves the
+grid to it.
 
 What the module does, in plain English, is in `module/locale/description-en.md`.
 

@@ -332,8 +332,6 @@ change anything outside the map editor.
 
 ## Resource grid
 
-Formerly the separate Resource Grid Overlay module by Monsterfish.
-
 Draws over the map the grid the AI uses when it looks for places for its quarries, iron mines,
 pitch rigs and woodcutters: blocks of 5 x 5 tiles. A patch of stone inside one block is worth
 more to the AI than the same patch spread over four. It also draws the four lines where the AI's
@@ -341,19 +339,12 @@ castle layout turns with the keep's position, and in every block the tiles an AI
 cover.
 
 - **Alt + G** shows or hides it in the map editor. Another Alt + key can be chosen in the
-  settings. With a Custom Hotkeys version that lets modules add their own shortcuts, the
-  shortcut is listed there under Map Editor Improvements and can be changed; a second shortcut
-  for games is listed too and starts without a key.
+  settings, or the shortcut can be changed in Custom Hotkeys.
 - By default it only shows in the flattened view (space bar), where the lines lie exactly on the
   ground, and it is hidden in the V view.
 - **Allow the overlay during games** lets you check the lines in a test game.
 - The colours of the grid, the boundaries and the mine footprint can be changed.
-- Leaving the map hides it, so it starts hidden each time you open the editor.
 - Nothing is saved into the map.
-
-Settings made in the old Resource Grid Overlay module are not taken over. If you changed them,
-set them again in this module's "Resource grid" group. If Resource Grid Overlay is still
-turned on, this module leaves the grid to it; turn it off.
 
 ## Good to know
 

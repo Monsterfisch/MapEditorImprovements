@@ -390,7 +390,4 @@ grid_enabled: Ressourcenraster-Overlay
 grid_enabled_tooltip: 'Ermöglicht es, das Ressourcenraster über der Karte einzublenden. Aus: Das Raster
   und sein Kürzel stehen nicht zur Verfügung.'
 grid_group_descr: Zeichnet das 5×5-Ressourcenraster der KI, die Grenzen der Burgdrehung und die Grundfläche
-  der Eisenmine über die Karte. Zuvor das Modul Resource Grid Overlay. Alt plus die gewählte Taste blendet
-  es im Karteneditor ein oder aus. Mit einer Version von Custom Hotkeys, die Modulen eigene Kürzel erlaubt,
-  erscheint das Kürzel dort unter Map Editor Improvements und lässt sich ändern; die hier gewählte Taste
-  dient dann nur als erster Vorschlag.
+  der Eisenmine über die Karte. Alt plus die gewählte Taste blendet es im Karteneditor ein oder aus.

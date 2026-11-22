@@ -388,5 +388,4 @@ grid_colour_black: 黑色
 map_editor: 地图编辑器
 grid_enabled: 资源网格叠加层
 grid_enabled_tooltip: 允许在地图上显示资源网格。关闭：网格及其快捷键均不可用。
-grid_group_descr: 在地图上绘制 AI 的 5×5 资源网格、城堡旋转分界线以及铁矿占地。原为独立的 Resource Grid Overlay 模块。在地图编辑器中按 Alt 加所选按键可显示或隐藏网格。若使用的
-  Custom Hotkeys 版本支持模块注册自定义快捷键，该快捷键会列在其中的 Map Editor Improvements 下并可修改；此处选择的按键届时仅作为初始建议。
+grid_group_descr: 在地图上绘制 AI 的 5×5 资源网格、城堡旋转分界线以及铁矿占地。在地图编辑器中按 Alt 加所选按键可显示或隐藏网格。

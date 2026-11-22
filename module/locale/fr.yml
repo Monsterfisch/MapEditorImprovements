@@ -390,7 +390,5 @@ grid_enabled: Superposition de la grille des ressources
 grid_enabled_tooltip: 'Permet d''afficher la grille des ressources sur la carte. Désactivé : la grille
   et son raccourci ne sont pas disponibles.'
 grid_group_descr: La grille des ressources 5×5 de l'IA, les limites de rotation du château et l'emprise
-  de la mine de fer, tracées sur la carte. Auparavant le module Resource Grid Overlay. Alt plus la touche
-  choisie l'affiche ou la masque dans l'éditeur de cartes. Avec une version de Custom Hotkeys permettant
-  aux modules d'ajouter leurs propres raccourcis, le raccourci y figure sous Map Editor Improvements où
-  vous pouvez le modifier ; la touche choisie ici ne sert alors que de suggestion initiale.
+  de la mine de fer, tracées sur la carte. Alt plus la touche choisie l'affiche ou la masque dans l'éditeur
+  de cartes.

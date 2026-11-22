@@ -1,6 +1,5 @@
 -- Names of the resource grid's actions in Custom Hotkeys, in the nine UCP languages.
--- Machine translations for de, fr, ru, hu, tr, ch, es and fa need human review. The category is
--- the module's name, which its descriptions keep in English in every language.
+-- The category is the module's name, which its descriptions keep in English in every language.
 return {
   category = {
     en = "Map Editor Improvements",

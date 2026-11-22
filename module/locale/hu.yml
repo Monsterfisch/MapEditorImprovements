@@ -390,7 +390,4 @@ grid_enabled: Nyersanyagrács-átfedés
 grid_enabled_tooltip: 'Lehetővé teszi a nyersanyagrács megjelenítését a térkép felett. Ki: a rács és a
   gyorsbillentyűje nem érhető el.'
 grid_group_descr: Az MI 5×5-ös nyersanyagrácsa, a várforgatási határok és a vasbánya helyigénye a térképre
-  rajzolva. Korábban a Resource Grid Overlay modul része volt. Az Alt és a választott billentyű együttesen
-  megjeleníti vagy elrejti a térképszerkesztőben. Olyan Custom Hotkeys verzióval, amely lehetővé teszi
-  a moduloknak saját gyorsbillentyűk hozzáadását, a gyorsbillentyű ott szerepel a Map Editor Improvements
-  alatt, ahol megváltoztatható; az itt választott billentyű ekkor csak első javaslatként szolgál.
+  rajzolva. Az Alt és a választott billentyű együttesen megjeleníti vagy elrejti a térképszerkesztőben.

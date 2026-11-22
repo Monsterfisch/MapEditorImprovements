@@ -809,7 +809,4 @@ grid_enabled: Resource grid overlay
 grid_enabled_tooltip: 'Lets you show the resource grid over the map. Off: the grid and its shortcut are
   not available.'
 grid_group_descr: The AI's 5x5 resource grid, the castle-rotation boundaries and the iron mine footprint,
-  drawn over the map. Formerly the Resource Grid Overlay module. Alt plus the chosen key shows or hides
-  it in the map editor. With a Custom Hotkeys version that lets modules add their own shortcuts, the shortcut
-  is listed there under Map Editor Improvements, where you can change it; the key chosen here is then
-  only its first suggestion.
+  drawn over the map. Alt plus the chosen key shows or hides it in the map editor.

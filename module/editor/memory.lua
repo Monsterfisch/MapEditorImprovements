@@ -25,10 +25,6 @@ end
 -- is first tested with the framework's scanner, which steps over memory that is not there, and only
 -- read once its first page holds the header. Without a usable section table the image's end is
 -- used (it also spans the game's large data sections, so it is slower).
--- Framework 3.0.7 has no scan limited to the main executable. The patching library's unreleased
--- `scanForAOBInMainModule` (RPS branch fix/aob-scan-bounds, 604174b), which looks only at the
--- executable's code pages, replaces sectionEnd and the bounded second scan below once a framework
--- release offers it.
 local found = {}             -- { first, stop } of each section found
 local missed = {}            -- 64 KiB boundaries below which no header turned up
 local function sectionEnd(inside)

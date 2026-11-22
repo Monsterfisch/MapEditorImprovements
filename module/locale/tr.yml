@@ -390,7 +390,4 @@ grid_enabled: Kaynak ızgarası katmanı
 grid_enabled_tooltip: 'Kaynak ızgarasını harita üzerinde göstermenizi sağlar. Kapalı: ızgara ve kısayolu
   kullanılamaz.'
 grid_group_descr: Yapay zekânın 5×5 kaynak ızgarası, kale dönüş sınırları ve demir madeni alanı harita
-  üzerine çizilir. Eskiden Resource Grid Overlay modülüydü. Alt ile seçilen tuş, harita düzenleyicide
-  bunu gösterir veya gizler. Modüllerin kendi kısayollarını eklemesine izin veren bir Custom Hotkeys sürümüyle
-  kısayol orada Map Editor Improvements altında listelenir ve değiştirilebilir; burada seçilen tuş o zaman
-  yalnızca ilk öneri olarak kullanılır.
+  üzerine çizilir. Alt ile seçilen tuş, harita düzenleyicide bunu gösterir veya gizler.

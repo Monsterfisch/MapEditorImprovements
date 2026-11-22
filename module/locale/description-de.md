@@ -168,8 +168,6 @@ Das Spiel zeichnet das Editormenü nur neu, solange der Mauszeiger darüber lieg
 
 ## Ressourcenraster
 
-Zuvor das eigenständige Modul Resource Grid Overlay von Monsterfish.
-
 Zeichnet das Raster über die Karte, das die KI bei der Standortsuche für ihre Steinbrüche,
 Eisenminen, Pechförderer und Holzfäller nutzt: Blöcke aus 5 × 5 Feldern. Ein Steinvorkommen
 innerhalb eines Blocks ist für die KI wertvoller als dasselbe Vorkommen über vier Blöcke
@@ -178,21 +176,12 @@ Position des Bergfrieds dreht, sowie in jedem Block die Felder, die eine KI-Eise
 würde.
 
 - **Alt + G** blendet es im Karteneditor ein oder aus. Eine andere Kombination aus Alt + Taste
-  lässt sich in den Einstellungen wählen. Mit einer Version von Custom Hotkeys, die Modulen
-  eigene Kürzel erlaubt, erscheint das Kürzel dort unter Map Editor Improvements und kann
-  geändert werden; ein zweites Kürzel für laufende Spiele wird ebenfalls aufgeführt und ist
-  anfangs nicht belegt.
+  lässt sich in den Einstellungen wählen, oder das Kürzel kann in Custom Hotkeys geändert werden.
 - Standardmäßig erscheint es nur in der flachen Ansicht (Leertaste), in der die Linien exakt auf
   dem Boden liegen, und bleibt in der V-Ansicht ausgeblendet.
 - **Raster auch im Spiel erlauben** lässt dich die Linien in einem Testspiel prüfen.
 - Die Farben des Rasters, der Grenzen und der Grundfläche der Eisenmine lassen sich ändern.
-- Beim Verlassen der Karte wird es ausgeblendet, sodass es bei jedem Öffnen des Editors zunächst
-  ausgeblendet ist.
 - Es wird nichts in der Karte gespeichert.
-
-Einstellungen aus dem alten Modul Resource Grid Overlay werden nicht übernommen. Wenn du sie
-geändert hast, stelle sie in der Gruppe „Ressourcenraster“ dieses Moduls neu ein. Ist Resource
-Grid Overlay noch aktiviert, überlässt dieses Modul ihm das Raster; schalte es ab.
 
 ## Gut zu wissen
 

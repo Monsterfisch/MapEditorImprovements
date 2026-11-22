@@ -168,8 +168,6 @@ Oyun düzenleyici menüsünü yalnızca fare üzerindeyken yeniden çizer. Fare 
 
 ## Kaynak ızgarası
 
-Eskiden Monsterfish tarafından yapılan ayrı Resource Grid Overlay modülüydü.
-
 Yapay zekânın taş ocakları, demir madenleri, zift kuyuları ve oduncuları için yer ararken
 kullandığı 5 × 5 karelik bloklardan oluşan ızgarayı harita üzerine çizer. Tek bir blok içindeki
 taş yatağı, yapay zekâ için aynı yatağın dört bloğa yayılmış hâlinden daha değerlidir. Ayrıca
@@ -177,19 +175,12 @@ yapay zekânın kale planının iç kalenin konumuna göre döndüğü dört çi
 yapay zekâ demir madeninin kaplayacağı kareleri de çizer.
 
 - **Alt + G** harita düzenleyicide bunu gösterir veya gizler. Ayarlardan başka bir Alt + tuş
-  seçilebilir. Modüllerin kendi kısayollarını eklemesine izin veren bir Custom Hotkeys sürümüyle
-  kısayol orada Map Editor Improvements altında listelenir ve değiştirilebilir; oyunlar için
-  ikinci bir kısayol da listelenir ve başlangıçta tuş atanmamıştır.
+  seçilebilir ya da kısayol Custom Hotkeys içinde değiştirilebilir.
 - Varsayılan olarak yalnızca çizgilerin zemine tam oturduğu düzleştirilmiş görünümde (Boşluk
   tuşu) gösterilir ve V görünümünde gizlenir.
 - **Oyun sırasında ızgaraya izin ver**, bir deneme oyununda çizgileri kontrol etmenizi sağlar.
 - Izgaranın, sınırların ve maden alanının renkleri değiştirilebilir.
-- Haritadan çıkmak onu gizler; böylece düzenleyiciyi her açtığınızda gizli başlar.
 - Haritaya hiçbir şey kaydedilmez.
-
-Eski Resource Grid Overlay modülünde yapılan ayarlar devralınmaz. Onları değiştirdiyseniz bu
-modülün «Kaynak ızgarası» grubunda yeniden ayarlayın. Resource Grid Overlay hâlâ açıksa bu modül
-ızgarayı ona bırakır; onu kapatın.
 
 ## Bilmekte fayda var
 

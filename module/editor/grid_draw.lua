@@ -3,8 +3,7 @@
 --
 -- The frame routine is called from the map drawing's patch site (editor/frame.lua) and only
 -- calls into lua when there is something new to work out. Switched off, it costs one compare a
--- frame. Switched on, it checks the same things the lua used to - map editor, flattened view,
--- V view - and then compares the few values the picture depends on (map rotation, zoom level,
+-- frame. Switched on, it checks the map editor, flattened view and V view itself, and then compares the few values the picture depends on (map rotation, zoom level,
 -- camera, rendered area, pixel format) with the ones it last drew for. Only when one of them has
 -- changed does it call lua, which clips every line to the new view and writes what is left into
 -- a short list. Every other frame the assembly replays that list.
@@ -12,9 +11,7 @@
 -- The pixels are put down by the module's own line loop, straight into the map surface. It is
 -- Bresenham with the same start point, error term and tie-break as `PencilRenderCore::drawLine`,
 -- so it sets exactly the pixels the game's drawer would, and it does both rows of the two-pixel
--- line in the same pass. The game's drawer calls a plot function for every pixel and works the
--- address out again each time, and at a wide resolution zoomed out that was most of what the
--- overlay cost.
+-- line in the same pass.
 
 local M = {}
 
@@ -90,7 +87,7 @@ end
 -- axis exactly when dy > dx, as the game's own test has it. The game's separate horizontal and
 -- vertical loops put down the same pixels as this one does with a zero minor step, just in the
 -- other order, which one colour cannot show. Each step writes the pixel and the one below it,
--- which is the second line the two-pixel width used to take.
+-- so one pass draws both rows of the two-pixel line.
 local SEGMENT_SCRIPT = [[
   drawSegment:
     push ebp

@@ -390,7 +390,5 @@ grid_enabled: Superposición de cuadrícula de recursos
 grid_enabled_tooltip: 'Permite mostrar la cuadrícula de recursos sobre el mapa. Desactivado: la cuadrícula
   y su atajo no están disponibles.'
 grid_group_descr: La cuadrícula de recursos 5×5 de la IA, los límites de rotación del castillo y la superficie
-  de la mina de hierro, dibujados sobre el mapa. Antes era el módulo Resource Grid Overlay. Alt más la
-  tecla elegida la muestra u oculta en el editor de mapas. Con una versión de Custom Hotkeys que permita
-  a los módulos añadir sus propios atajos, el atajo aparece allí bajo Map Editor Improvements, donde puedes
-  cambiarlo; la tecla elegida aquí pasa a ser solo su sugerencia inicial.
+  de la mina de hierro, dibujados sobre el mapa. Alt más la tecla elegida la muestra u oculta en el editor
+  de mapas.
