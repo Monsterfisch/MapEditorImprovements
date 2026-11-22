@@ -84,7 +84,9 @@ local function scanUnique(pattern, purpose)
   else
     again = core.scanForAOB(pattern, address + 1)
   end
-  if again ~= nil and again ~= 0 then
+  -- Only a match inside the section counts: the framework's scanner checks its end between memory
+  -- regions, so a merged region could reach past it.
+  if again ~= nil and again ~= 0 and (stop == nil or again < stop) then
     error(string.format("%s: %s matches twice (0x%X, 0x%X)", MODULE_NAME, purpose, address, again))
   end
   return address
