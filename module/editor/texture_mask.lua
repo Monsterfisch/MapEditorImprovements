@@ -37,6 +37,7 @@ local rd8 = memory.rd8
 local wr32 = memory.wr32
 local wr16 = memory.wr16
 local buttonPictures = require("editor.images").buttonPictures
+local frame = require("editor.frame")
 
 ---------------------------------------------------------------------------------------
 -- The texture mask (Textures menu)
@@ -216,12 +217,13 @@ function C.patchHeightFilters(self, G, data)
 end
 
 -- After the map is drawn, every frame: the tree preview (also while the menu is hidden), and
--- outside the map editor the height tool settings back to their defaults.
+-- outside the map editor the height tool settings back to their defaults. The routine runs from
+-- the map drawing's patch site (editor/frame.lua), which init.lua puts in once every feature has
+-- added its routine.
 function C.patchFrame(self, G, data)
   local R = C.resolvePipette(G)
   local H = C.heightWords()
-  local site = scan(K.AOB_FRAME, "the map drawing") + K.FRAME.site
-  expectBytes(site, { 0x8B, 0x0D }, "the map drawing")
+  frame.resolve()
   local plants = core.allocate(K.PLANT_TOOLS, true)
   local pad = C.assemble("alwaysYes", {})
   data.groupOn = core.allocate(4, true)
@@ -236,11 +238,11 @@ function C.patchFrame(self, G, data)
     end
     pad = C.luaPad(data.treePreviewDraw, "the tree preview")
   end
-  C.patchJump(self, site, K.FRAME.size, C.assemble("frameHook", {
+  frame.add("editor", C.assemble("frameHook", {
     GAME_MODE = R.gameMode, MAP_EDITOR = K.MAP_EDITOR, RANGE_MIN = H.rangeMin, RANGE_MAX = H.rangeMax,
     DEFAULT_MIN = K.HEIGHT_RANGE_DEFAULT[1], DEFAULT_MAX = K.HEIGHT_RANGE_DEFAULT[2], SNAP = H.snap,
     INVERT = H.invert, IGNORE_WATER = H.ignoreWater, IGNORE_FARMLAND = H.ignoreFarmland, SUBTYPE = G.subtype,
-    PLANT_TOOLS = K.PLANT_TOOLS, PLANTS = plants, PAD = pad, OPERAND = rd32(site + 2), BACK = site + K.FRAME.size,
+    PLANT_TOOLS = K.PLANT_TOOLS, PLANTS = plants, PAD = pad,
     GROUP_ON = data.groupOn, FIRST_GROUP = G.firstGroup, GROUP_SLOTS = G.groupSlots, GROUP_SIZE = G.groupSize,
     GROUP_COUNT = data.groupCount or data.groupOn, GROUP_MARGIN = K.GROUP_MARGIN, GROUP_PAD = groupPad,
   }))

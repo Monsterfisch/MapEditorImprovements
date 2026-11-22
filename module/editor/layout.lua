@@ -28,6 +28,9 @@ local DEFAULTS = {
   eraser = { choice = true, seagulls = true },
   map_settings = { show_locked = true, button = true, menu = true },
   heights = { max_height = true, tool_options = true, invert_key_on = true, invert_key = "ctrl" },
+  grid = { enabled = true, key = "letter_g", outside_editor = true, flattened_only = true, hide_in_v_view = true,
+    grid_colour = "white", rotation_lines = true, rotation_colour = "cyan", mine_boxes = true, mine_colour = "red",
+    mine_size = 4 },
 }
 
 ---------------------------------------------------------------------------------------
@@ -883,11 +886,7 @@ K.AOB_LEVEL_AVERAGE = "8B 44 24 24 F6 84 87 ? ? ? ? 30 75 18 0F B6 84 38 ? ? ? ?
 K.LEVEL_AVERAGE = { site = 0x0E, size = 8, height = 0x12, next = 0x26 }
 K.AOB_LEVEL_EQUAL = "7E 31 8A 8C 2F ? ? ? ? 0F B6 D1 2B D6"
 K.LEVEL_EQUAL = { size = 9, height = 5, noStep = 0x33 }
--- The one call of renderMap and the floater pass: `mov [..],ebp / call renderMap / call / mov eax,
--- [..] (resource-grid-overlay detours this one) / mov ecx,[OPERAND] / push eax / push ecx / mov
--- ecx, viewport`; the module detours the `mov ecx`.
-K.AOB_FRAME = "89 2D ? ? ? ? E8 ? ? ? ? E8 ? ? ? ? ? ? ? ? ? 8B 0D ? ? ? ? 50 51 B9"
-K.FRAME = { site = 21, size = 6, operand = 23 }
+-- The map drawing's patch site (renderMap's call and the floater pass) is editor/frame.lua's.
 K.PLANT_TOOLS = 512                      -- the tree preview's table of tools, a byte each
 -- placeTree turns a tile down with these flags (and with a plant on it).
 K.TREE_REFUSED, K.TREE_FOOT_REFUSED = 0x703E25B5, 0x10100500

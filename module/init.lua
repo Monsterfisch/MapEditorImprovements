@@ -58,6 +58,12 @@
   11. Random mixes: the felled tree row gets a random standing tree (placeTree's stage, 0 up to
      the brush's) and a random felled tree (logs 1 up to the most), the shrub row a random
      shrub (the command-to-type function picks one of the five shrub commands).
+  12. Resource grid (editor/grid.lua, formerly the Resource Grid Overlay module): the AI's 5 x 5
+     resource grid, the keep rotation boundaries and the iron mine footprint drawn over the map,
+     toggled with Alt + G or through Custom Hotkeys.
+
+  The map drawing's patch site after renderMap is shared: editor/frame.lua puts it in once, at
+  the end of enable, and calls the grid's routine and then the editor's own frame work from it.
 
   None of the menu changes patch code. The landscape editor's menu items are a static table
   handed to the Menu constructor by a CRT initializer (push table / mov ecx, menu / call
@@ -80,6 +86,7 @@ local templates = layout.templates
 local MODULE_NAME = layout.MODULE_NAME
 local C = layout.C
 local AOB_MENU_REDRAW = layout.AOB_MENU_REDRAW
+local DEFAULTS = layout.DEFAULTS
 local MENU_REDRAW_SITE = layout.MENU_REDRAW_SITE
 local MENU_REDRAW_SIZE = layout.MENU_REDRAW_SIZE
 local AOB_GAME_MODE = layout.AOB_GAME_MODE
@@ -118,6 +125,8 @@ require("editor.castle_controls")
 require("editor.walls")
 require("editor.castle_menu")
 require("editor.castle")
+local frame = require("editor.frame")
+local grid = require("editor.grid")
 
 ---------------------------------------------------------------------------------------
 -- Always keep the menu up to date
@@ -276,6 +285,20 @@ local function enable(self, config)
     local ok, problem = pcall(enableRedraw, self)
     if not ok then log(WARNING, tostring(problem) .. "; the menu is redrawn as usual") end
   end
+  local gridConfig = {}
+  for name, value in pairs(DEFAULTS.grid) do gridConfig[name] = value end
+  for name, value in pairs(type(config.grid) == "table" and config.grid or {}) do gridConfig[name] = value end
+  local gridOn = false
+  if gridConfig.enabled == true then
+    local ok, problem = pcall(grid.enable, self, gridConfig)
+    gridOn = ok and problem == true
+    if not ok then log(WARNING, tostring(problem) .. "; no resource grid") end
+  end
+  -- Last: the map drawing's patch site with every routine the features above added.
+  frame.commit(self, function(problem)
+    log(WARNING, tostring(problem) .. (gridOn and "; no resource grid, " or "; ")
+      .. "the tree preview only shows with the menu")
+  end)
 end
 
 local function disable(self, config)

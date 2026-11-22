@@ -2040,10 +2040,9 @@ mov eax,1
 ret
 ]]
 
--- After the map is drawn (the instruction after renderMap's call and the floater pass: `mov
--- ecx,[OPERAND]`), every frame on the game screen: in the map editor the tree preview while a
--- plant tool is chosen (PLANTS: a byte per tool); outside it the height tool settings go back to
--- their defaults.
+-- After the map is drawn (called from the map drawing's patch site, editor/frame.lua), every
+-- frame on the game screen: in the map editor the tree preview while a plant tool is chosen
+-- (PLANTS: a byte per tool); outside it the height tool settings go back to their defaults.
 templates.frameHook = [[
 pushad
 cmp dword [GAME_MODE],MAP_EDITOR
@@ -2084,8 +2083,7 @@ je frame_done
 call PAD
 frame_done:
 popad
-mov ecx,[OPERAND]
-jmp BACK
+ret
 ]]
 
 -- Every-frame item of the heights menu: PAD while COUNT is not 0 (a whole rock to move) or the
