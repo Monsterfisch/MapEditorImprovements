@@ -1,7 +1,7 @@
 # Map Editor Improvements
 
 **Autoren**: Monsterfish, Heroesflorian
-**Version**: 1.0.63
+**Version**: 1.0.65
 
 Zeigt im Karteneditor deutlich mehr Informationen über die bearbeitete Karte an und ergänzt Werkzeuge, die dem Editor fehlen: Wachstumsstufen für Bäume, Apfelbäume, mehr Sträucher, gefällte Bäume, Kies und Eisen, Felsenvarianten, Herdengrößen und vieles mehr. Jeder Teil lässt sich in den Einstellungen einzeln abschalten.
 
@@ -165,6 +165,34 @@ Eine Pipetten-Schaltfläche sitzt in der linken Spalte des Landschaftseditors ü
 ## Menü immer aktuell halten
 
 Das Spiel zeichnet das Editormenü nur neu, solange der Mauszeiger darüber liegt. Ändert sich etwas, während die Maus auf der Karte ist (z. B. Werkzeugwechsel per Taste oder aktualisierte Tierzähler), bleibt das Menü sonst veraltet. Mit dieser Einstellung wird das Menü im Karteneditor laufend aktualisiert; außerhalb des Editors ändert sich nichts.
+
+## Ressourcenraster
+
+Zuvor das eigenständige Modul Resource Grid Overlay von Monsterfish.
+
+Zeichnet das Raster über die Karte, das die KI bei der Standortsuche für ihre Steinbrüche,
+Eisenminen, Pechförderer und Holzfäller nutzt: Blöcke aus 5 × 5 Feldern. Ein Steinvorkommen
+innerhalb eines Blocks ist für die KI wertvoller als dasselbe Vorkommen über vier Blöcke
+verteilt. Außerdem zeichnet es die vier Linien, an denen sich der Burgplan der KI je nach
+Position des Bergfrieds dreht, sowie in jedem Block die Felder, die eine KI-Eisenmine belegen
+würde.
+
+- **Alt + G** blendet es im Karteneditor ein oder aus. Eine andere Kombination aus Alt + Taste
+  lässt sich in den Einstellungen wählen. Mit einer Version von Custom Hotkeys, die Modulen
+  eigene Kürzel erlaubt, erscheint das Kürzel dort unter Map Editor Improvements und kann
+  geändert werden; ein zweites Kürzel für laufende Spiele wird ebenfalls aufgeführt und ist
+  anfangs nicht belegt.
+- Standardmäßig erscheint es nur in der flachen Ansicht (Leertaste), in der die Linien exakt auf
+  dem Boden liegen, und bleibt in der V-Ansicht ausgeblendet.
+- **Raster auch im Spiel erlauben** lässt dich die Linien in einem Testspiel prüfen.
+- Die Farben des Rasters, der Grenzen und der Grundfläche der Eisenmine lassen sich ändern.
+- Beim Verlassen der Karte wird es ausgeblendet, sodass es bei jedem Öffnen des Editors zunächst
+  ausgeblendet ist.
+- Es wird nichts in der Karte gespeichert.
+
+Einstellungen aus dem alten Modul Resource Grid Overlay werden nicht übernommen. Wenn du sie
+geändert hast, stelle sie in der Gruppe „Ressourcenraster“ dieses Moduls neu ein. Ist Resource
+Grid Overlay noch aktiviert, überlässt dieses Modul ihm das Raster; schalte es ab.
 
 ## Gut zu wissen
 

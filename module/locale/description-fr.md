@@ -1,7 +1,7 @@
 # Map Editor Improvements
 
 **Auteurs** : Monsterfish, Heroesflorian
-**Version** : 1.0.63
+**Version** : 1.0.65
 
 Enrichit l'éditeur de cartes avec davantage d'informations sur la carte en cours et des outils qui lui manquaient : stades de croissance des arbres, pommiers, buissons supplémentaires, arbres abattus, gravier et fer, variantes de rochers, taille des troupeaux, etc. Chaque fonctionnalité peut être désactivée séparément dans les paramètres.
 
@@ -165,6 +165,34 @@ Bouton pipette dans la colonne gauche de l'éditeur de paysage, au-dessus de la 
 ## Toujours garder le menu à jour
 
 Le jeu ne redessine le menu de l'éditeur que lorsque la souris est dessus. Si un état change pendant que la souris est sur la carte (raccourci clavier, compteurs d'animaux), le menu reste figé jusqu'au retour de la souris. Avec ce paramètre, le menu est redessiné en permanence dans l'éditeur de cartes, sans effet hors de l'éditeur.
+
+## Grille des ressources
+
+Auparavant le module distinct Resource Grid Overlay de Monsterfish.
+
+Trace sur la carte la grille utilisée par l'IA lorsqu'elle cherche des emplacements pour ses
+carrières, mines de fer, puits de brai et bûcherons : des blocs de 5 × 5 cases. Un gisement de
+pierre contenu dans un seul bloc a plus de valeur pour l'IA que le même gisement réparti sur
+quatre. Affiche également les quatre lignes où l'orientation du château de l'IA bascule selon la
+position du donjon, ainsi que, dans chaque bloc, les cases qu'occuperait une mine de fer de
+l'IA.
+
+- **Alt + G** l'affiche ou la masque dans l'éditeur de cartes. Une autre combinaison Alt + touche
+  peut être choisie dans les paramètres. Avec une version de Custom Hotkeys permettant aux
+  modules d'ajouter leurs propres raccourcis, le raccourci y figure sous Map Editor Improvements
+  et peut être modifié ; un second raccourci pour les parties y figure aussi, sans touche par
+  défaut.
+- Par défaut, elle ne s'affiche qu'en vue aplatie (barre d'espace), où les lignes reposent
+  exactement sur le sol, et elle est masquée dans la vue V.
+- **Autoriser la grille en partie** vous permet de vérifier les lignes lors d'une partie de test.
+- Les couleurs de la grille, des limites et de l'emprise de la mine peuvent être modifiées.
+- Quitter la carte la masque, de sorte qu'elle reste masquée à chaque ouverture de l'éditeur.
+- Rien n'est enregistré dans la carte.
+
+Les paramètres définis dans l'ancien module Resource Grid Overlay ne sont pas repris. Si vous
+les avez modifiés, réglez-les de nouveau dans le groupe « Grille des ressources » de ce module.
+Si Resource Grid Overlay est encore activé, ce module lui laisse la gestion de la grille ;
+désactivez-le.
 
 ## Bon à savoir
 

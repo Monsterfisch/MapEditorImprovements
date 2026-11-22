@@ -1,7 +1,7 @@
 # Map Editor Improvements
 
 **Yazarlar**: Monsterfish, Heroesflorian
-**Sürüm**: 1.0.63
+**Sürüm**: 1.0.65
 
 Harita düzenleyicinin üzerinde çalıştığınız harita hakkında daha fazla bilgi göstermesini sağlar ve düzenleyicide eksik olan araçları ekler: ağaç büyüme aşamaları, elma ağaçları, daha fazla çalı, devrilmiş ağaçlar, çakıl ve demir, kaya çeşitleri, sürü boyutları ve daha fazlası. Her bölüm ayarlardan ayrı ayrı kapatılabilir.
 
@@ -165,6 +165,31 @@ Arazi düzenleyicinin sol sütununda fırça boyutunun üstünde yer alır. Seç
 ## Menüyü her zaman güncel tut
 
 Oyun düzenleyici menüsünü yalnızca fare üzerindeyken yeniden çizer. Fare haritadayken bir değişiklik olduğunda (kısayol, sayaç değişimi) menü güncel kalmaz. Bu ayarla harita düzenleyicide menü sürekli güncellenir; düzenleyici dışında hiçbir şeyi değiştirmez.
+
+## Kaynak ızgarası
+
+Eskiden Monsterfish tarafından yapılan ayrı Resource Grid Overlay modülüydü.
+
+Yapay zekânın taş ocakları, demir madenleri, zift kuyuları ve oduncuları için yer ararken
+kullandığı 5 × 5 karelik bloklardan oluşan ızgarayı harita üzerine çizer. Tek bir blok içindeki
+taş yatağı, yapay zekâ için aynı yatağın dört bloğa yayılmış hâlinden daha değerlidir. Ayrıca
+yapay zekânın kale planının iç kalenin konumuna göre döndüğü dört çizgiyi ve her blokta bir
+yapay zekâ demir madeninin kaplayacağı kareleri de çizer.
+
+- **Alt + G** harita düzenleyicide bunu gösterir veya gizler. Ayarlardan başka bir Alt + tuş
+  seçilebilir. Modüllerin kendi kısayollarını eklemesine izin veren bir Custom Hotkeys sürümüyle
+  kısayol orada Map Editor Improvements altında listelenir ve değiştirilebilir; oyunlar için
+  ikinci bir kısayol da listelenir ve başlangıçta tuş atanmamıştır.
+- Varsayılan olarak yalnızca çizgilerin zemine tam oturduğu düzleştirilmiş görünümde (Boşluk
+  tuşu) gösterilir ve V görünümünde gizlenir.
+- **Oyun sırasında ızgaraya izin ver**, bir deneme oyununda çizgileri kontrol etmenizi sağlar.
+- Izgaranın, sınırların ve maden alanının renkleri değiştirilebilir.
+- Haritadan çıkmak onu gizler; böylece düzenleyiciyi her açtığınızda gizli başlar.
+- Haritaya hiçbir şey kaydedilmez.
+
+Eski Resource Grid Overlay modülünde yapılan ayarlar devralınmaz. Onları değiştirdiyseniz bu
+modülün «Kaynak ızgarası» grubunda yeniden ayarlayın. Resource Grid Overlay hâlâ açıksa bu modül
+ızgarayı ona bırakır; onu kapatın.
 
 ## Bilmekte fayda var
 

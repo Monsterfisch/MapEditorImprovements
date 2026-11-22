@@ -1,7 +1,7 @@
 # Map Editor Improvements
 
 **Autores**: Monsterfish, Heroesflorian
-**Versión**: 1.0.63
+**Versión**: 1.0.65
 
 Hace que el editor de mapas muestre más información sobre el mapa en el que trabajas y añade herramientas que le faltaban: fases de crecimiento de árboles, manzanos, más arbustos, árboles talados, grava y hierro, variantes de rocas, tamaños de manadas y mucho más. Cada función puede desactivarse en los ajustes.
 
@@ -158,6 +158,32 @@ Situado en la columna izquierda del editor de terreno, sobre el tamaño del pinc
 ## Mantener el menú siempre actualizado
 
 El juego solo redibuja el menú cuando el ratón está encima. Con este ajuste el menú se actualiza continuamente en el editor de mapas sin cambiar nada fuera de él.
+
+## Cuadrícula de recursos
+
+Antes era el módulo independiente Resource Grid Overlay de Monsterfish.
+
+Dibuja sobre el mapa la cuadrícula que usa la IA al buscar emplazamientos para sus canteras,
+minas de hierro, pozos de brea y leñadores: bloques de 5 × 5 casillas. Una veta de piedra dentro
+de un solo bloque vale más para la IA que la misma veta repartida entre cuatro. También dibuja
+las cuatro líneas donde el diseño del castillo de la IA gira según la posición de la fortaleza,
+y en cada bloque las casillas que cubriría una mina de hierro de la IA.
+
+- **Alt + G** la muestra u oculta en el editor de mapas. Se puede elegir otra combinación de
+  Alt + tecla en los ajustes. Con una versión de Custom Hotkeys que permita a los módulos añadir
+  sus propios atajos, el atajo aparece allí bajo Map Editor Improvements y se puede cambiar;
+  también aparece un segundo atajo para partidas, sin tecla asignada al principio.
+- Por defecto solo se muestra en la vista plana (barra espaciadora), donde las líneas quedan
+  exactamente sobre el suelo, y se oculta en la vista de la tecla V.
+- **Permitir la cuadrícula durante partidas** te permite comprobar las líneas en una partida de
+  prueba.
+- Se pueden cambiar los colores de la cuadrícula, los límites y la superficie de la mina.
+- Al salir del mapa se oculta, de modo que empieza oculta cada vez que abres el editor.
+- No se guarda nada en el mapa.
+
+Los ajustes hechos en el antiguo módulo Resource Grid Overlay no se transfieren. Si los
+cambiaste, configúralos de nuevo en el grupo «Cuadrícula de recursos» de este módulo. Si
+Resource Grid Overlay sigue activado, este módulo le deja la cuadrícula; desactívalo.
 
 ## Conviene saber
 

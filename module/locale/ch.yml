@@ -328,3 +328,65 @@ map_settings_group: 地图设置
 map_settings_group_descr: |-
   地图类型、尺寸、锁定状态以及对应的菜单界面。
 qol: 体验优化
+grid_group: 资源网格
+grid_key: 网格快捷键（Alt+按键）
+grid_outside_editor: 允许游戏中显示网格
+grid_flattened_only: 仅在平坦视图显示
+grid_hide_in_v_view: 在 V 键视图隐藏
+grid_colour: 网格颜色
+grid_rotation_group: 城堡朝向
+grid_rotation_lines: 显示城堡旋转分界线
+grid_rotation_colour: 分界线颜色
+grid_mine_group: 铁矿占地
+grid_mine_boxes: 显示铁矿占地
+grid_mine_colour: 占地颜色
+grid_mine_size: 占地宽度（格）
+grid_key_letter_g: Alt + G
+grid_key_letter_a: Alt + A
+grid_key_letter_b: Alt + B
+grid_key_letter_f: Alt + F
+grid_key_letter_i: Alt + I
+grid_key_letter_j: Alt + J
+grid_key_letter_l: Alt + L
+grid_key_letter_m: Alt + M
+grid_key_letter_n: Alt + N
+grid_key_letter_o: Alt + O
+grid_key_letter_p: Alt + P
+grid_key_letter_s: Alt + S
+grid_key_letter_w: Alt + W
+grid_key_letter_y: Alt + Y
+grid_key_letter_z: Alt + Z
+grid_key_f1: Alt + F1
+grid_key_f2: Alt + F2
+grid_key_f3: Alt + F3
+grid_key_f4: Alt + F4
+grid_key_f5: Alt + F5
+grid_key_f6: Alt + F6
+grid_key_f7: Alt + F7
+grid_key_f8: Alt + F8
+grid_key_f9: Alt + F9
+grid_key_numpad_multiply: Alt + 数字小键盘 *
+grid_key_numpad_add: Alt + 数字小键盘 +
+grid_key_numpad_subtract: Alt + 数字小键盘 -
+grid_key_numpad_decimal: Alt + 数字小键盘 .
+grid_key_numpad_divide: Alt + 数字小键盘 /
+grid_key_insert: Alt + Insert
+grid_key_delete_key: Alt + Delete
+grid_key_home: Alt + Home
+grid_key_end_key: Alt + End
+grid_key_page_up: Alt + Page Up
+grid_key_page_down: Alt + Page Down
+grid_key_caps_lock: Alt + Caps Lock
+grid_colour_white: 白色
+grid_colour_yellow: 黄色
+grid_colour_cyan: 青色
+grid_colour_green: 绿色
+grid_colour_magenta: 品红
+grid_colour_orange: 橙色
+grid_colour_red: 红色
+grid_colour_black: 黑色
+map_editor: 地图编辑器
+grid_enabled: 资源网格叠加层
+grid_enabled_tooltip: 允许在地图上显示资源网格。关闭：网格及其快捷键均不可用。
+grid_group_descr: 在地图上绘制 AI 的 5×5 资源网格、城堡旋转分界线以及铁矿占地。原为独立的 Resource Grid Overlay 模块。在地图编辑器中按 Alt 加所选按键可显示或隐藏网格。若使用的
+  Custom Hotkeys 版本支持模块注册自定义快捷键，该快捷键会列在其中的 Map Editor Improvements 下并可修改；此处选择的按键届时仅作为初始建议。

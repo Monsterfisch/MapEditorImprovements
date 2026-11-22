@@ -328,3 +328,69 @@ map_settings_group: Paramètres de la carte
 map_settings_group_descr: |-
   Les paramètres de la carte : type, taille, verrouillage et menus associés.
 qol: Qualité de vie
+grid_group: Grille des ressources
+grid_key: Raccourci de la grille (Alt+touche)
+grid_outside_editor: Autoriser la grille en partie
+grid_flattened_only: Afficher uniquement en vue aplatie
+grid_hide_in_v_view: Masquer dans la vue V
+grid_colour: Couleur de la grille
+grid_rotation_group: Orientation du château
+grid_rotation_lines: Afficher les limites de rotation du château
+grid_rotation_colour: Couleur des limites
+grid_mine_group: Emprise de la mine de fer
+grid_mine_boxes: Afficher l'emprise de la mine de fer
+grid_mine_colour: Couleur de l'emprise
+grid_mine_size: Largeur de l'emprise (cases)
+grid_key_letter_g: Alt + G
+grid_key_letter_a: Alt + A
+grid_key_letter_b: Alt + B
+grid_key_letter_f: Alt + F
+grid_key_letter_i: Alt + I
+grid_key_letter_j: Alt + J
+grid_key_letter_l: Alt + L
+grid_key_letter_m: Alt + M
+grid_key_letter_n: Alt + N
+grid_key_letter_o: Alt + O
+grid_key_letter_p: Alt + P
+grid_key_letter_s: Alt + S
+grid_key_letter_w: Alt + W
+grid_key_letter_y: Alt + Y
+grid_key_letter_z: Alt + Z
+grid_key_f1: Alt + F1
+grid_key_f2: Alt + F2
+grid_key_f3: Alt + F3
+grid_key_f4: Alt + F4
+grid_key_f5: Alt + F5
+grid_key_f6: Alt + F6
+grid_key_f7: Alt + F7
+grid_key_f8: Alt + F8
+grid_key_f9: Alt + F9
+grid_key_numpad_multiply: Alt + Pavé numérique *
+grid_key_numpad_add: Alt + Pavé numérique +
+grid_key_numpad_subtract: Alt + Pavé numérique -
+grid_key_numpad_decimal: Alt + Pavé numérique .
+grid_key_numpad_divide: Alt + Pavé numérique /
+grid_key_insert: Alt + Inser
+grid_key_delete_key: Alt + Suppr
+grid_key_home: Alt + Début
+grid_key_end_key: Alt + Fin
+grid_key_page_up: Alt + Page préc.
+grid_key_page_down: Alt + Page suiv.
+grid_key_caps_lock: Alt + Verr. maj.
+grid_colour_white: Blanc
+grid_colour_yellow: Jaune
+grid_colour_cyan: Cyan
+grid_colour_green: Vert
+grid_colour_magenta: Magenta
+grid_colour_orange: Orange
+grid_colour_red: Rouge
+grid_colour_black: Noir
+map_editor: Éditeur de cartes
+grid_enabled: Superposition de la grille des ressources
+grid_enabled_tooltip: 'Permet d''afficher la grille des ressources sur la carte. Désactivé : la grille
+  et son raccourci ne sont pas disponibles.'
+grid_group_descr: La grille des ressources 5×5 de l'IA, les limites de rotation du château et l'emprise
+  de la mine de fer, tracées sur la carte. Auparavant le module Resource Grid Overlay. Alt plus la touche
+  choisie l'affiche ou la masque dans l'éditeur de cartes. Avec une version de Custom Hotkeys permettant
+  aux modules d'ajouter leurs propres raccourcis, le raccourci y figure sous Map Editor Improvements où
+  vous pouvez le modifier ; la touche choisie ici ne sert alors que de suggestion initiale.

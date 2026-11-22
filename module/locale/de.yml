@@ -328,3 +328,69 @@ map_settings_group: Karteneinstellungen
 map_settings_group_descr: |-
   Die Einstellungen der Karte: Kartentyp, Größe, Sperre und die zugehörigen Menüs.
 qol: Komfortfunktionen
+grid_group: Ressourcenraster
+grid_key: Rasterkürzel (Alt+Taste)
+grid_outside_editor: Raster auch im Spiel erlauben
+grid_flattened_only: Nur in flacher Ansicht zeigen
+grid_hide_in_v_view: In der V-Ansicht ausblenden
+grid_colour: Rasterfarbe
+grid_rotation_group: Burgausrichtung
+grid_rotation_lines: Grenzen der Burgdrehung zeigen
+grid_rotation_colour: Grenzfarbe
+grid_mine_group: Grundfläche der Eisenmine
+grid_mine_boxes: Grundfläche der Eisenmine zeigen
+grid_mine_colour: Grundflächenfarbe
+grid_mine_size: Breite der Grundfläche (Felder)
+grid_key_letter_g: Alt + G
+grid_key_letter_a: Alt + A
+grid_key_letter_b: Alt + B
+grid_key_letter_f: Alt + F
+grid_key_letter_i: Alt + I
+grid_key_letter_j: Alt + J
+grid_key_letter_l: Alt + L
+grid_key_letter_m: Alt + M
+grid_key_letter_n: Alt + N
+grid_key_letter_o: Alt + O
+grid_key_letter_p: Alt + P
+grid_key_letter_s: Alt + S
+grid_key_letter_w: Alt + W
+grid_key_letter_y: Alt + Y
+grid_key_letter_z: Alt + Z
+grid_key_f1: Alt + F1
+grid_key_f2: Alt + F2
+grid_key_f3: Alt + F3
+grid_key_f4: Alt + F4
+grid_key_f5: Alt + F5
+grid_key_f6: Alt + F6
+grid_key_f7: Alt + F7
+grid_key_f8: Alt + F8
+grid_key_f9: Alt + F9
+grid_key_numpad_multiply: Alt + Ziffernblock *
+grid_key_numpad_add: Alt + Ziffernblock +
+grid_key_numpad_subtract: Alt + Ziffernblock -
+grid_key_numpad_decimal: Alt + Ziffernblock .
+grid_key_numpad_divide: Alt + Ziffernblock /
+grid_key_insert: Alt + Einfügen
+grid_key_delete_key: Alt + Entf
+grid_key_home: Alt + Pos1
+grid_key_end_key: Alt + Ende
+grid_key_page_up: Alt + Bild hoch
+grid_key_page_down: Alt + Bild runter
+grid_key_caps_lock: Alt + Feststelltaste
+grid_colour_white: Weiß
+grid_colour_yellow: Gelb
+grid_colour_cyan: Cyan
+grid_colour_green: Grün
+grid_colour_magenta: Magenta
+grid_colour_orange: Orange
+grid_colour_red: Rot
+grid_colour_black: Schwarz
+map_editor: Karteneditor
+grid_enabled: Ressourcenraster-Overlay
+grid_enabled_tooltip: 'Ermöglicht es, das Ressourcenraster über der Karte einzublenden. Aus: Das Raster
+  und sein Kürzel stehen nicht zur Verfügung.'
+grid_group_descr: Zeichnet das 5×5-Ressourcenraster der KI, die Grenzen der Burgdrehung und die Grundfläche
+  der Eisenmine über die Karte. Zuvor das Modul Resource Grid Overlay. Alt plus die gewählte Taste blendet
+  es im Karteneditor ein oder aus. Mit einer Version von Custom Hotkeys, die Modulen eigene Kürzel erlaubt,
+  erscheint das Kürzel dort unter Map Editor Improvements und lässt sich ändern; die hier gewählte Taste
+  dient dann nur als erster Vorschlag.

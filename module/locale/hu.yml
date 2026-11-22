@@ -328,3 +328,69 @@ map_settings_group: Térképbeállítások
 map_settings_group_descr: |-
   A térkép beállításai: térképtípus, méret, zárolás és az ezeket mutató menük.
 qol: Kényelmi funkciók
+grid_group: Nyersanyagrács
+grid_key: Rács gyorsbillentyűje (Alt+billentyű)
+grid_outside_editor: Rács engedélyezése játék közben
+grid_flattened_only: Csak sík nézetben
+grid_hide_in_v_view: Elrejtés a V nézetben
+grid_colour: Rács színe
+grid_rotation_group: Vár tájolása
+grid_rotation_lines: Várforgatási határok mutatása
+grid_rotation_colour: Határ színe
+grid_mine_group: Vasbánya helyigénye
+grid_mine_boxes: Vasbánya helyének mutatása
+grid_mine_colour: Alaprajz színe
+grid_mine_size: Alaprajz szélessége (mező)
+grid_key_letter_g: Alt + G
+grid_key_letter_a: Alt + A
+grid_key_letter_b: Alt + B
+grid_key_letter_f: Alt + F
+grid_key_letter_i: Alt + I
+grid_key_letter_j: Alt + J
+grid_key_letter_l: Alt + L
+grid_key_letter_m: Alt + M
+grid_key_letter_n: Alt + N
+grid_key_letter_o: Alt + O
+grid_key_letter_p: Alt + P
+grid_key_letter_s: Alt + S
+grid_key_letter_w: Alt + W
+grid_key_letter_y: Alt + Y
+grid_key_letter_z: Alt + Z
+grid_key_f1: Alt + F1
+grid_key_f2: Alt + F2
+grid_key_f3: Alt + F3
+grid_key_f4: Alt + F4
+grid_key_f5: Alt + F5
+grid_key_f6: Alt + F6
+grid_key_f7: Alt + F7
+grid_key_f8: Alt + F8
+grid_key_f9: Alt + F9
+grid_key_numpad_multiply: Alt + Számbillentyűzet *
+grid_key_numpad_add: Alt + Számbillentyűzet +
+grid_key_numpad_subtract: Alt + Számbillentyűzet -
+grid_key_numpad_decimal: Alt + Számbillentyűzet .
+grid_key_numpad_divide: Alt + Számbillentyűzet /
+grid_key_insert: Alt + Insert
+grid_key_delete_key: Alt + Delete
+grid_key_home: Alt + Home
+grid_key_end_key: Alt + End
+grid_key_page_up: Alt + Page Up
+grid_key_page_down: Alt + Page Down
+grid_key_caps_lock: Alt + Caps Lock
+grid_colour_white: Fehér
+grid_colour_yellow: Sárga
+grid_colour_cyan: Cián
+grid_colour_green: Zöld
+grid_colour_magenta: Bíbor
+grid_colour_orange: Narancs
+grid_colour_red: Piros
+grid_colour_black: Fekete
+map_editor: Térképszerkesztő
+grid_enabled: Nyersanyagrács-átfedés
+grid_enabled_tooltip: 'Lehetővé teszi a nyersanyagrács megjelenítését a térkép felett. Ki: a rács és a
+  gyorsbillentyűje nem érhető el.'
+grid_group_descr: Az MI 5×5-ös nyersanyagrácsa, a várforgatási határok és a vasbánya helyigénye a térképre
+  rajzolva. Korábban a Resource Grid Overlay modul része volt. Az Alt és a választott billentyű együttesen
+  megjeleníti vagy elrejti a térképszerkesztőben. Olyan Custom Hotkeys verzióval, amely lehetővé teszi
+  a moduloknak saját gyorsbillentyűk hozzáadását, a gyorsbillentyű ott szerepel a Map Editor Improvements
+  alatt, ahol megváltoztatható; az itt választott billentyű ekkor csak első javaslatként szolgál.

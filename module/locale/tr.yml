@@ -328,3 +328,69 @@ map_settings_group: Harita ayarları
 map_settings_group_descr: |-
   Haritanın ayarları: harita türü, boyutu, kilidi ve bunları gösteren menüler.
 qol: Yaşam kalitesi
+grid_group: Kaynak ızgarası
+grid_key: Izgara kısayolu (Alt+tuş)
+grid_outside_editor: Oyun sırasında ızgaraya izin ver
+grid_flattened_only: Yalnızca düzleştirilmiş görünümde göster
+grid_hide_in_v_view: V tuşu görünümünde gizle
+grid_colour: Izgara rengi
+grid_rotation_group: Kale yönü
+grid_rotation_lines: Kale dönüş sınırlarını göster
+grid_rotation_colour: Sınır rengi
+grid_mine_group: Demir madeni alanı
+grid_mine_boxes: Demir madeni alanını göster
+grid_mine_colour: Alan rengi
+grid_mine_size: Alan genişliği (kare)
+grid_key_letter_g: Alt + G
+grid_key_letter_a: Alt + A
+grid_key_letter_b: Alt + B
+grid_key_letter_f: Alt + F
+grid_key_letter_i: Alt + I
+grid_key_letter_j: Alt + J
+grid_key_letter_l: Alt + L
+grid_key_letter_m: Alt + M
+grid_key_letter_n: Alt + N
+grid_key_letter_o: Alt + O
+grid_key_letter_p: Alt + P
+grid_key_letter_s: Alt + S
+grid_key_letter_w: Alt + W
+grid_key_letter_y: Alt + Y
+grid_key_letter_z: Alt + Z
+grid_key_f1: Alt + F1
+grid_key_f2: Alt + F2
+grid_key_f3: Alt + F3
+grid_key_f4: Alt + F4
+grid_key_f5: Alt + F5
+grid_key_f6: Alt + F6
+grid_key_f7: Alt + F7
+grid_key_f8: Alt + F8
+grid_key_f9: Alt + F9
+grid_key_numpad_multiply: Alt + Sayısal tuş takımı *
+grid_key_numpad_add: Alt + Sayısal tuş takımı +
+grid_key_numpad_subtract: Alt + Sayısal tuş takımı -
+grid_key_numpad_decimal: Alt + Sayısal tuş takımı .
+grid_key_numpad_divide: Alt + Sayısal tuş takımı /
+grid_key_insert: Alt + Insert
+grid_key_delete_key: Alt + Delete
+grid_key_home: Alt + Home
+grid_key_end_key: Alt + End
+grid_key_page_up: Alt + Page Up
+grid_key_page_down: Alt + Page Down
+grid_key_caps_lock: Alt + Caps Lock
+grid_colour_white: Beyaz
+grid_colour_yellow: Sarı
+grid_colour_cyan: Camgöbeği
+grid_colour_green: Yeşil
+grid_colour_magenta: Eflatun
+grid_colour_orange: Turuncu
+grid_colour_red: Kırmızı
+grid_colour_black: Siyah
+map_editor: Harita düzenleyici
+grid_enabled: Kaynak ızgarası katmanı
+grid_enabled_tooltip: 'Kaynak ızgarasını harita üzerinde göstermenizi sağlar. Kapalı: ızgara ve kısayolu
+  kullanılamaz.'
+grid_group_descr: Yapay zekânın 5×5 kaynak ızgarası, kale dönüş sınırları ve demir madeni alanı harita
+  üzerine çizilir. Eskiden Resource Grid Overlay modülüydü. Alt ile seçilen tuş, harita düzenleyicide
+  bunu gösterir veya gizler. Modüllerin kendi kısayollarını eklemesine izin veren bir Custom Hotkeys sürümüyle
+  kısayol orada Map Editor Improvements altında listelenir ve değiştirilebilir; burada seçilen tuş o zaman
+  yalnızca ilk öneri olarak kullanılır.
