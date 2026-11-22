@@ -23,11 +23,18 @@ end
 -- address of the game is assumed; nil if no header turns up within 64 MiB below it. Each boundary
 -- is first tested with the framework's scanner, which steps over memory that is not there, and only
 -- read once its first page holds the header.
-local imageEnds = {}
+-- Framework 3.0.7 has no scan limited to the main executable. The patching library's unreleased
+-- `scanForAOBInMainModule` (RPS branch fix/aob-scan-bounds, 604174b) does exactly this and
+-- replaces imageEnd and the bounded second scan below once a framework release offers it.
+local images = {}            -- { first, stop } of each image found
+local missed = {}            -- 64 KiB boundaries below which no header turned up
 local function imageEnd(inside)
-  local base = inside - inside % 0x10000
-  if imageEnds[base] ~= nil then return imageEnds[base] or nil end
-  local start = base
+  for _, image in ipairs(images) do
+    if inside >= image[1] and inside < image[2] then return image[2] end
+  end
+  local start = inside - inside % 0x10000
+  if missed[start] then return nil end
+  local base = start
   for _ = 1, 0x400 do
     if base < 0x10000 then break end
     local mz = core.scanForAOB("4D 5A", base, base + 0x10)
@@ -36,24 +43,27 @@ local function imageEnd(inside)
     if lfanew > 0 and lfanew < 0xF00 and (rd32(pe) & 0xFFFFFFFF) == 0x4550 and (rd16(pe + 4) & 0xFFFF) == 0x14C then
       local stop = base + (rd32(pe + 0x50) & 0xFFFFFFFF)   -- OptionalHeader.SizeOfImage
       if stop > inside then
-        imageEnds[start] = stop
+        images[#images + 1] = { base, stop }
         return stop
       end
     end
     base = base - 0x10000
   end
-  imageEnds[start] = false
+  missed[start] = true
+  log(WARNING, string.format("%s: no executable header found below 0x%X; pattern checks scan to the "
+    .. "framework's default end", MODULE_NAME, inside))
   return nil
 end
 
 -- scan, and also refused when the pattern matches a second time further on in the executable. The
--- second look ends with the executable's image, so it costs no more than the first.
+-- second look ends with the executable's image (its last byte), so it doesn't wander through the
+-- rest of the process.
 local function scanUnique(pattern, purpose)
   local address = scan(pattern, purpose)
   local stop = imageEnd(address)
   local again
   if stop ~= nil then
-    again = core.scanForAOB(pattern, address + 1, stop)
+    again = core.scanForAOB(pattern, address + 1, stop - 1)
   else
     again = core.scanForAOB(pattern, address + 1)
   end
