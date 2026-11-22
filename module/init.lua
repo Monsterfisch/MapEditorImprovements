@@ -294,6 +294,7 @@ local function enable(self, config)
     gridOn = ok and problem == true
     if not ok then log(WARNING, tostring(problem) .. "; no resource grid") end
   end
+  if not gridOn then frame.remove("grid") end
   -- Last: the map drawing's patch site with every routine the features above added.
   frame.commit(self, function(problem)
     log(WARNING, tostring(problem) .. (gridOn and "; no resource grid, " or "; ")

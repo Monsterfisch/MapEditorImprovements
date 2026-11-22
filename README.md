@@ -251,5 +251,5 @@ What the module does, in plain English, is in `module/locale/description-en.md`.
 ## Credits
 
 Map Editor Improvements is by Monsterfish (GitHub: Monsterfisch) and Heroesflorian. The resource
-grid is Monsterfish's Resource Grid Overlay, merged into this module with both authors'
-agreement. See `module/CREDITS.md`.
+grid is Monsterfish's Resource Grid Overlay. Krarilotus proposed merging it into this module, and
+Heroesflorian, co-author of this module, agreed. See `module/CREDITS.md`.

@@ -12,11 +12,12 @@
 -- reads them before setting them) and returns with `ret`.
 --
 -- Without the grid only the second load is taken, as the editor has always done, so the first one
--- stays free for Resource Grid Overlay 1.1, which takes it when it is installed on its own. While
--- that module is active the grid stays off here and commit() waits until every module has been
--- enabled, because that module's pattern also reads the second load.
+-- stays free for the separate Resource Grid Overlay module (1.0.0 and 1.1.x take it when it is
+-- installed on its own). While that module is active the grid stays off here and commit() waits
+-- until every module has been enabled, because that module's pattern also reads the second load.
 
 local menu_install = require("editor.menu_install")
+local memory = require("editor.memory")
 local MODULE_NAME = require("editor.layout").MODULE_NAME
 
 local AOB = "89 2D ? ? ? ? E8 ? ? ? ? E8 ? ? ? ? ? ? ? ? ? 8B 0D ? ? ? ? 50 51 B9 ? ? ? ? E8 ? ? ? ?"
@@ -30,38 +31,24 @@ local ORDER = { "grid", "editor" }
 local M = {}
 local site = nil
 local routines = {}
+local running = {}
 
 local function readAddress(address)
-  return core.readInteger(address) & 0xFFFFFFFF
-end
-
-local function expect(address, bytes, purpose)
-  for index, byte in ipairs(bytes) do
-    if (core.readByte(address + index - 1) & 0xFF) ~= byte then
-      error(string.format("%s: %s at 0x%X is not the code this module knows", MODULE_NAME, purpose, address))
-    end
-  end
+  return memory.rd32(address) & 0xFFFFFFFF
 end
 
 ---Find the site once: one match, the instructions around the loads as expected.
 ---@return table site { base, viewport, firstLoadFree }
 function M.resolve()
   if site ~= nil then return site end
-  local ok, base = pcall(core.AOBScan, AOB)
-  if not ok or base == nil or base == 0 then
-    error(MODULE_NAME .. ": could not find the map drawing")
-  end
-  local again = core.scanForAOB(AOB, base + 1)
-  if again ~= nil and again ~= 0 then
-    error(string.format("%s: the map drawing matches twice (0x%X, 0x%X)", MODULE_NAME, base, again))
-  end
-  expect(base + LOAD_ECX, { 0x8B, 0x0D }, "the map drawing")
-  expect(base + AFTER_LOADS, { 0x50, 0x51, 0xB9 }, "the map drawing")
+  local base = memory.scanUnique(AOB, "the map drawing")
+  memory.expectBytes(base + LOAD_ECX, { 0x8B, 0x0D }, "the map drawing")
+  memory.expectBytes(base + AFTER_LOADS, { 0x50, 0x51, 0xB9 }, "the map drawing")
   site = {
     base = base,
     viewport = readAddress(base + VIEWPORT),
-    -- Another module (Resource Grid Overlay 1.1 on its own) may already have taken the first load.
-    firstLoadFree = (core.readByte(base + LOAD_EAX) & 0xFF) == OPCODE_LOAD_EAX,
+    -- Another module (Resource Grid Overlay on its own) may already have taken the first load.
+    firstLoadFree = (memory.rd8(base + LOAD_EAX) & 0xFF) == OPCODE_LOAD_EAX,
   }
   return site
 end
@@ -71,6 +58,19 @@ end
 ---@param routine number address of the routine
 function M.add(name, routine)
   routines[name] = routine
+end
+
+---Take a routine back before the site goes in (its feature did not finish enabling).
+---@param name string
+function M.remove(name)
+  routines[name] = nil
+end
+
+---Whether the site is in and runs this feature's routine.
+---@param name string
+---@return boolean
+function M.running(name)
+  return running[name] == true
 end
 
 ---Put the site in with every routine added so far. Called once, at the end of enable.
@@ -94,24 +94,20 @@ function M.install(self)
   end
   lines[#lines + 1] = "mov ecx,[LOAD_B]"
   lines[#lines + 1] = "jmp BACK"
-  local values = {
+  menu_install.patchJump(self, at, size, core.allocateAssembly(table.concat(lines, "\n") .. "\n", {
     LOAD_A = readAddress(S.base + LOAD_EAX + 1),
     LOAD_B = readAddress(S.base + LOAD_ECX + 2),
     BACK = S.base + AFTER_LOADS,
     GRID = routines.grid, EDITOR = routines.editor,
-  }
-  local used = {}
-  for name, value in pairs(values) do
-    if table.concat(lines, "\n"):find("%f[%w_]" .. name .. "%f[^%w_]") then used[name] = value end
-  end
-  menu_install.patchJump(self, at, size, core.allocateAssembly(table.concat(lines, "\n") .. "\n", used))
+  }))
+  for name in pairs(routines) do running[name] = true end
   routines = {}
   log(INFO, string.format("%s: map drawing at 0x%X (%d bytes)%s", MODULE_NAME, at, size,
     grid and ", with the resource grid" or ""))
   return true
 end
 
----Put the site in now, or, while Resource Grid Overlay 1.1 is active, once every module has been
+---Put the site in now, or, while Resource Grid Overlay is active, once every module has been
 ---enabled: that module reads the whole call site, the second load included, when it is enabled
 ---and stays off if it has changed, so the site goes in after it in either load order.
 ---@param self table the module

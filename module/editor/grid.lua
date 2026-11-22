@@ -28,6 +28,7 @@
 
 local layout = require("editor.layout")
 local MODULE_NAME = layout.MODULE_NAME
+local memory = require("editor.memory")
 local frame = require("editor.frame")
 local B = require("editor.grid_draw")
 local V = require("editor.grid_view")
@@ -185,16 +186,10 @@ end
 ---@param purpose string what the address is for, for the log line
 ---@return number|nil address
 local function scanOptional(pattern, purpose)
-  local found, address = pcall(core.AOBScan, pattern)
-  if not found or address == nil or address == 0 then
-    log(WARNING, MODULE_NAME .. ": resource grid: could not find " .. purpose
-      .. "; that part is disabled. Another module has probably changed it.")
-    return nil
-  end
-  local again = core.scanForAOB(pattern, address + 1)
-  if again ~= nil and again ~= 0 then
-    log(WARNING, string.format("%s: resource grid: %s matches twice (0x%X, 0x%X); that part is disabled.",
-      MODULE_NAME, purpose, address, again))
+  local found, address = pcall(memory.scanUnique, pattern, purpose)
+  if not found then
+    log(WARNING, tostring(address) .. "; resource grid: that part is disabled. Another module has "
+      .. "probably changed it.")
     return nil
   end
   return address
@@ -392,7 +387,7 @@ function M.enable(self, config)
     return registers
   end, rebuildPad, 5)
 
-  frame.add("grid", B.build({
+  local routine = B.build({
     OVERLAY_SHOWN = control + B.SHOWN,
     OVERLAY_EDITOR_ONLY = control + B.EDITOR_ONLY,
     OVERLAY_FLATTENED_ONLY = control + B.FLATTENED_ONLY,
@@ -412,7 +407,7 @@ function M.enable(self, config)
     SURFACE_POINTER_ADDRESS = surfacePointer,
     SURFACE_PITCH_VALUE = V.SURFACE_PITCH,
     REBUILD_ADDRESS = rebuildPad,
-  }))
+  })
 
   ---Whether the overlay is allowed where the game currently is. Normally that means the map
   ---editor; with the "outside the map editor" option on it means anywhere the map is drawn,
@@ -421,8 +416,9 @@ function M.enable(self, config)
   local function allowedHere()
     return not editorOnly or readInteger(gameMode) == GAME_MODE_EDITOR
   end
+  -- Also false while the map drawing's site is not in (it failed, or waits for afterInit).
   local function toggle()
-    if not allowedHere() then return false end
+    if not allowedHere() or not frame.running("grid") then return false end
     writeInteger(control + B.SHOWN, readInteger(control + B.SHOWN) == 0 and 1 or 0)
     return true
   end
@@ -496,6 +492,8 @@ function M.enable(self, config)
     log(WARNING, MODULE_NAME .. ": resource grid: no screen change site, so it stays on when you leave the map")
   end
 
+  -- Last, once every other part is in: a failure above leaves no grid routine behind.
+  frame.add("grid", routine)
   log(INFO, string.format("%s: resource grid: %s, %d lines, rotation boundaries %s, %s.",
     MODULE_NAME, input, #state.lines[V.DEFAULT_ORIENTATION][1], withRotation and "on" or "off",
     editorOnly and "map editor only" or "on every map"))

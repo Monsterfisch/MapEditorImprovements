@@ -12,8 +12,19 @@ local wr32, wr16 = core.writeInteger, core.writeSmallInteger
 
 local function scan(pattern, purpose)
   local ok, address = pcall(core.AOBScan, pattern)
-  if not ok or address == nil then
+  if not ok or address == nil or address == 0 then
     error(MODULE_NAME .. ": could not find " .. purpose)
+  end
+  return address
+end
+
+-- scan, and also refused when the pattern matches a second time further on (the framework's own
+-- upper bound, as its unbounded scans use).
+local function scanUnique(pattern, purpose)
+  local address = scan(pattern, purpose)
+  local again = core.scanForAOB(pattern, address + 1)
+  if again ~= nil and again ~= 0 then
+    error(string.format("%s: %s matches twice (0x%X, 0x%X)", MODULE_NAME, purpose, address, again))
   end
   return address
 end
@@ -79,6 +90,7 @@ end
 
 return {
   scan = scan,
+  scanUnique = scanUnique,
   expectBytes = expectBytes,
   readOperand = readOperand,
   readCallTarget = readCallTarget,

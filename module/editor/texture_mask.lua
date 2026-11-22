@@ -28,7 +28,6 @@ local C = layout.C
 local PENCIL_TARGET = layout.PENCIL_TARGET
 local memory = require("editor.memory")
 local scan = memory.scan
-local expectBytes = memory.expectBytes
 local readCallTarget = memory.readCallTarget
 local item = memory.item
 local dwordList = memory.dwordList
