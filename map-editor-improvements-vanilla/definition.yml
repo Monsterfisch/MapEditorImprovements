@@ -1,0 +1,20 @@
+name: map-editor-improvements-vanilla
+display-name: Map Editor Improvements Vanilla
+author: Monsterfish, Heroesflorian
+version: 1.0.1
+type: plugin
+game:
+- SHC==1.41
+- SHCE==1.41
+family:
+- name: map-editor-improvements
+  root: true
+  members:
+  - map-editor-improvements-recommended
+  default: map-editor-improvements-recommended
+meta:
+  version: 1.0.0
+dependencies:
+  framework: '>=3.0.7'
+  frontend: '>=1.0.17 <2.0.0'
+  map-editor-improvements: ^1.0.85

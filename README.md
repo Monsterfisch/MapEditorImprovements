@@ -5,7 +5,12 @@ show more about the map you are working on: how many animals, units, trees and r
 right on the landscape editor's buttons, with a red "i" button to hide or show the numbers. It
 also keeps the editor's menu up to date while the mouse is on the map, and adds tools: tree
 growth stages, apple trees, more shrubs, felled trees, random mixes, gravel and iron, rock
-variants, herd sizes.
+variants, herd sizes. And it draws the grid the AI reads when it looks for places for its
+resource buildings - 5 x 5 blocks of tiles - over the terrain, with the four lines where a keep's
+rotation changes and the tiles an iron mine would cover in each block; **Alt + G** switches it on
+and off. That resource grid was the separate Resource Grid Overlay module until 1.0.65; its
+settings are not taken over, and while Resource Grid Overlay is turned on this module leaves the
+grid to it.
 
 What the module does, in plain English, is in `module/locale/description-en.md`.
 
@@ -23,8 +28,7 @@ What the module does, in plain English, is in `module/locale/description-en.md`.
 ## Development workflow
 
 1. Edit under `module/`.
-2. `python tools/publish.py --bump` - raises the last version slot (in `definition.yml` and the
-   description) and copies the module to `ucp/modules/map-editor-improvements-<version>` in the
+2. `python tools/publish.py --bump` - raises the last version slot (in `definition.yml`) and copies the module to `ucp/modules/map-editor-improvements-<version>` in the
    game folder. The first time, add `--game "<game folder>"` (the folder with `ucp-config.yml`);
    the script stores it in `tools/publish-config.json` and uses it from then on. Older copies
    are removed, except the newest one and any version the UCP config still uses (`--keep`
@@ -41,9 +45,9 @@ What the module does, in plain English, is in `module/locale/description-en.md`.
    `definition.yml`, then install it from the UCP3 GUI or drop it into `ucp/modules`.
 2. In the UCP3 GUI's Content tab, add Map Editor Improvements to the active extensions and
    apply. Its entries under "Customisations" switch each feature on or off; by default
-   everything is on.
+   everything is off (see Vanilla and Recommended below).
 3. Start the game and open the map editor: the features are in the landscape editor's menus and
-   the castle mode's building menu.
+   the castle mode's building menu. [docs/features.md](docs/features.md) describes every feature.
 
 ## How it works
 
@@ -188,7 +192,8 @@ What the module does, in plain English, is in `module/locale/description-en.md`.
   use). Erase all seagulls calls the game's own unused deleteAllSeagulls; erase all crows clears the
   tree words and deletes crow entities (type 0x1C); erase all animals is Alt + E's call. The real
   unit limit is the "N more units" line's `mov ecx, 2499 / sub ecx, [units]` (9999 in Extreme).
-  The herds and groups line is drawn from the renderMap detour, which counts the group slots.
+  The herds and groups line is drawn from the map drawing's patch site (below), which counts the
+  group slots.
 * **Eraser choice.** useEraserBrush and eraseAreaWithBrush have the same three loops. The first's
   `movsx eax, [organisms]` answers 0 for a tree or rock the choice leaves (with Animals the tree's
   crow words are cleared); the second's building search answers "nothing" (it fills the found
@@ -204,5 +209,63 @@ What the module does, in plain English, is in `module/locale/description-en.md`.
   menu (MapEditorProperties) and the Load dialog get one item each by copying whatever table the
   constructor pushes now (autosave extends the Load dialog first); locked maps stay in the list
   when mapNames_filterMapsIfMapLock's `cmp [lock], 0 / jne` is answered "keep".
+* **Panels above the menu never overlap.** Every floating panel (the picture rows of both menus, the herd and height panels, the wall height slider) is placed by `module/editor/lane.lua`: at the lowest free spot over the menu, clear of the menu's own items above its top (measured like the module measures buttons), of the game's description line and the row above it, of the building counts, and of the panels the menu draws before it in the same frame (the pipette panel before a Vegetation panel, a wall panel before its slider). When nothing along that line is wide enough, the panel moves up. `cd bench && python test_layout.py` checks every panel kind on both executables' menus at screen widths from 800 to 2560, and walks through the tabs frame by frame: panels left up on another tab don't count, panels up at once never overlap and nothing moves between frames.
+* **The map drawing's patch site.** After `renderMap`'s one call and the floater pass come two
+  loads (`mov eax,[..]`, `mov ecx,[..]`). `module/editor/frame.lua` puts one jump in their place
+  that calls the resource grid's routine and then the editor's own frame work (tree preview,
+  herds and groups line, height tool reset outside the editor), does both loads and goes on.
+  With the grid off only the second load is taken, so Resource Grid Overlay 1.1 can still take
+  the first when it is installed on its own; with that module active, this one leaves the grid
+  to it.
+* **The resource grid.** `AIVState` holds one `HeatMap` record per 5 x 5 block, 80 x 80 of them,
+  and every resource-building decision is a search over those blocks - so the block edges are
+  what a mapper needs to see. `setKeepOffsetAndOrientation` builds the whole AIV turned by the
+  quarter the keep sits in, which gives the four rotation boundaries; the AI puts an iron mine
+  flat in the low corner of its block, which gives the footprint. One linear transform per map
+  rotation, halved exactly when zoomed out, places the lines; they lie at the height the game
+  levels the map to in its flattened view. The frame routine is assembly: with the grid off, a
+  compare; with it on, it compares the values the picture depends on (rotation, zoom, camera,
+  rendered area, pixel format) with the ones it last drew for and only calls into lua when one
+  has changed. The pixels go into the map surface through the module's own Bresenham loop,
+  which follows `PencilRenderCore::drawLine` rule for rule.
+* **The module's keys in Custom Hotkeys.** With a Custom Hotkeys that offers `registerAction`
+  (`module/editor/actions.lua`), these keys are actions there, in the category "Map Editor
+  Improvements", which the player can rebind, clear or reset. Each suggests the key chosen in
+  this module's options, at its US-layout position (on other layouts a letter may sit elsewhere);
+  Custom Hotkeys leaves an action unbound when that key is already taken.
+
+  | Action | Context | Suggested | Does |
+  |---|---|---|---|
+  | `ext.map-editor-improvements.grid-toggle` | map editor | Alt + the grid key (G) | shows or hides the grid |
+  | `ext.map-editor-improvements.grid-toggle-game` | games, while the grid may show there | Alt + the grid key (G) | the same in games |
+  | `ext.map-editor-improvements.pipette` | map editor (does nothing in the build menu) | the pipette key (P), if on | chooses the pipette, then its next kind |
+  | `ext.map-editor-improvements.undo` / `.redo` | map editor | none (the buttons have no key) | a click on the undo or redo button |
+
+  Without that API, or when it refuses the grid's editor action or the pipette action, the
+  module's own key handling stays: the grid through the WM_SYSKEYDOWN arm of the window
+  procedure (Alt + G sits on that table's do-nothing case in both executables), in the editor
+  and in games; the pipette key through its key poll. The API registers the grid's two actions
+  one at a time; should it take the editor one and refuse the game one, the grid toggles in the
+  editor only, and the log says so.
+  Custom Hotkeys also offers unassigned hold actions for sampling another tile, painting any
+  tile and reversing Equalize. The module's configured keys still work. The game handles Alt + E
+  for land animals and Alt + comma for opening and closing Map Settings.
+  Leaving the map puts the grid away: `requestScreenChange` is redirected after
+  the pending screen is stored, past every byte Resolution Based Zoom's pattern on that function
+  reads.
 * Every address is found by pattern scan or read out of the instruction that uses it, and
   checked against the bytes the module expects. Verified offline against both exes.
+
+## Vanilla and Recommended
+
+Every option of the module is off by default, so the module alone leaves the editor as the game
+has it. Two plugins in this repository form the Map Editor Improvements family in the launcher:
+`map-editor-improvements-recommended` (offered first) switches on the recommended settings,
+`map-editor-improvements-vanilla` keeps everything off. Plugins that build on the module set the
+options they need themselves.
+
+## Credits
+
+Map Editor Improvements is by Monsterfish (GitHub: Monsterfisch) and Heroesflorian. The resource
+grid is Monsterfish's Resource Grid Overlay. Krarilotus proposed merging it into this module, and
+Heroesflorian, co-author of this module, agreed. See `module/CREDITS.md`.

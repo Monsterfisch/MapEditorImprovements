@@ -1,0 +1,253 @@
+meta:
+  version: 1.0.0
+config-sparse:
+  modules:
+    map-editor-improvements:
+      config:
+        counts:
+          enabled:
+            contents:
+              suggested-value: true
+          shown:
+            contents:
+              suggested-value: true
+        trees:
+          growth_from_brush:
+            contents:
+              suggested-value: true
+          apple:
+            contents:
+              suggested-value: true
+          shrubs:
+            contents:
+              suggested-value: true
+          felled:
+            contents:
+              suggested-value: true
+          no_shrub_stacking:
+            contents:
+              suggested-value: true
+          preview:
+            contents:
+              suggested-value: true
+          random_mix:
+            contents:
+              suggested-value: true
+          obstacles:
+            contents:
+              suggested-value: true
+          rocks_and_water:
+            contents:
+              suggested-value: true
+          spread_order:
+            contents:
+              suggested-value: true
+          spread_outlines:
+            contents:
+              suggested-value: true
+        textures:
+          gravel_and_iron:
+            contents:
+              suggested-value: true
+          mask:
+            contents:
+              suggested-value: true
+          mask_by_type:
+            contents:
+              suggested-value: true
+          no_heights_iron:
+            contents:
+              suggested-value: true
+        water:
+          decorations:
+            contents:
+              suggested-value: true
+          foam_on_sea:
+            contents:
+              suggested-value: true
+        rocks:
+          signpost:
+            contents:
+              suggested-value: true
+          random_preview:
+            contents:
+              suggested-value: true
+          variants:
+            contents:
+              suggested-value: true
+          invisible:
+            contents:
+              suggested-value: true
+          erase_invisible:
+            contents:
+              suggested-value: true
+          remove_lost:
+            contents:
+              suggested-value: true
+        heights:
+          max_height:
+            contents:
+              suggested-value: true
+          tool_options:
+            contents:
+              suggested-value: true
+          invert_key_on:
+            contents:
+              suggested-value: true
+        castle:
+          building_counts:
+            contents:
+              suggested-value: true
+          tower_ruins:
+            contents:
+              suggested-value: true
+          tunnel_and_tents:
+            contents:
+              suggested-value: true
+          statues_and_shrines:
+            contents:
+              suggested-value: true
+          barrier:
+            contents:
+              suggested-value: true
+          several_keeps:
+            contents:
+              suggested-value: true
+          several_storage_and_recruitment:
+            contents:
+              suggested-value: true
+          tower_engines_anywhere:
+            contents:
+              suggested-value: true
+          keep_parts:
+            contents:
+              suggested-value: true
+          all_players:
+            contents:
+              suggested-value: true
+          player_zero:
+            contents:
+              suggested-value: true
+          keep_ground:
+            contents:
+              suggested-value: true
+          rotation:
+            contents:
+              suggested-value: true
+          unit_colour:
+            contents:
+              suggested-value: true
+          keep_crests:
+            contents:
+              suggested-value: true
+          wall_tools:
+            contents:
+              suggested-value: true
+          all_keeps:
+            contents:
+              suggested-value: true
+          damaged_walls:
+            contents:
+              suggested-value: true
+          variant_panels:
+            contents:
+              suggested-value: true
+          ruined_cathedral:
+            contents:
+              suggested-value: true
+          moat_kinds:
+            contents:
+              suggested-value: true
+          moat_on_marsh:
+            contents:
+              suggested-value: true
+          moat_removal_keeps_ground:
+            contents:
+              suggested-value: true
+        herds:
+          panel:
+            contents:
+              suggested-value: true
+          bird_bins:
+            contents:
+              suggested-value: true
+          animal_bin:
+            contents:
+              suggested-value: true
+          group_warning:
+            contents:
+              suggested-value: true
+        brushes:
+          full_shape:
+            contents:
+              suggested-value: true
+        undo:
+          enabled:
+            contents:
+              suggested-value: true
+        pipette:
+          enabled:
+            contents:
+              suggested-value: true
+          select_key_on:
+            contents:
+              suggested-value: true
+          read_key_on:
+            contents:
+              suggested-value: true
+          any_tile_key_on:
+            contents:
+              suggested-value: true
+        eraser:
+          choice:
+            contents:
+              suggested-value: true
+          seagulls:
+            contents:
+              suggested-value: true
+        map_settings:
+          show_locked:
+            contents:
+              suggested-value: true
+          menu:
+            contents:
+              suggested-value: true
+          size_refresh:
+            contents:
+              suggested-value: true
+          camera_edge:
+            contents:
+              suggested-value: true
+        menu:
+          always_update:
+            contents:
+              suggested-value: true
+          compass:
+            contents:
+              suggested-value: true
+          compass_turn:
+            contents:
+              suggested-value: true
+          dust_clouds:
+            contents:
+              suggested-value: true
+        grid:
+          enabled:
+            contents:
+              suggested-value: true
+          outside_editor:
+            contents:
+              suggested-value: true
+          flattened_only:
+            contents:
+              suggested-value: true
+          hide_in_v_view:
+            contents:
+              suggested-value: true
+          rotation_lines:
+            contents:
+              suggested-value: true
+          mine_boxes:
+            contents:
+              suggested-value: true
+  plugins: {}

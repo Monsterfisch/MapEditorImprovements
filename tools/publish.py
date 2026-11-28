@@ -81,12 +81,6 @@ def bump():
     text = re.sub(r'^(\s+version:\s*)\S+', r'\g<1>' + new, text, count=1, flags=re.M)
     with open(path, 'w', encoding='utf-8', newline='\n') as f:
         f.write(text)
-    description = os.path.join(MODULE, 'locale', 'description-en.md')
-    with open(description, encoding='utf-8') as f:
-        text = f.read()
-    text = re.sub(r'^\*\*Version\*\*: \S+', '**Version**: ' + new, text, count=1, flags=re.M)
-    with open(description, 'w', encoding='utf-8', newline='\n') as f:
-        f.write(text)
     print('%s -> %s' % (current, new))
     return new
 

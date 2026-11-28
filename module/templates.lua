@@ -368,7 +368,9 @@ jmp BACK
 -- next rock gets another rotation (0, 2, 4 or 6, never the same twice in a row).
 templates.rockTurn = [[
 mov eax,[esi+ROTATION]
-cmp dword [esi+ROTATION+4],TURN_MODE
+cmp dword [GAME_MODE],MAP_EDITOR
+jne rock_turn_done
+cmp dword [esi+MODE],TURN_MODE
 jne rock_turn_done
 push eax
 push ecx
@@ -950,22 +952,6 @@ mov dword [FLAG],VALUE
 jmp ACTION
 ]]
 
--- placeKeep, before a later part of the keep (lua appends the replaced instructions): in the map
--- The same frame spot when templates.frameHook is not there: outside the map editor the
--- building orientation goes back to the game's own (the AI's building placement reads it too).
-templates.rotationFrame = [[
-cmp dword [GAME_MODE],MAP_EDITOR
-je rotation_frame_done
-cmp dword [ROTATION_ON],0
-je rotation_frame_done
-push eax
-mov eax,[ROTATION_DEFAULT]
-mov [ORIENTATION],eax
-pop eax
-rotation_frame_done:
-mov ecx,[OPERAND]
-jmp BACK
-]]
 
 -- The right-click ring's compass, replacing `mov REG,[NEXT]` before setMapRotation(NEXT): with
 -- Ctrl held the map turns the other way (2 * CURRENT - NEXT, orientations 0, 2, 4, 6).
@@ -1079,19 +1065,15 @@ edge_low_ok:
 jmp BACK
 ]]
 
--- TriggerPlaceBuilding's default orientation, replacing `mov eax,[ORIENTATION]`: in the map
--- editor with the rotation list on, the orientation the list asks for (logged by PAD).
+-- TriggerPlaceBuilding's orientation read. An override belongs to the tool that supplied it.
 templates.rotationRead = [[
 cmp dword [GAME_MODE],MAP_EDITOR
 jne rotation_plain
-cmp dword [ROTATION_ON],0
-je rotation_plain
 cmp dword [WANTED],0xFFFFFFFF
 je rotation_plain
 mov eax,[TOOL]
 cmp eax,[WANTED_TOOL]
 jne rotation_plain
-call PAD
 mov eax,[WANTED]
 jmp BACK
 rotation_plain:
@@ -1099,23 +1081,80 @@ mov eax,[ORIENTATION]
 jmp BACK
 ]]
 
--- The cursor preview (setConstructionGFXLayerBasedOnPlacementChecks, thiscall, 4 arguments)
--- reads the keep layout tables (doors / campfire / stockpile, per keep type and orientation)
--- always at orientation 0. In the map editor with a turn chosen (ROTATION: orientation / 2), the
--- chosen orientation's rows are swapped into the first slot for the call and swapped back after.
+-- The cursor's orientation reset, between the comparison and the branch using its flags.
+templates.previewRotationReset = [[
+pushfd
+push eax
+mov eax,ebx
+cmp dword [GAME_MODE],MAP_EDITOR
+jne preview_rotation_store
+mov eax,[TOOL]
+cmp eax,[WANTED_TOOL]
+jne preview_rotation_plain
+mov eax,[WANTED]
+cmp eax,6
+ja preview_rotation_plain
+shr eax,1
+jmp preview_rotation_store
+preview_rotation_plain:
+mov eax,ebx
+preview_rotation_store:
+mov [ROTATION],eax
+pop eax
+popfd
+jmp BACK
+]]
+
+-- The validator and cursor renderer both read keep parts from row zero.
 templates.keepPreviewTurn = [[
 cmp dword [GAME_MODE],MAP_EDITOR
 jne preview_plain
 cmp dword [ROTATION],0
 je preview_plain
+cmp dword [ROTATION],3
+ja preview_plain
+cmp word [esp+ARG_BYTES-4],0x3C
+jb preview_plain
+cmp word [esp+ARG_BYTES-4],0x3E
+ja preview_plain
+; The rejected preview can read raw row indices even for tiles outside the map.
+if ARG_BYTES = 16
+  cmp dword [ecx+0x554934],0
+  je preview_turn
+  push eax
+  push edx
+  movzx eax,word [esp+20]
+  sub eax,0x3C
+  shl eax,2
+  add eax,[ROTATION]
+  shl eax,4
+  add eax,KEEP_BOUNDS
+  mov edx,[esp+12]
+  cmp edx,[eax]
+  jl preview_outside
+  cmp edx,[eax+4]
+  jg preview_outside
+  mov edx,[esp+16]
+  cmp edx,[eax+8]
+  jl preview_outside
+  cmp edx,[eax+12]
+  jg preview_outside
+  pop edx
+  pop eax
+end if
+preview_turn:
 call preview_swap
-push dword [esp+0x10]
-push dword [esp+0x10]
-push dword [esp+0x10]
-push dword [esp+0x10]
+repeat ARG_BYTES/4
+  push dword [esp+ARG_BYTES]
+end repeat
 call PREVIEW
 call preview_swap
-ret 0x10
+ret ARG_BYTES
+if ARG_BYTES = 16
+preview_outside:
+  pop edx
+  pop eax
+end if
 preview_plain:
 jmp PREVIEW
 preview_swap:
@@ -1176,6 +1215,50 @@ cmp ebp,KEEP_ROWS
 jb preview_type
 popad
 ret
+]]
+
+-- Translate the native footprint iterator's offsets by the change in the part's origin.
+templates.rotatedPreviewPart = [[
+cmp dword [GAME_MODE],MAP_EDITOR
+jne part_plain
+cmp dword [ROTATION],0
+je part_plain
+cmp dword [ROTATION],3
+ja part_plain
+push dword [esp+8]
+push dword [esp+8]
+call WALK
+push eax
+push edx
+imul ecx,[ROTATION],ROW_SIZE
+mov eax,[ecx+PART]
+sub eax,[PART]
+add eax,[esi+TILE_X]
+mov edx,[ecx+PART+4]
+sub edx,[PART+4]
+add edx,[esi+TILE_Y]
+mov ecx,Y_ORIGIN
+add ecx,edx
+cmp ecx,MAP_SIZE
+jae part_skip
+imul ecx,MAP_SIZE
+add ecx,X_ORIGIN
+add ecx,eax
+mov [esi+TILE_X],eax
+mov [esi+TILE_Y],edx
+add eax,X_ORIGIN
+cmp eax,MAP_SIZE
+jae part_skip
+cmp byte [VALID+ecx],0
+jne part_done
+part_skip:
+mov dword [esp+8],SKIP
+part_done:
+pop edx
+pop eax
+ret 8
+part_plain:
+jmp WALK
 ]]
 
 -- placeKeep's ground painter (thiscall, 6 arguments): in the map editor the ground stays as it is.
@@ -2315,19 +2398,13 @@ mov eax,1
 ret
 ]]
 
--- After the map is drawn (the instruction after renderMap's call and the floater pass: `mov
--- ecx,[OPERAND]`), every frame on the game screen: in the map editor the tree preview while a
--- plant tool is chosen (PLANTS: a byte per tool); outside it the height tool settings go back to
--- their defaults.
+-- After the map is drawn (called from the map drawing's patch site, editor/frame.lua), every
+-- frame on the game screen: in the map editor the tree preview while a plant tool is chosen
+-- (PLANTS: a byte per tool); outside it the height tool settings go back to their defaults.
 templates.frameHook = [[
 pushad
 cmp dword [GAME_MODE],MAP_EDITOR
 je frame_editor
-cmp dword [ROTATION_ON],0
-je frame_rotation_kept
-mov eax,[ROTATION_DEFAULT]
-mov [ORIENTATION],eax
-frame_rotation_kept:
 mov dword [RANGE_MIN],DEFAULT_MIN
 mov dword [RANGE_MAX],DEFAULT_MAX
 mov dword [SNAP],1
@@ -2361,11 +2438,12 @@ cmp eax,PLANT_TOOLS
 jae frame_done
 cmp byte [PLANTS+eax],0
 je frame_done
+cmp dword [MENU_RENDER],RENDER_NONE
+jne frame_done
 call PAD
 frame_done:
 popad
-mov ecx,[OPERAND]
-jmp BACK
+ret
 ]]
 
 -- Every-frame item of the heights menu: PAD while COUNT is not 0 (a whole rock to move) or the

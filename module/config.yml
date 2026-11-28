@@ -1,0 +1,52 @@
+meta:
+  version: 1.0.0
+config-sparse:
+  modules:
+    map-editor-improvements:
+      config:
+        counts:
+          shown:
+            contents:
+              suggested-value: false
+        textures:
+          no_heights_iron:
+            contents:
+              suggested-value: false
+        heights:
+          invert_key_on:
+            contents:
+              suggested-value: false
+          invert_key:
+            contents:
+              suggested-value: ctrl
+        pipette:
+          select_key_on:
+            contents:
+              suggested-value: false
+          select_key:
+            contents:
+              suggested-value: letter_p
+          read_key_on:
+            contents:
+              suggested-value: false
+          read_key:
+            contents:
+              suggested-value: ctrl
+          any_tile_key_on:
+            contents:
+              suggested-value: false
+          any_tile_key:
+            contents:
+              suggested-value: alt
+        grid:
+          rotation_colour:
+            contents:
+              suggested-value: cyan
+          mine_colour:
+            contents:
+              suggested-value: red
+          mine_size:
+            contents:
+              suggested-value: 4
+  plugins: {}
+  load-order: []

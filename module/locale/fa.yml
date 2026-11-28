@@ -1,0 +1,293 @@
+counts_group: شمارنده‌های نقشه
+counts_group_descr: نشان می‌دهد نقشه چقدر به سقف شمار اشیا نزدیک است.
+counts_enabled: شمارش اشیای نقشه
+counts_enabled_tooltip: روی i قرمز بالای دکمهٔ دارای نماد کلید کلیک کنید، سپس نشانگر را روی «حیوانات»، «پوشش گیاهی»، «صخره‌ها» یا یکی از گزینه‌های این منوها ببرید.
+trees_group: درختان و بوته‌ها
+trees_group_descr: قرار دادن و مرتب‌سازی پوشش گیاهی در حالت چشم‌انداز.
+trees_growth: اندازهٔ قلم‌مو رشد درخت را تعیین کند
+trees_growth_tooltip: در «پوشش گیاهی» درخت و اندازهٔ قلم‌مو را انتخاب کنید. اندازهٔ 4 درخت بالغ و اندازه‌های 6 و 7 درخت خشک می‌کارند.
+trees_apple: درخت سیب در پوشش گیاهی
+trees_apple_tooltip: پیش از کاشتن، درخت سیب را در پوشش گیاهی انتخاب کنید.
+trees_shrubs: رنگ بوته‌ها
+trees_shrubs_tooltip: یک بوته در پوشش گیاهی انتخاب کنید و سپس رنگی از ردیف بالای منو برگزینید.
+trees_felled: گونه‌های درخت افتاده
+trees_felled_tooltip: درختی در پوشش گیاهی انتخاب کرده و گونهٔ افتاده را بر اساس تعداد تنه از ردیف بالای منو برگزینید.
+trees_random_mix: ترکیب تصادفی پوشش گیاهی
+trees_random_mix_tooltip: برای ترکیب گونه‌ها روی ? در ردیف بوته یا درخت کلیک کنید. برای توقف دوباره کلیک کنید یا گونهٔ دیگری برگزینید.
+trees_obstacles: درخت در کنار موانع
+trees_obstacles_tooltip: کادر بالایی سمت راست پوشش گیاهی را تیک بزنید تا کنار موانع درخت بکارید.
+trees_rocks_and_water: پوشش گیاهی روی صخره و آب
+trees_rocks_and_water_tooltip: کادر پایینی سمت راست پوشش گیاهی را تیک بزنید تا روی صخره و آب بکارید.
+trees_preview: پیش‌نمایش پوشش گیاهی زیر نشانگر
+trees_preview_tooltip: در بزرگ‌نمایی عادی، نشانگر را روی نقشه ببرید تا پیش‌نمایش درخت یا بوتهٔ انتخابی را ببینید.
+trees_no_stacking: جلوگیری از روی‌هم‌گذاری پوشش گیاهی
+trees_no_stacking_tooltip: از انباشته شدن گیاهان روی یک کاشی جلوگیری می‌کند و انباشته‌های قدیمی را با پاک‌کن پاک می‌کند.
+textures_group: بافت‌های زمین
+textures_group_descr: نحوهٔ رنگ‌آمیزی بافت زمین توسط قلم‌موی چشم‌انداز را تعیین می‌کند.
+textures_gravel_and_iron: سنگریزه و آهن در بافت‌ها
+textures_gravel_and_iron_tooltip: سنگریزه یا آهن را در بافت‌ها انتخاب کرده و روی نقشه بکشید.
+textures_mask: رنگ‌آمیزی فقط روی بافت آغازین
+textures_mask_tooltip: روی مربع نیمه‌پر در بالا سمت چپ کلیک کنید و هر حرکت را روی بافتی که می‌خواهید عوض شود آغاز کنید.
+textures_mask_by_type: یکی دانستن گونه‌های آب در بافت
+textures_mask_by_type_tooltip: با روشن بودن ماسک، روی گونه‌های مختلف بافت آغازین دریا، رود یا گذرگاه آب می‌کشد.
+water_group: آب
+water_group_descr: افزودن جزئیات رودخانه در حالت چشم‌انداز.
+water_decorations: کف و موج کوچک در آب
+water_decorations_tooltip: کف یا موج کوچک را در منوی آب انتخاب کرده و روی کاشی‌های رودخانه بکشید.
+water_foam_on_sea: تبدیل کاشی‌های دریا به رود کف‌آلود
+water_foam_on_sea_tooltip: کف را از منوی آب روی کاشی‌های دریا بکشید تا به رود تبدیل شوند.
+rocks_group: صخره‌ها
+rocks_group_descr: قرار دادن، چرخاندن و حذف صخره‌ها در حالت چشم‌انداز.
+rocks_signpost: تابلوی راهنما در نقشه‌های نبرد آزاد
+rocks_signpost_tooltip: در نقشهٔ نبرد آزاد، صخره‌ها را باز کرده و تابلوی راهنما را انتخاب کنید.
+rocks_random_preview: زاویهٔ تصادفی صخره در هر جاگذاری
+rocks_random_preview_tooltip: در چشم‌انداز > صخره‌ها، اندازه‌ای برگزینید و روی چرخش تصادفی کلیک کنید. پیش‌نمایش پس از هر تلاش زاویهٔ دیگری برمی‌گزیند.
+rocks_variants: انتخاب گونهٔ صخره
+rocks_variants_tooltip: اندازهٔ صخره را انتخاب کرده و روی یک گونه بالای صخره‌ها کلیک کنید. کوچک‌ترین اندازه به‌طور پیش‌فرض صخرهٔ پنجم دارد.
+rocks_invisible: قرار دادن صخره‌های نامرئی
+rocks_invisible_tooltip: پیش از جاگذاری، کادر سمت راست صخره‌ها را تیک بزنید. صخره‌های نامرئی مانع عبور و ساخت‌وساز می‌شوند.
+rocks_erase_invisible: پاک کردن صخره‌های نامرئی
+rocks_erase_invisible_tooltip: از پاک‌کن چشم‌انداز برای پاک‌سازی کاشی‌های مسدودشده با صخرهٔ نامرئی استفاده کنید.
+rocks_remove_lost: پاک‌سازی رکوردهای صخره‌های گمشده
+rocks_remove_lost_tooltip: روی «Remove lost rocks» در پایین راست صخره‌ها کلیک کنید تا بدون تغییر کاشی‌ها ظرفیت آزاد شود.
+heights_group: ارتفاعات
+heights_group_descr: شکل‌دهی به پستی‌وبلندی زمین در حالت چشم‌انداز.
+heights_max_height: بیشینهٔ ارتفاع در ارتفاعات
+heights_max_height_tooltip: «Max Height» کنار کمینهٔ ارتفاع را انتخاب کنید تا زمین زیر قلم‌مو به بیشترین ارتفاع برسد.
+heights_tool_options: کنترل‌های قلم‌موی ارتفاع
+heights_tool_options_tooltip: یک ابزار ارتفاعات برگزینید تا بازه، قدرت، محافظت زمین و برخورد با صخره‌ها را بالای منو تنظیم کنید.
+heights_invert_key: نگه‌داشتن برای وارونه کردن هموارسازی
+heights_invert_key_tooltip: با انتخاب هموارسازی، این کلید را نگه دارید تا زمین ناهموار شود و برای هموارسازی دوباره رهایش کنید.
+castle_building_counts: شمارش ساختمان‌ها بالای نقشهٔ کوچک
+castle_building_counts_tooltip: شمار ساختمان‌ها را بالای نقشهٔ کوچک در حالت قلعه ببینید. متن شناور به‌طور پیش‌فرض کنار می‌رود.
+castle_tower_ruins: ویرانه‌های برج‌ها
+castle_tower_ruins_tooltip: یک ویرانه را از ردیف گونه‌ها بالای برج‌ها برگزینید.
+castle_tunnel_and_tents: ورودی تونل و چادرهای محاصره
+castle_tunnel_and_tents_tooltip: صنف تونل‌کن‌ها یا صنف مهندسان را انتخاب کرده و ورودی یا چادر را بالای منو برگزینید.
+castle_statues: تندیس و زیارتگاه‌های بیشتر
+castle_statues_tooltip: تندیس یا زیارتگاهی انتخاب کرده و گونه‌اش را بالای منو برگزینید یا موارد اضافی را در چیزهای خوب بیابید.
+castle_barrier: مانع در ویرانه‌ها
+castle_barrier_tooltip: مانع را در پایین راست بخش ویرانه‌ها بیابید.
+castle_several_keeps: چند دژ مرکزی برای هر بازیکن
+castle_several_keeps_tooltip: دژهای اضافی را مثل معمول قرار دهید. با فعال بودن نشان‌های دژ، برای انتخاب دژ فعال روی یک نشان کلیک کنید.
+castle_several_storage: چند ساختمان انبار و سربازگیری
+castle_several_storage_tooltip: ساختمان‌های انبار و سربازگیری اضافی را مثل معمول بگذارید. انبارهای جداگانه ممکن است دسترسی منابع اطراف را تغییر دهند.
+castle_tower_engines: قرار دادن ادوات برجی روی کاشی‌های قابل عبور
+castle_tower_engines_tooltip: یک وسیلهٔ برجی را از ساختمان‌های نظامی انتخاب کرده و روی کاشی قابل عبور بگذارید.
+castle_keep_parts: قرار دادن بخش‌هایی از دژ مرکزی
+castle_keep_parts_tooltip: یک دژ را انتخاب کرده و در ردیف بالای دژها گزینهٔ «Keep only» یا «No stockpile» را برگزینید.
+castle_damaged_walls: قرار دادن دیوار یا پلهٔ آسیب‌دیده
+castle_damaged_walls_tooltip: دیوار یا پله را انتخاب کرده و پیش از جاگذاری روی «Damaged» بالای منوی ساختمان کلیک کنید.
+castle_variant_panels: انتخاب گونهٔ ساختمان
+castle_variant_panels_tooltip: ساختمان پشتیبانی‌شده را انتخاب کرده و روی یک گونه در ردیف بالای منوی ساختمان کلیک کنید.
+castle_ruined_cathedral: قرار دادن کلیسای جامع با ظاهر ویرانه
+castle_ruined_cathedral_tooltip: گونهٔ ویرانه را بالای منوی ساختمان برگزینید؛ عملکردش مانند کلیسای جامع عادی است.
+castle_moat_kinds: انتخاب نوع خندق
+castle_moat_kinds_tooltip: خندق را در دروازه‌ها انتخاب کرده و بالای منو گزینهٔ «Dug»، «Planned» یا «Permanent» را برگزینید.
+castle_moat_on_marsh: اجازهٔ خندق روی باتلاق
+castle_moat_on_marsh_tooltip: خندق را روی باتلاق بگذارید. پر کردن خندق باتلاق زیر آن را برمی‌گرداند.
+castle_moat_removal_keeps_ground: حفظ زمین هنگام حذف خندق
+castle_moat_removal_keeps_ground_tooltip: حذف خندق زمین اصلی زیر آن را بازمی‌گرداند.
+herds_group: گله‌ها
+herds_group_descr: مدیریت گله‌ها و پرندگان در حالت چشم‌انداز.
+herds_panel: اندازه و رفتار گله
+herds_panel_tooltip: حیوان گله‌ای را انتخاب کرده و اندازه و رفتارش را در پنل بالای حیوانات تنظیم کنید.
+brushes_group: قلم‌موها
+brushes_group_descr: نحوهٔ پوشش کاشی‌ها توسط قلم‌موی ویرایشگر را تغییر می‌دهد.
+brushes_full_shape: اصلاح شکل قلم‌مو
+brushes_full_shape_tooltip: کل پیش‌نمایش قلم‌مو را پر می‌کند بی‌آنکه ابزار در مرکز دو بار اعمال شود.
+undo_group: واگرد و از نو
+undo_group_descr: بازگشت و پیش‌روی میان ویرایش‌های اخیر.
+undo_enabled: واگرد و از نو
+undo_enabled_tooltip: با پیکان‌های بالا سمت چپ تا 20 ویرایش را واگردانی یا دوباره اعمال کنید. میانبرهای این دو عمل را می‌توانید در «گزینه‌ها > میانبرهای سفارشی» تعیین کنید.
+pipette_group: قطره‌چکان
+pipette_group_descr: نمونه‌برداری از یک کاشی و استفادهٔ دوباره از محتوای آن روی نقشه.
+pipette_enabled: کپی کردن زمین یا اشیا با قطره‌چکان
+pipette_enabled_tooltip: روی قطره‌چکان بالای اندازهٔ قلم‌مو کلیک کرده، ارتفاعات، بافت‌ها، اشیا یا همه را برگزینید، سپس روی کاشی مبدأ کلیک کرده و بکشید.
+pipette_select_key: میانبر قطره‌چکان
+pipette_select_key_tooltip: فشردن دوبارهٔ این کلید حالت‌ها را عوض می‌کند؛ یا قطره‌چکان را در «گزینه‌ها > میانبرهای سفارشی» تنظیم کنید.
+pipette_read_key: نگه‌داشتن برای نمونه‌برداری از کاشی دیگر
+pipette_read_key_tooltip: هنگام کلیک روی کاشی مبدأ جدید با قطره‌چکان، این کلید را نگه دارید.
+key_letter_a: A
+key_letter_b: B
+key_letter_c: C
+key_letter_d: D
+key_letter_e: E
+key_letter_f: F
+key_letter_g: G
+key_letter_h: H
+key_letter_i: I
+key_letter_j: J
+key_letter_k: K
+key_letter_l: L
+key_letter_m: M
+key_letter_n: N
+key_letter_o: O
+key_letter_p: P
+key_letter_q: Q
+key_letter_r: R
+key_letter_s: S
+key_letter_t: T
+key_letter_u: U
+key_letter_v: V
+key_letter_w: W
+key_letter_x: X
+key_letter_y: Y
+key_letter_z: Z
+key_digit_0: "0"
+key_digit_1: "1"
+key_digit_2: "2"
+key_digit_3: "3"
+key_digit_4: "4"
+key_digit_5: "5"
+key_digit_6: "6"
+key_digit_7: "7"
+key_digit_8: "8"
+key_digit_9: "9"
+key_f1: F1
+key_f2: F2
+key_f3: F3
+key_f4: F4
+key_f5: F5
+key_f6: F6
+key_f7: F7
+key_f8: F8
+key_f9: F9
+key_f10: F10
+key_f11: F11
+key_f12: F12
+key_ctrl: Ctrl
+key_shift: Shift
+key_alt: Alt
+key_space: فاصله (Space)
+key_tab: Tab
+menu_group: رفتار ویرایشگر
+menu_group_descr: نمایش و بازترسیم ویرایشگر را کنترل می‌کند.
+menu_compass: نمایش جهت شمال در ویرایشگر
+menu_compass_tooltip: شمال را از قطب‌نمای ثابت بالا سمت چپ (در صورت فعال بودن واگرد و از نو، زیر آن‌ها) بخوانید.
+menu_compass_turn: Ctrl جهت چرخش نقشه را برعکس کند
+menu_compass_turn_tooltip: حلقهٔ کلیک راست را باز کرده و هنگام رفتن روی قطب‌نمای آن، Ctrl را نگه دارید تا پادساعتگرد بچرخد.
+menu_dust_clouds: جلوگیری از کرش ابرهای گردوغبار
+menu_dust_clouds_tooltip: هنگام ویرایش نقشه از کرش‌های ناشی از ابرهای گردوغبار جلوگیری می‌کند.
+menu_always_update: به‌روزرسانی پیوستهٔ پنل ویرایشگر هنگام کار
+menu_always_update_tooltip: هنگام قرار داشتن نشانگر روی نقشه، کنترل‌های ویرایشگر را به‌روز نگه می‌دارد.
+castle_all_players: نمایش سپر هر هشت بازیکن
+castle_all_players_tooltip: در حالت قلعه هر یک از هشت سپر کنار نقشهٔ کوچک را انتخاب کنید.
+castle_all_keeps: عمارت و دژ مستحکم در همهٔ نقشه‌ها
+castle_all_keeps_tooltip: در هر نوع نقشه، عمارت یا دژ مستحکم را از بخش دژها انتخاب کنید.
+castle_player_zero: نمایش سپر بازیکن خنثی
+castle_player_zero_tooltip: برای قرار دادن اشیای بازیکن 0، روی نهمین سپر سفید کنار نقشهٔ کوچک کلیک کنید.
+castle_keep_ground: حفظ زمین هنگام قرار دادن دژ مرکزی
+castle_keep_ground_tooltip: دژها را بدون هموار کردن زمین زیرشان قرار می‌دهد.
+castle_rotation: فهرست چرخش ساختمان‌ها
+castle_rotation_tooltip: در حالت قلعه، دقیقاً بالای منوی پایین سمت چپ روی «Rotation» کلیک کرده و پیش از قرار دادن ساختمان پشتیبانی‌شده، زاویه‌ای برگزینید.
+castle_unit_colour: انتخاب رنگ واحد جدا از مالکیت
+castle_unit_colour_tooltip: برای تغییر ظاهر واحد، نشانی بالای منوی واحدهای اروپایی یا عرب برگزینید.
+castle_keep_crests: انتخاب دژ فعال از روی نشان آن
+castle_keep_crests_tooltip: با فعال بودن چند دژ، برای انتخاب یا لغو دژ فعال روی یک نشان کلیک کنید. راهنمای شناور به‌طور پیش‌فرض روشن است.
+castle_wall_tools: ارتفاع دیوارها و کنگره‌های مستقل
+castle_wall_tools_tooltip: دیوار یا پله را انتخاب کرده و از کنترل‌های بالای منو استفاده کنید. برای بازگردانی تنظیمات روی «Reset» کنارش بزنید.
+trees_spread_order: گروه‌بندی درختان بر پایهٔ زمین گسترش
+trees_spread_order_tooltip: درختان را در پوشش گیاهی بر اساس زمینی که در آن می‌رویند گروه‌بندی می‌کند. بوته‌ها به‌طور پیش‌فرض ردیف جدا دارند.
+trees_spread_outlines: نشانه‌گذاری زمین گسترش درختان
+trees_spread_outlines_tooltip: در پوشش گیاهی، سبز نشانهٔ درختان زمین حاصل‌خیز و بژ نشانهٔ درختان زمین غیرحاصل‌خیز است.
+herds_bird_bins: حذف همهٔ کلاغ‌ها یا مرغ‌های دریایی
+herds_bird_bins_tooltip: در حیوانات، روی سطل زباله کنار نماد کلاغ یا مرغ دریایی کلیک کنید تا آن نوع پرنده حذف شود.
+herds_group_warning: هشدار در نزدیکی سقف گله‌ها
+herds_group_warning_tooltip: هنگام نزدیک شدن گله‌ها و گروه‌های نیرو به سقف نقشه، جایگاه‌های باقی‌مانده را نشان می‌دهد.
+eraser_choice: انتخاب موارد قابل حذف با پاک‌کن
+eraser_choice_tooltip: پاک‌کن را انتخاب کرده و سپس بالای منو همه، حیوانات، واحدها، ساختمان‌ها، پوشش گیاهی یا صخره‌ها را برگزینید.
+eraser_seagulls: پاک کردن مرغ‌های دریایی در حال پرواز
+eraser_seagulls_tooltip: برای حذف مرغ‌های دریایی در حال پرواز از پاک‌کن استفاده کنید. در صورت فعال بودن حالت‌های پاک‌کن، حیوانات یا همه را برگزینید.
+map_settings_show_locked: نمایش نقشه‌های قفل‌شده در بارگذاری
+map_settings_show_locked_tooltip: در پنجرهٔ بارگذاری ویرایشگر، زیر فهرست فایل‌ها گزینهٔ «Show locked maps» را تیک بزنید.
+map_settings_menu: تنظیمات گستردهٔ نقشه
+map_settings_menu_tooltip: در ویرایشگر Alt+, را بزنید. لغزندهٔ «Map size» را بکشید و رها کنید تا اندازه اعمال شود. دکمهٔ «Map Settings» بالای «به نقشه» به‌طور پیش‌فرض فعال است.
+map_settings_size_refresh: اعمال فوری نقشه‌های کوچک‌تر
+map_settings_size_refresh_tooltip: اندازهٔ کوچک‌تر نقشه را هنگام ویرایش اعمال کرده و لبه‌های جدید را بی‌درنگ ببینید.
+map_settings_camera_edge: نمایش کامل لبهٔ نقشه
+map_settings_camera_edge_tooltip: دوربین را به لبه ببرید تا بیرونی‌ترین کاشی‌های نقشه دیده شوند.
+eraser_group: پاک‌کن
+eraser_group_descr: تعیین می‌کند پاک‌کن چشم‌انداز چه چیزهایی را پاک کند.
+map_settings_group: تنظیمات نقشه
+map_settings_group_descr: تغییر نوع نقشه، ابعاد و پرچم‌ها، یا مرور نقشه‌های قفل‌شده.
+qol: سهولت استفاده
+grid_group: شبکه منابع
+grid_key: میانبر پیشنهادی Alt برای شبکه
+grid_outside_editor: اجازهٔ نمایش شبکه هنگام بازی
+grid_flattened_only: نمایش شبکه فقط در نمای مسطح
+grid_hide_in_v_view: پنهان کردن شبکه در نمای V
+grid_colour: رنگ شبکه
+grid_rotation_group: جهت قلعه
+grid_rotation_lines: نمایش مرزهای چرخش دژ
+grid_mine_group: جای معدن آهن
+grid_mine_boxes: نمایش جای معدن آهن
+grid_key_letter_g: Alt + G
+grid_key_letter_a: Alt + A
+grid_key_letter_b: Alt + B
+grid_key_letter_f: Alt + F
+grid_key_letter_i: Alt + I
+grid_key_letter_j: Alt + J
+grid_key_letter_l: Alt + L
+grid_key_letter_m: Alt + M
+grid_key_letter_n: Alt + N
+grid_key_letter_o: Alt + O
+grid_key_letter_p: Alt + P
+grid_key_letter_s: Alt + S
+grid_key_letter_w: Alt + W
+grid_key_letter_y: Alt + Y
+grid_key_letter_z: Alt + Z
+grid_key_f1: Alt + F1
+grid_key_f2: Alt + F2
+grid_key_f3: Alt + F3
+grid_key_f4: Alt + F4
+grid_key_f5: Alt + F5
+grid_key_f6: Alt + F6
+grid_key_f7: Alt + F7
+grid_key_f8: Alt + F8
+grid_key_f9: Alt + F9
+grid_key_numpad_multiply: Alt + صفحه اعداد *
+grid_key_numpad_add: Alt + صفحه اعداد +
+grid_key_numpad_subtract: Alt + صفحه اعداد -
+grid_key_numpad_decimal: Alt + صفحه اعداد .
+grid_key_numpad_divide: Alt + صفحه اعداد /
+grid_key_insert: Alt + Insert
+grid_key_delete_key: Alt + Delete
+grid_key_home: Alt + Home
+grid_key_end_key: Alt + End
+grid_key_page_up: Alt + Page Up
+grid_key_page_down: Alt + Page Down
+grid_key_caps_lock: Alt + Caps Lock
+grid_colour_white: سفید
+grid_colour_yellow: زرد
+grid_colour_cyan: فیروزه‌ای
+grid_colour_green: سبز
+grid_colour_magenta: سرخابی
+grid_colour_orange: نارنجی
+grid_colour_red: قرمز
+grid_colour_black: سیاه
+map_editor: ویرایشگر نقشه
+grid_enabled: نمایش شبکهٔ منابع
+grid_enabled_tooltip: در ویرایشگر Alt+G را بزنید یا میانبر شبکه را در «گزینه‌ها > میانبرهای سفارشی» تغییر دهید.
+grid_group_descr: نمایش شبکهٔ منابع، مرزهای چرخش دژ یا جای پای معدن آهن.
+herds_animal_bin: افزودن دکمهٔ پاک کردن همهٔ حیوانات خشکی (Alt+E)
+key_configured: استفاده از کلید پیکربندی‌شده
+key_off: خاموش
+castle_buildings_group: ساختمان‌های قلعه
+castle_buildings_group_descr: قرار دادن ساختمان‌ها در حالت قلعه.
+keeps_group: دژها و انبارها
+keeps_group_descr: تنظیم دژها، انبارها و ساختمان‌های سربازگیری در حالت قلعه.
+players_group: بازیکنان
+players_group_descr: انتخاب بازیکنان، رنگ‌ها و نوع دژ در حالت قلعه.
+fortifications_group: دیوارها و خندق‌ها
+fortifications_group_descr: قرار دادن دیوارها، پله‌ها و خندق‌ها در حالت قلعه.
+tree_brush_group: کاشت و قلم‌مو
+tree_brush_group_descr: تنظیم شیوهٔ کاشت قلم‌موی پوشش گیاهی در حالت چشم‌انداز.
+tree_spread_group: گسترش درختان
+tree_spread_group_descr: منوی پوشش گیاهی نشان می‌دهد هر درخت روی چه زمینی گسترش می‌یابد.
+cat_terrain_water: زمین و آب
+cat_vegetation_animals: گیاهان و جانوران
+cat_castle_placement: جای‌گذاری قلعه
+cat_players_walls_moats: بازیکنان، دیوارها و خندق‌ها
+cat_painting_corrections: نقاشی و اصلاحات
+cat_map_layout: چیدمان و تنظیمات نقشه
